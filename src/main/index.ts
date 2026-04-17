@@ -6,6 +6,7 @@ import { fileService } from './file-service'
 import type { CommandResult } from '@/shared/types'
 
 let mainWindow: BrowserWindow | null
+const currentRepoPath = process.cwd();
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -74,4 +75,8 @@ ipcMain.handle('execute-git-command', async (_event, _repoPath, command): Promis
     success: true,
     output: `Command received: ${command}`,
   }
+})
+
+ipcMain.handle('get-current-repo-path', () => {
+  return currentRepoPath;
 })

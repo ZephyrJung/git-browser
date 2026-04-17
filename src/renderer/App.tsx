@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import type { FileNode, WorkMode, GitStatus } from '@/shared/types';
+import type { FileNode, WorkMode, AppSettings, GitStatus } from '@/shared/types';
 import TitleBar from './components/TitleBar';
 import FileTree from './components/FileTree';
 import CodeViewer from './components/CodeViewer';
@@ -11,21 +11,40 @@ const App: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);
   const [workMode, setWorkMode] = useState<WorkMode>('command');
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [gitStatus] = useState<GitStatus>({
+  const [settings, setSettings] = useState<AppSettings | null>(null);
+  const [gitStatus, setGitStatus] = useState<GitStatus>({
     branch: 'main',
     hasUncommittedChanges: false,
     files: {},
   });
+  const [repoPath, setRepoPath] = useState<string>('');
   const [sidebarWidth, setSidebarWidth] = useState(280);
   const isDragging = useRef(false);
 
   useEffect(() => {
+    const getRepoPath = async () => {
+      const path = await window.electron.getCurrentRepoPath();
+      setRepoPath(path);
+    };
+    getRepoPath();
+  }, []);
+
+  useEffect(() => {
     const loadSettings = async () => {
-      const settings = await window.electron.getSettings();
-      setWorkMode(settings.defaultMode);
+      const loaded = await window.electron.getSettings();
+      setSettings(loaded);
+      setWorkMode(loaded.defaultMode);
+      // Refresh git status after settings loaded
+      refreshGitStatus();
     };
     loadSettings();
   }, []);
+
+  const refreshGitStatus = async () => {
+    if (!repoPath) return;
+    const status = await window.electron.getGitStatus(repoPath);
+    setGitStatus(status);
+  };
 
   const startDrag = () => {
     isDragging.current = true;
@@ -55,6 +74,15 @@ const App: React.FC = () => {
     setSettingsOpen(!settingsOpen);
   };
 
+  const handleCloseSettings = async () => {
+    // Reload settings after dialog closed in case it was saved
+    const loaded = await window.electron.getSettings();
+    setSettings(loaded);
+    setWorkMode(loaded.defaultMode);
+    refreshGitStatus();
+    setSettingsOpen(false);
+  };
+
   return (
     <div
       className="flex flex-col h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
@@ -70,6 +98,8 @@ const App: React.FC = () => {
           <FileTree
             onFileSelect={handleFileSelect}
             gitStatus={gitStatus}
+            showHidden={settings?.showHiddenFiles ?? true}
+            repoPath={repoPath}
           />
         </div>
         <div
@@ -86,8 +116,8 @@ const App: React.FC = () => {
       ) : (
         <ButtonBar />
       )}
-      {settingsOpen && (
-        <SettingsDialog onClose={handleToggleSettings} />
+      {settingsOpen && settings && (
+        <SettingsDialog onClose={handleCloseSettings} />
       )}
     </div>
   );

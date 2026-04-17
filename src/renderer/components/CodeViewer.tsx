@@ -13,12 +13,17 @@ const CodeViewer: React.FC<CodeViewerProps> = ({ file, currentBranch }) => {
   const [recentFiles] = useState<string[]>([]); // TODO: 从状态管理获取
 
   useEffect(() => {
-    if (!file) {
-      setContent('');
-      return;
-    }
-    // TODO: 实际从主进程读取文件
-    setContent(`// ${file.path}\n// 内容将从文件系统读取\n\nfunction example() {\n  return 42;\n}`);
+    const loadContent = async () => {
+      if (!file) {
+        setContent('');
+        return;
+      }
+      const cwd = process.cwd();
+      const fullPath = `${cwd}/${file.path}`;
+      const content = await window.electron.readFile(fullPath);
+      setContent(content);
+    };
+    loadContent();
   }, [file]);
 
   const toggleRecent = () => {
@@ -30,8 +35,8 @@ const CodeViewer: React.FC<CodeViewerProps> = ({ file, currentBranch }) => {
       <div className="flex-1 flex flex-col bg-white dark:bg-gray-900">
         <div className="flex items-center h-10 px-4 border-b border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
           {currentBranch && (
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              [{currentBranch}]
+            <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+              {currentBranch}
             </span>
           )}
           <span className="ml-2 text-sm text-gray-400 dark:text-gray-500">

@@ -1,19 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { FileNode, GitStatus } from '@/shared/types';
 import { getStatusColorClass } from '../utils/statusColors';
 
 interface FileTreeProps {
   onFileSelect: (file: FileNode) => void;
   gitStatus: GitStatus;
+  showHidden: boolean;
+  repoPath: string;
 }
 
 type TabType = 'all' | 'staged' | 'favorites';
 
-const FileTree: React.FC<FileTreeProps> = ({ onFileSelect, gitStatus }) => {
+const FileTree: React.FC<FileTreeProps> = ({ onFileSelect, gitStatus, showHidden, repoPath }) => {
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set(['/']));
   const [activeTab, setActiveTab] = useState<TabType>('all');
   const [showSearch, setShowSearch] = useState(false);
   const [search, setSearch] = useState('');
+  const [rootFiles, setRootFiles] = useState<FileNode[]>([]);
+
+  useEffect(() => {
+    const loadFiles = async () => {
+      if (!repoPath) return;
+      const fullPath = repoPath;
+      const files = await window.electron.listFiles(fullPath, showHidden);
+      setRootFiles(files);
+    };
+    loadFiles();
+  }, [showHidden, repoPath]);
 
   const toggleExpand = (path: string) => {
     const newExpanded = new Set(expandedPaths);
@@ -77,60 +90,8 @@ const FileTree: React.FC<FileTreeProps> = ({ onFileSelect, gitStatus }) => {
     );
   };
 
-  // TODO: 实际数据从主进程获取，这里使用示例数据
-  const mockRoot: FileNode = {
-    name: '.',
-    path: '/',
-    isDirectory: true,
-    status: 'normal',
-    children: [
-      {
-        name: 'src',
-        path: '/src',
-        isDirectory: true,
-        status: 'normal',
-        children: [
-          {
-            name: 'main',
-            path: '/src/main',
-            isDirectory: true,
-            status: 'normal',
-            children: [
-              {
-                name: 'index.ts',
-                path: '/src/main/index.ts',
-                isDirectory: false,
-                status: 'modified',
-              },
-            ],
-          },
-          {
-            name: 'renderer',
-            path: '/src/renderer',
-            isDirectory: true,
-            status: 'normal',
-            children: [
-              {
-                name: 'App.tsx',
-                path: '/src/renderer/App.tsx',
-                isDirectory: false,
-                status: 'normal',
-              },
-            ],
-          },
-        ],
-      },
-      {
-        name: 'package.json',
-        path: '/package.json',
-        isDirectory: false,
-        status: 'modified',
-      },
-    ],
-  };
-
   return (
-    <div className="w-full h-full border-r border-gray-300 dark:border-gray-700 flex flex-col bg-gray-50 dark:bg-gray-900">
+    <div className="w-full h-full flex flex-col bg-gray-50 dark:bg-gray-900">
       <div className="border-b border-gray-300 dark:border-gray-700">
         <div className="flex items-center p-1">
           <div className="flex flex-1">
@@ -186,7 +147,7 @@ const FileTree: React.FC<FileTreeProps> = ({ onFileSelect, gitStatus }) => {
         )}
       </div>
       <div className="flex-1 overflow-y-auto">
-        {mockRoot.children?.map((child: FileNode) => renderNode(child))}
+        {rootFiles.map((child: FileNode) => renderNode(child))}
       </div>
     </div>
   );
