@@ -1,18 +1,28 @@
 import { defineConfig } from 'vite'
+import { resolve } from 'path'
 import electron from 'vite-plugin-electron'
-import path from 'path'
 
 export default defineConfig({
   plugins: [
-    electron({
-      entry: {
-        main: 'src/main/index.ts',
+    electron([
+      {
+        // Main process entry
+        entry: 'src/main/index.ts',
+        onstart: (options) => {
+          // Reload app when main process changes
+          options.reload()
+        },
       },
-    }),
+    ]),
   ],
   resolve: {
     alias: {
-      '@': path.join(__dirname, 'src'),
+      '@': resolve(__dirname, 'src'),
     },
+  },
+  base: './',
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true,
   },
 })

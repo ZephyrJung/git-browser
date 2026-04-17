@@ -85,8 +85,7 @@ class FileService {
     return [];
   }
   async readFile(filePath) {
-    const fs2 = require("fs");
-    return fs2.readFileSync(filePath, "utf-8");
+    return fs.readFileSync(filePath, "utf-8");
   }
 }
 const fileService = new FileService();
@@ -96,7 +95,7 @@ function createWindow() {
     width: 1200,
     height: 800,
     titleBarStyle: "hidden",
-    frame: true,
+    frame: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
@@ -106,7 +105,7 @@ function createWindow() {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
     mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.loadFile(path$1.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
+    mainWindow.loadFile(path$1.join(__dirname, "../dist/index.html"));
   }
   mainWindow.on("closed", () => {
     mainWindow = null;

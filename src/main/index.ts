@@ -7,26 +7,24 @@ import type { CommandResult } from '@/shared/types'
 
 let mainWindow: BrowserWindow | null
 
-declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string
-declare const MAIN_WINDOW_VITE_NAME: string
-
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     titleBarStyle: 'hidden',
-    frame: true,
+    frame: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
     },
   })
 
-  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL)
+  if (process.env.NODE_ENV === 'development') {
+    const url = 'http://localhost:5173'
+    mainWindow.loadURL(url)
     mainWindow.webContents.openDevTools()
   } else {
-    mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`))
+    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'))
   }
 
   mainWindow.on('closed', () => {

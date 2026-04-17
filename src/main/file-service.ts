@@ -1,6 +1,7 @@
 // 文件系统服务
 // 后续实现具体功能
 
+import fs from 'fs';
 import type { FileNode } from '@/shared/types';
 
 export class FileService {
@@ -10,7 +11,6 @@ export class FileService {
   }
 
   async readFile(filePath: string): Promise<string> {
-    const fs = require('fs');
     return fs.readFileSync(filePath, 'utf-8');
   }
 }
