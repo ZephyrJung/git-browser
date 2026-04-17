@@ -12,7 +12,7 @@ const App: React.FC = () => {
   const [workMode, setWorkMode] = useState<WorkMode>('command');
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [gitStatus] = useState<GitStatus>({
-    branch: '',
+    branch: 'main',
     hasUncommittedChanges: false,
     files: {},
   });
@@ -78,6 +78,7 @@ const App: React.FC = () => {
         />
         <CodeViewer
           file={selectedFile}
+          currentBranch={gitStatus.branch}
         />
       </div>
       {workMode === 'command' ? (
