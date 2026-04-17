@@ -606,10 +606,17 @@ var implementation$1 = function bind(that) {
 var implementation = implementation$1;
 var functionBind = Function.prototype.bind || implementation;
 var functionCall = Function.prototype.call;
-var functionApply = Function.prototype.apply;
+var functionApply;
+var hasRequiredFunctionApply;
+function requireFunctionApply() {
+  if (hasRequiredFunctionApply) return functionApply;
+  hasRequiredFunctionApply = 1;
+  functionApply = Function.prototype.apply;
+  return functionApply;
+}
 var reflectApply = typeof Reflect !== "undefined" && Reflect && Reflect.apply;
 var bind$2 = functionBind;
-var $apply$1 = functionApply;
+var $apply$1 = requireFunctionApply();
 var $call$2 = functionCall;
 var $reflectApply = reflectApply;
 var actualApply = $reflectApply || bind$2.call($call$2, $apply$1);
@@ -729,7 +736,7 @@ var hasSymbols = requireHasSymbols()();
 var getProto = requireGetProto();
 var $ObjectGPO = requireObject_getPrototypeOf();
 var $ReflectGPO = requireReflect_getPrototypeOf();
-var $apply = functionApply;
+var $apply = requireFunctionApply();
 var $call = functionCall;
 var needsEval = {};
 var TypedArray = typeof Uint8Array === "undefined" || !getProto ? undefined$1 : getProto(Uint8Array);
@@ -1370,7 +1377,7 @@ function requireApplyBind() {
   if (hasRequiredApplyBind) return applyBind;
   hasRequiredApplyBind = 1;
   var bind3 = functionBind;
-  var $apply2 = functionApply;
+  var $apply2 = requireFunctionApply();
   var actualApply$1 = actualApply;
   applyBind = function applyBind2() {
     return actualApply$1(bind3, $apply2, arguments);
@@ -18122,7 +18129,8 @@ function createWindow() {
     mainWindow.loadURL(url);
     mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.loadFile(path$1.join(__dirname, "../dist/index.html"));
+    const indexPath = path$1.join(app.getAppPath(), "dist/index.html");
+    mainWindow.loadFile(indexPath);
   }
   mainWindow.on("closed", () => {
     mainWindow = null;

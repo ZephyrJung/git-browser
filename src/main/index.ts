@@ -25,7 +25,8 @@ function createWindow() {
     mainWindow.loadURL(url)
     mainWindow.webContents.openDevTools()
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'))
+    const indexPath = path.join(app.getAppPath(), 'dist/index.html')
+    mainWindow.loadFile(indexPath)
   }
 
   mainWindow.on('closed', () => {
