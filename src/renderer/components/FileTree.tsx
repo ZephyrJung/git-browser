@@ -7,8 +7,12 @@ interface FileTreeProps {
   gitStatus: GitStatus;
 }
 
+type TabType = 'all' | 'staged' | 'favorites';
+
 const FileTree: React.FC<FileTreeProps> = ({ onFileSelect, gitStatus }) => {
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set(['/']));
+  const [activeTab, setActiveTab] = useState<TabType>('all');
+  const [showSearch, setShowSearch] = useState(false);
   const [search, setSearch] = useState('');
 
   const toggleExpand = (path: string) => {
@@ -126,15 +130,60 @@ const FileTree: React.FC<FileTreeProps> = ({ onFileSelect, gitStatus }) => {
   };
 
   return (
-    <div className="w-80 min-w-[200px] max-w-[50%] border-r border-gray-300 dark:border-gray-700 flex flex-col bg-gray-50 dark:bg-gray-900">
-      <div className="p-2 border-b border-gray-300 dark:border-gray-700">
-        <input
-          type="text"
-          placeholder="搜索文件..."
-          className="w-full px-2 py-1 text-sm border rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 outline-none focus:ring-1 focus:ring-blue-500"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
+    <div className="w-full h-full border-r border-gray-300 dark:border-gray-700 flex flex-col bg-gray-50 dark:bg-gray-900">
+      <div className="border-b border-gray-300 dark:border-gray-700">
+        <div className="flex items-center p-1">
+          <div className="flex flex-1">
+            <button
+              className={`flex-1 px-2 py-1 text-sm rounded ${
+                activeTab === 'all'
+                  ? 'bg-blue-500 text-white'
+                  : 'hover:bg-gray-200 dark:hover:bg-gray-800'
+              }`}
+              onClick={() => setActiveTab('all')}
+            >
+              文件
+            </button>
+            <button
+              className={`flex-1 px-2 py-1 text-sm rounded ${
+                activeTab === 'staged'
+                  ? 'bg-blue-500 text-white'
+                  : 'hover:bg-gray-200 dark:hover:bg-gray-800'
+              }`}
+              onClick={() => setActiveTab('staged')}
+            >
+              暂存区
+            </button>
+            <button
+              className={`flex-1 px-2 py-1 text-sm rounded ${
+                activeTab === 'favorites'
+                  ? 'bg-blue-500 text-white'
+                  : 'hover:bg-gray-200 dark:hover:bg-gray-800'
+              }`}
+              onClick={() => setActiveTab('favorites')}
+            >
+              收藏
+            </button>
+          </div>
+          <button
+            className="px-2 py-1 ml-1 rounded hover:bg-gray-200 dark:hover:bg-gray-800"
+            onClick={() => setShowSearch(!showSearch)}
+            title="搜索"
+          >
+            🔍
+          </button>
+        </div>
+        {showSearch && (
+          <div className="p-2 border-t border-gray-300 dark:border-gray-700">
+            <input
+              type="text"
+              placeholder="搜索文件..."
+              className="w-full px-2 py-1 text-sm border rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 outline-none focus:ring-1 focus:ring-blue-500"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </div>
+        )}
       </div>
       <div className="flex-1 overflow-y-auto">
         {mockRoot.children?.map((child: FileNode) => renderNode(child))}
