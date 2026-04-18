@@ -9,11 +9,13 @@ let mainWindow: BrowserWindow | null
 const currentRepoPath = process.cwd();
 
 function createWindow() {
+  const isWindows = process.platform === 'win32';
+  
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
-    titleBarStyle: 'hidden',
-    frame: false,
+    titleBarStyle: isWindows ? 'hidden' : 'default',
+    frame: !isWindows,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -78,6 +80,26 @@ ipcMain.handle('execute-git-command', async (_event, _repoPath, command): Promis
   }
 })
 
+ipcMain.handle('get-file-diff', async (_event, repoPath, filePath) => {
+  return gitService.getFileDiff(repoPath, filePath);
+})
+
 ipcMain.handle('get-current-repo-path', () => {
   return currentRepoPath;
+})
+
+ipcMain.handle('get-platform', () => {
+  return process.platform;
+})
+
+ipcMain.handle('minimize-window', () => {
+  if (mainWindow) {
+    mainWindow.minimize();
+  }
+})
+
+ipcMain.handle('close-window', () => {
+  if (mainWindow) {
+    mainWindow.close();
+  }
 })

@@ -15,7 +15,7 @@ export class FileService {
 
     for (const file of files) {
       // 跳过 node_modules 和 .git
-      if (file === 'node_modules' || file === '.git' || file === '.gitignore' && !showHidden) {
+      if (file === 'node_modules' || file === '.git' || (file === '.gitignore' && !showHidden)) {
         continue;
       }
 
@@ -26,7 +26,11 @@ export class FileService {
 
       const fullPath = path.join(dirPath, file);
       const stats = fs.statSync(fullPath);
-      const nodeRelativePath = path.join(relativePath, file);
+      let nodeRelativePath = relativePath ? path.join(relativePath, file) : file;
+
+      // Always normalize to forward slash because git output uses forward slash
+      // regardless of OS, so matching works correctly on all platforms
+      nodeRelativePath = nodeRelativePath.replace(/\\/g, '/');
 
       if (stats.isDirectory()) {
         const children = this.readDirectory(fullPath, nodeRelativePath, showHidden);

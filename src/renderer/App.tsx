@@ -34,11 +34,14 @@ const App: React.FC = () => {
       const loaded = await window.electron.getSettings();
       setSettings(loaded);
       setWorkMode(loaded.defaultMode);
-      // Refresh git status after settings loaded
-      refreshGitStatus();
     };
     loadSettings();
   }, []);
+
+  // Refresh git status whenever repoPath changes
+  useEffect(() => {
+    refreshGitStatus();
+  }, [repoPath]);
 
   const refreshGitStatus = async () => {
     if (!repoPath) return;

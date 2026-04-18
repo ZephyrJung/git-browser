@@ -84,7 +84,7 @@ const FileTree: React.FC<FileTreeProps> = ({ onFileSelect, gitStatus, showHidden
     // Search filter
     if (search && !node.name.toLowerCase().includes(search.toLowerCase())) {
       // If node doesn't match but has children that match, still render
-      if (!node.children || node.children.length === 0) {
+      if (!node.children || !hasMatchingChild(node, search)) {
         return false;
       }
     }
@@ -108,6 +108,20 @@ const FileTree: React.FC<FileTreeProps> = ({ onFileSelect, gitStatus, showHidden
         return true;
     }
   }, [activeTab, search, gitStatus.files, favorites]);
+
+  // Check if any descendant matches search
+  const hasMatchingChild = (node: FileNode, search: string): boolean => {
+    if (!node.children) return false;
+    for (const child of node.children) {
+      if (child.name.toLowerCase().includes(search.toLowerCase())) {
+        return true;
+      }
+      if (child.isDirectory && hasMatchingChild(child, search)) {
+        return true;
+      }
+    }
+    return false;
+  };
 
   const hasChangedFile = (node: FileNode): boolean => {
     if (!node.children) return false;
@@ -144,6 +158,7 @@ const FileTree: React.FC<FileTreeProps> = ({ onFileSelect, gitStatus, showHidden
     const isExpanded = expandedPaths.has(node.path);
     const hasVisibleChildren = node.children && node.children.some(child => shouldRenderNode(child));
     const isFavorite = favorites.has(node.path);
+    const showFavorite = activeTab === 'all'; // Only show favorite star in "all files" tab
 
     return (
       <div key={node.path}>
@@ -165,11 +180,11 @@ const FileTree: React.FC<FileTreeProps> = ({ onFileSelect, gitStatus, showHidden
             }
           }}
           onContextMenu={e => {
-            if (!node.isDirectory) {
+            if (!node.isDirectory && showFavorite) {
               toggleFavorite(e, node.path);
             }
           }}
-          title={!node.isDirectory ? (isFavorite ? '右键取消收藏' : '右键添加收藏') : ''}
+          title={!node.isDirectory && showFavorite ? (isFavorite ? '右键取消收藏' : '右键添加收藏') : ''}
         >
           {node.isDirectory && (
             <span className="mr-1 text-xs flex-shrink-0">
@@ -178,10 +193,13 @@ const FileTree: React.FC<FileTreeProps> = ({ onFileSelect, gitStatus, showHidden
           )}
           {!node.isDirectory && <span className="mr-1 w-3 flex-shrink-0"></span>}
           <span className="text-sm flex-1 min-w-0">{node.name}</span>
-          {!node.isDirectory && (
+          {!node.isDirectory && showFavorite && (
             <span className="ml-1 w-4 flex-shrink-0 text-center cursor-pointer" onClick={e => toggleFavorite(e, node.path)} title={isFavorite ? '取消收藏' : '添加收藏'}>
               {isFavorite ? '⭐' : '☆'}
             </span>
+          )}
+          {!node.isDirectory && !showFavorite && (
+            <span className="ml-1 w-4 flex-shrink-0"></span>
           )}
         </div>
         {node.isDirectory && isExpanded && hasVisibleChildren && (

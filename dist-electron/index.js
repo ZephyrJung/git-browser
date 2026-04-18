@@ -8,6 +8,7 @@ import path from "path";
 import os from "os";
 import require$$0 from "buffer";
 import require$$4 from "crypto";
+import { execSync } from "child_process";
 const defaultSettings = {
   showHiddenFiles: true,
   showLineNumbers: true,
@@ -18029,27 +18030,35 @@ class GitService {
   async getStatus(repoPath) {
     try {
       const branch2 = await _default.currentBranch({ fs, dir: repoPath, gitdir: repoPath + "/.git" });
-      const status2 = await _default.status({ fs, dir: repoPath });
+      const output = execSync("git status --porcelain", { cwd: repoPath, encoding: "utf-8" });
+      const lines = output.trim().split("\n").filter((line) => line.trim());
       const files = {};
-      for (const file of status2) {
-        if (file.includes(" ")) {
-          files[file.split(" ")[1]] = "conflict";
-        } else {
-          const filePath = file;
-          if (file.startsWith("A ")) {
-            files[filePath.substring(2)] = "new";
-          } else if (file.startsWith("M ")) {
-            files[filePath.substring(2)] = "modified";
-          } else if (file.startsWith(" D ")) {
-            files[filePath.substring(2)] = "deleted";
-          } else {
-            files[filePath] = "modified";
-          }
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+        const code = trimmed.substring(0, 2);
+        let filePath = trimmed.substring(2).trim();
+        if (filePath.startsWith('"') && filePath.endsWith('"')) {
+          filePath = filePath.slice(1, -1);
+        }
+        filePath = filePath.replace(/\\/g, "/");
+        if (code.includes("U")) {
+          files[filePath] = "conflict";
+        } else if (code === "??") {
+          files[filePath] = "new";
+        } else if (code.includes("A")) {
+          files[filePath] = "new";
+        } else if (code.includes("M")) {
+          files[filePath] = "modified";
+        } else if (code.includes("D")) {
+          files[filePath] = "deleted";
+        } else if (code.includes("R")) {
+          files[filePath] = "modified";
         }
       }
       return {
         branch: branch2 || "",
-        hasUncommittedChanges: status2.length > 0,
+        hasUncommittedChanges: lines.length > 0,
         files
       };
     } catch (e) {
@@ -18059,6 +18068,86 @@ class GitService {
         hasUncommittedChanges: false,
         files: {}
       };
+    }
+  }
+  async getFileDiff(repoPath, filePath) {
+    try {
+      const fullPath = `${repoPath}/${filePath}`;
+      const currentContent = fs.readFileSync(fullPath, "utf-8");
+      let currentLines = currentContent.split("\n");
+      if (currentContent.endsWith("\n")) {
+        currentLines = currentLines.slice(0, -1);
+      }
+      const isUntracked = execSync(`git ls-files --others --exclude-standard "${filePath}"`, {
+        cwd: repoPath,
+        encoding: "utf-8",
+        stdio: ["ignore", "pipe", "ignore"]
+      }).trim();
+      if (isUntracked) {
+        return currentLines.map((content) => ({
+          content,
+          type: "added"
+        }));
+      }
+      let diffOutput;
+      try {
+        diffOutput = execSync(`git diff HEAD -- "${filePath}"`, {
+          cwd: repoPath,
+          encoding: "utf-8",
+          stdio: ["ignore", "pipe", "ignore"]
+        });
+      } catch (e) {
+        diffOutput = e.stdout || "";
+      }
+      if (!diffOutput.trim()) {
+        return currentLines.map((content) => ({
+          content,
+          type: "unchanged"
+        }));
+      }
+      const lineStatuses = Array(currentLines.length).fill("unchanged");
+      const diffLines = diffOutput.split("\n");
+      let currentNewLine = 0;
+      for (const line of diffLines) {
+        if (line.startsWith("diff --git") || line.startsWith("index ") || line.startsWith("--- ") || line.startsWith("+++ ") || line.startsWith("@@ ")) {
+          if (line.startsWith("@@ ")) {
+            const match = line.match(/\+(\d+)(?:,\d+)?/);
+            if (match) {
+              currentNewLine = parseInt(match[1], 10) - 1;
+            }
+          }
+          continue;
+        }
+        if (line.startsWith("+")) {
+          const lineIndex = currentNewLine;
+          if (lineIndex < lineStatuses.length) {
+            lineStatuses[lineIndex] = "added";
+          }
+          currentNewLine++;
+        } else if (!line.startsWith("-")) {
+          currentNewLine++;
+        }
+      }
+      return currentLines.map((content, index2) => ({
+        content,
+        type: lineStatuses[index2]
+      }));
+    } catch (e) {
+      console.error("Failed to get file diff:", e);
+      try {
+        const fullPath = `${repoPath}/${filePath}`;
+        const content = fs.readFileSync(fullPath, "utf-8");
+        let lines = content.split("\n");
+        if (content.endsWith("\n")) {
+          lines = lines.slice(0, -1);
+        }
+        return lines.map((line) => ({
+          content: line,
+          type: "unchanged"
+        }));
+      } catch {
+        return [];
+      }
     }
   }
 }
@@ -18079,7 +18168,8 @@ class FileService {
       }
       const fullPath = path.join(dirPath, file);
       const stats = fs.statSync(fullPath);
-      const nodeRelativePath = path.join(relativePath, file);
+      let nodeRelativePath = relativePath ? path.join(relativePath, file) : file;
+      nodeRelativePath = nodeRelativePath.replace(/\\/g, "/");
       if (stats.isDirectory()) {
         const children = this.readDirectory(fullPath, nodeRelativePath, showHidden);
         result.push({
@@ -18114,11 +18204,12 @@ const fileService = new FileService();
 let mainWindow;
 const currentRepoPath = process.cwd();
 function createWindow() {
+  const isWindows = process.platform === "win32";
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
-    titleBarStyle: "hidden",
-    frame: false,
+    titleBarStyle: isWindows ? "hidden" : "default",
+    frame: !isWindows,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
@@ -18169,6 +18260,22 @@ ipcMain.handle("execute-git-command", async (_event, _repoPath, command) => {
     output: `Command received: ${command}`
   };
 });
+ipcMain.handle("get-file-diff", async (_event, repoPath, filePath) => {
+  return gitService.getFileDiff(repoPath, filePath);
+});
 ipcMain.handle("get-current-repo-path", () => {
   return currentRepoPath;
+});
+ipcMain.handle("get-platform", () => {
+  return process.platform;
+});
+ipcMain.handle("minimize-window", () => {
+  if (mainWindow) {
+    mainWindow.minimize();
+  }
+});
+ipcMain.handle("close-window", () => {
+  if (mainWindow) {
+    mainWindow.close();
+  }
 });

@@ -45,3 +45,8 @@ export interface CommandResult {
   output: string;
   error?: string;
 }
+
+export interface LineInfo {
+  content: string;
+  type: 'unchanged' | 'added' | 'removed';
+}

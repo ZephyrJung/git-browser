@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import type { FileNode } from '@/shared/types';
+import type { LineInfo } from '@/shared/types';
 import { highlight } from '../utils/syntaxHighlight';
 
 interface CodeViewerProps {
@@ -8,26 +9,38 @@ interface CodeViewerProps {
 }
 
 const CodeViewer: React.FC<CodeViewerProps> = ({ file, currentBranch }) => {
-  const [content, setContent] = useState('');
+  const [lines, setLines] = useState<LineInfo[]>([]);
   const [showRecent, setShowRecent] = useState(false);
   const [recentFiles] = useState<string[]>([]); // TODO: 从状态管理获取
 
   useEffect(() => {
     const loadContent = async () => {
       if (!file) {
-        setContent('');
+        setLines([]);
         return;
       }
-      const cwd = process.cwd();
-      const fullPath = `${cwd}/${file.path}`;
-      const content = await window.electron.readFile(fullPath);
-      setContent(content);
+      const cwd = await window.electron.getCurrentRepoPath();
+
+      // Always get diff info now - if file is unchanged it will just return all unchanged
+      const diffLines = await window.electron.getFileDiff(cwd, file.path);
+      setLines(diffLines);
     };
     loadContent();
   }, [file]);
 
   const toggleRecent = () => {
     setShowRecent(!showRecent);
+  };
+
+  const getLineBgClass = (type: LineInfo['type']): string => {
+    switch (type) {
+      case 'added':
+        return 'bg-green-50 dark:bg-green-900/30';
+      case 'removed':
+        return 'bg-red-50 dark:bg-red-900/30';
+      default:
+        return '';
+    }
   };
 
   if (!file) {
@@ -49,8 +62,6 @@ const CodeViewer: React.FC<CodeViewerProps> = ({ file, currentBranch }) => {
       </div>
     );
   }
-
-  const highlighted = highlight(content, file.path);
 
   return (
     <div className="flex-1 flex flex-col bg-white dark:bg-gray-900">
@@ -92,10 +103,18 @@ const CodeViewer: React.FC<CodeViewerProps> = ({ file, currentBranch }) => {
       </div>
       <div className="flex-1 overflow-auto p-4">
         <pre className="text-sm">
-          <code
-            className="prism-code"
-            dangerouslySetInnerHTML={{ __html: highlighted }}
-          />
+          <code className="prism-code">
+            {lines.map((line, index) => (
+              <div key={index} className={`block ${getLineBgClass(line.type)}`}>
+                <span className="inline-block w-8 text-right pr-2 text-gray-400 select-none">
+                  {index + 1}
+                </span>
+                <span dangerouslySetInnerHTML={{
+                  __html: line.content === '' ? '&nbsp;' : highlight(line.content, file.path)
+                }} />
+              </div>
+            ))}
+          </code>
         </pre>
       </div>
     </div>
