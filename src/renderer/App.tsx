@@ -7,6 +7,8 @@ import CommandBar from './components/CommandBar';
 import ButtonBar from './components/ButtonBar';
 import SettingsDialog from './components/SettingsDialog';
 
+type TabType = 'all' | 'staged' | 'favorites';
+
 const App: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);
   const [workMode, setWorkMode] = useState<WorkMode>('command');
@@ -19,6 +21,7 @@ const App: React.FC = () => {
   });
   const [repoPath, setRepoPath] = useState<string>('');
   const [sidebarWidth, setSidebarWidth] = useState(280);
+  const [activeTab, setActiveTab] = useState<TabType>('all');
   const isDragging = useRef(false);
 
   useEffect(() => {
@@ -38,10 +41,10 @@ const App: React.FC = () => {
     loadSettings();
   }, []);
 
-  // Refresh git status whenever repoPath changes
+  // Refresh git status whenever repoPath changes or tab changes (always get latest)
   useEffect(() => {
     refreshGitStatus();
-  }, [repoPath]);
+  }, [repoPath, activeTab]);
 
   const refreshGitStatus = async () => {
     if (!repoPath) return;
@@ -103,6 +106,8 @@ const App: React.FC = () => {
             gitStatus={gitStatus}
             showHidden={settings?.showHiddenFiles ?? true}
             repoPath={repoPath}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
           />
         </div>
         <div

@@ -2,20 +2,28 @@ import React, { useState, useEffect, useCallback } from 'react';
 import type { FileNode, GitStatus } from '@/shared/types';
 import { getStatusColorClass } from '../utils/statusColors';
 
+type TabType = 'all' | 'staged' | 'favorites';
+
 interface FileTreeProps {
   onFileSelect: (file: FileNode) => void;
   gitStatus: GitStatus;
   showHidden: boolean;
   repoPath: string;
+  activeTab: TabType;
+  onTabChange: (tab: TabType) => void;
 }
-
-type TabType = 'all' | 'staged' | 'favorites';
 
 const FAVORITES_KEY = 'git-browser-favorites';
 
-const FileTree: React.FC<FileTreeProps> = ({ onFileSelect, gitStatus, showHidden, repoPath }) => {
+const FileTree: React.FC<FileTreeProps> = ({
+  onFileSelect,
+  gitStatus,
+  showHidden,
+  repoPath,
+  activeTab,
+  onTabChange,
+}) => {
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set(['/']));
-  const [activeTab, setActiveTab] = useState<TabType>('all');
   const [showSearch, setShowSearch] = useState(false);
   const [search, setSearch] = useState('');
   const [rootFiles, setRootFiles] = useState<FileNode[]>([]);
@@ -38,6 +46,8 @@ const FileTree: React.FC<FileTreeProps> = ({ onFileSelect, gitStatus, showHidden
     localStorage.setItem(FAVORITES_KEY, JSON.stringify(Array.from(favorites)));
   }, [favorites]);
 
+  // Reload files whenever tab changes or showHidden/repoPath changes
+  // to ensure we always get the latest file list
   useEffect(() => {
     const loadFiles = async () => {
       if (!repoPath) return;
@@ -46,7 +56,7 @@ const FileTree: React.FC<FileTreeProps> = ({ onFileSelect, gitStatus, showHidden
       setRootFiles(files);
     };
     loadFiles();
-  }, [showHidden, repoPath]);
+  }, [showHidden, repoPath, activeTab]);
 
   const toggleExpand = (path: string) => {
     const newExpanded = new Set(expandedPaths);
@@ -80,7 +90,8 @@ const FileTree: React.FC<FileTreeProps> = ({ onFileSelect, gitStatus, showHidden
   };
 
   // Filter nodes based on active tab and search
-  const shouldRenderNode = useCallback((node: FileNode): boolean => {
+  // Re-calculated on every render because gitStatus and activeTab change very frequently
+  const shouldRenderNode = (node: FileNode): boolean => {
     // Search filter
     if (search && !node.name.toLowerCase().includes(search.toLowerCase())) {
       // If node doesn't match but has children that match, still render
@@ -107,10 +118,10 @@ const FileTree: React.FC<FileTreeProps> = ({ onFileSelect, gitStatus, showHidden
       default:
         return true;
     }
-  }, [activeTab, search, gitStatus.files, favorites]);
+  };
 
   // Check if any descendant matches search
-  const hasMatchingChild = (node: FileNode, search: string): boolean => {
+  function hasMatchingChild(node: FileNode, search: string): boolean {
     if (!node.children) return false;
     for (const child of node.children) {
       if (child.name.toLowerCase().includes(search.toLowerCase())) {
@@ -121,9 +132,10 @@ const FileTree: React.FC<FileTreeProps> = ({ onFileSelect, gitStatus, showHidden
       }
     }
     return false;
-  };
+  }
 
-  const hasChangedFile = (node: FileNode): boolean => {
+  // Check if directory contains any changed files
+  function hasChangedFile(node: FileNode): boolean {
     if (!node.children) return false;
     for (const child of node.children) {
       if (!child.isDirectory && gitStatus.files[child.path] !== undefined) {
@@ -134,9 +146,10 @@ const FileTree: React.FC<FileTreeProps> = ({ onFileSelect, gitStatus, showHidden
       }
     }
     return false;
-  };
+  }
 
-  const hasFavoriteFile = (node: FileNode): boolean => {
+  // Check if directory contains any favorited files
+  function hasFavoriteFile(node: FileNode): boolean {
     if (!node.children) return false;
     for (const child of node.children) {
       if (!child.isDirectory && favorites.has(child.path)) {
@@ -147,7 +160,7 @@ const FileTree: React.FC<FileTreeProps> = ({ onFileSelect, gitStatus, showHidden
       }
     }
     return false;
-  };
+  }
 
   const renderNode = (node: FileNode, depth: number = 0) => {
     if (!shouldRenderNode(node)) {
@@ -226,7 +239,7 @@ const FileTree: React.FC<FileTreeProps> = ({ onFileSelect, gitStatus, showHidden
                   ? 'bg-blue-500 text-white'
                   : 'hover:bg-gray-200 dark:hover:bg-gray-800'
               }`}
-              onClick={() => setActiveTab('all')}
+              onClick={() => onTabChange('all')}
             >
               文件
             </button>
@@ -236,7 +249,7 @@ const FileTree: React.FC<FileTreeProps> = ({ onFileSelect, gitStatus, showHidden
                   ? 'bg-blue-500 text-white'
                   : 'hover:bg-gray-200 dark:hover:bg-gray-800'
               }`}
-              onClick={() => setActiveTab('staged')}
+              onClick={() => onTabChange('staged')}
             >
               暂存区
               {gitStatus.hasUncommittedChanges && (
@@ -249,7 +262,7 @@ const FileTree: React.FC<FileTreeProps> = ({ onFileSelect, gitStatus, showHidden
                   ? 'bg-blue-500 text-white'
                   : 'hover:bg-gray-200 dark:hover:bg-gray-800'
               }`}
-              onClick={() => setActiveTab('favorites')}
+              onClick={() => onTabChange('favorites')}
             >
               收藏
               {favorites.size > 0 && (
@@ -278,7 +291,9 @@ const FileTree: React.FC<FileTreeProps> = ({ onFileSelect, gitStatus, showHidden
         )}
       </div>
       <div className="flex-1 overflow-y-auto">
-        {renderRootNodes()}
+        <div key={`${activeTab}-${Object.keys(gitStatus.files).length}`}>
+          {renderRootNodes()}
+        </div>
         {activeTab === 'staged' && Object.keys(gitStatus.files).length === 0 && (
           <div className="p-4 text-sm text-gray-500 text-center">暂无变更文件</div>
         )}
