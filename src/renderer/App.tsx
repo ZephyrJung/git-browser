@@ -106,6 +106,25 @@ const App: React.FC = () => {
     setSettingsOpen(!settingsOpen);
   };
 
+  const toggleWorkMode = () => {
+    setWorkMode(prev => prev === 'command' ? 'button' : 'command');
+  };
+
+  // Global keyboard shortcut: Ctrl/Cmd + ` to toggle work mode
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check for Ctrl+` (Windows/Linux) or Cmd+` (macOS)
+      // Check both key name and key code for compatibility
+      const isBacktick = e.key === '`' || e.keyCode === 192;
+      if ((e.ctrlKey || e.metaKey) && isBacktick) {
+        e.preventDefault();
+        toggleWorkMode();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const handleCloseSettings = async () => {
     // Reload settings after dialog closed in case it was saved
     const loaded = await window.electron.getSettings();

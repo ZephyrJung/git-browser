@@ -403,6 +403,24 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile }) => {
                     className = 'block bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300';
                   } else if (line.startsWith('@')) {
                     className = 'block bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400';
+                  } else if (dialogTitle === 'git status' && (
+                    line.includes('Changes to be committed') ||
+                    line.includes('Changes not staged') ||
+                    line.includes('Untracked files') ||
+                    line.includes('Unmerged paths'))
+                  ) {
+                    className = 'block font-bold text-blue-700 dark:text-blue-300 mt-1';
+                  } else if (dialogTitle === 'git status' && line.trimLeft().startsWith('modified:')) {
+                    className = 'block text-blue-700 dark:text-blue-300';
+                  } else if (dialogTitle === 'git status' && (
+                    line.trimLeft().startsWith('new file:') ||
+                    line.trimLeft().startsWith('added:'))
+                  ) {
+                    className = 'block text-green-700 dark:text-green-300';
+                  } else if (dialogTitle === 'git status' && line.trimLeft().startsWith('deleted:')) {
+                    className = 'block text-red-700 dark:text-red-300';
+                  } else if (dialogTitle === 'git status' && line.trimLeft().startsWith('both modified:')) {
+                    className = 'block text-orange-700 dark:text-orange-300';
                   }
                   return (
                     <div key={index} className={className}>
