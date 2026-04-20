@@ -1,21 +1,148 @@
 import React, { useState } from 'react';
 import type { CommandResult } from '@/shared/types';
 
-interface CommandBarProps {
-  // TODO: 连接到 main process
+import type { FileNode } from '@/shared/types';
+
+interface CommitInfo {
+  hash: string;
+  author: string;
+  date: string;
+  message: string;
 }
 
-const CommandBar: React.FC<CommandBarProps> = () => {
+interface CommandBarProps {
+  selectedFile: FileNode | null;
+}
+
+const CommandBar: React.FC<CommandBarProps> = ({ selectedFile }) => {
   const [command, setCommand] = useState('');
   const [result, setResult] = useState<CommandResult | null>(null);
+  const [showOutputDialog, setShowOutputDialog] = useState(false);
+  const [dialogTitle, setDialogTitle] = useState('');
+  const [dialogOutput, setDialogOutput] = useState('');
+  const [showCommitHistory, setShowCommitHistory] = useState(false);
+  const [commits, setCommits] = useState<CommitInfo[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [copyToast, setCopyToast] = useState<string | null>(null);
+
+  const isGitLogCommand = (cmd: string): boolean => {
+    const trimmed = cmd.trim().toLowerCase();
+    return trimmed === 'git log' || trimmed.startsWith('git log ');
+  };
+
+  const shouldShowDialog = (cmd: string): boolean => {
+    const trimmed = cmd.trim().toLowerCase();
+    // Common commands that produce multi-line output should open in dialog
+    const dialogCommands = ['git status', 'git branch', 'git branches', 'git diff'];
+    return dialogCommands.some(c => trimmed === c || trimmed.startsWith(c + ' '));
+  };
+
+  const processCommand = (cmd: string): string => {
+    let processed = cmd.trim();
+    const lower = processed.toLowerCase();
+
+    // If git diff with no arguments and we have a selected file, add the file path
+    if ((lower === 'git diff' || lower === 'diff') && selectedFile) {
+      if (lower === 'diff') {
+        processed = `git diff ${selectedFile.path}`;
+      } else {
+        processed = `git diff ${selectedFile.path}`;
+      }
+    }
+
+    return processed;
+  };
+
+  const parseCommitsFromOutput = (output: string): CommitInfo[] => {
+    const lines = output.trim().split('\n').filter(line => line.trim());
+    return lines.map((line: string) => {
+      // Find the first three |, the rest is message (in case message contains |)
+      const firstSep = line.indexOf('|');
+      const secondSep = line.indexOf('|', firstSep + 1);
+      const thirdSep = line.indexOf('|', secondSep + 1);
+      if (firstSep !== -1 && secondSep !== -1 && thirdSep !== -1) {
+        const hash = line.slice(0, firstSep);
+        const author = line.slice(firstSep + 1, secondSep);
+        let date = line.slice(secondSep + 1, thirdSep);
+        // Remove timezone offset at the end (everything after last space)
+        const lastSpace = date.lastIndexOf(' ');
+        if (lastSpace !== -1) {
+          date = date.slice(0, lastSpace);
+        }
+        const message = line.slice(thirdSep + 1);
+        return { hash, author, date, message };
+      }
+      // Fallback
+      const parts = line.split('|');
+      let date = parts[2] || '';
+      const lastSpace = date.lastIndexOf(' ');
+      if (lastSpace !== -1) {
+        date = date.slice(0, lastSpace);
+      }
+      return {
+        hash: parts[0] || '',
+        author: parts[1] || '',
+        date,
+        message: parts.slice(3).join('|') || '',
+      };
+    });
+  };
+
+  const loadCommitHistory = async () => {
+    setLoading(true);
+    try {
+      const repoPath = await window.electron.getCurrentRepoPath();
+      // Use the same format as button bar
+      // Use double quotes for Windows compatibility (cmd doesn't like single quotes)
+      const logOutput: CommandResult = await window.electron.executeGitCommand(repoPath, 'git log --pretty=format:"%h|%an|%ci|%s" -n 100');
+      if (logOutput.output && logOutput.output.trim()) {
+        const parsedCommits = parseCommitsFromOutput(logOutput.output);
+        setCommits(parsedCommits);
+        setShowCommitHistory(true);
+      } else {
+        setResult({
+          success: false,
+          output: 'No commit history found',
+        });
+      }
+    } catch (e) {
+      console.error('Failed to load commit history:', e);
+      setResult({
+        success: false,
+        output: String(e),
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCopyHash = (hash: string) => {
+    navigator.clipboard.writeText(hash);
+    setCopyToast(`已复制: ${hash}`);
+    setTimeout(() => setCopyToast(null), 2000);
+  };
 
   const executeCommand = async () => {
     if (!command.trim()) return;
-    // TODO: 调用主进程执行命令
-    setResult({
-      success: true,
-      output: `Executed: ${command}`,
-    });
+    const processedCommand = processCommand(command);
+
+    if (isGitLogCommand(processedCommand)) {
+      // Special handling for git log - open formatted commit dialog
+      await loadCommitHistory();
+    } else if (shouldShowDialog(processedCommand)) {
+      // Show raw output in a dialog for common multi-line commands
+      const repoPath = await window.electron.getCurrentRepoPath();
+      const executionResult: CommandResult = await window.electron.executeGitCommand(repoPath, processedCommand);
+      setDialogTitle(processedCommand);
+      setDialogOutput(executionResult.output || executionResult.error || '');
+      setShowOutputDialog(true);
+      setResult(executionResult);
+    } else {
+      // Normal command execution - just show status
+      const repoPath = await window.electron.getCurrentRepoPath();
+      const executionResult: CommandResult = await window.electron.executeGitCommand(repoPath, processedCommand);
+      setResult(executionResult);
+    }
     setCommand('');
   };
 
@@ -24,6 +151,14 @@ const CommandBar: React.FC<CommandBarProps> = () => {
       e.preventDefault();
       executeCommand();
     }
+  };
+
+  const handleCloseCommitHistory = () => {
+    setShowCommitHistory(false);
+  };
+
+  const handleCloseOutputDialog = () => {
+    setShowOutputDialog(false);
   };
 
   return (
@@ -54,7 +189,126 @@ const CommandBar: React.FC<CommandBarProps> = () => {
             {result.success ? '✓' : '✗'}
           </span>
         )}
+        {loading && (
+          <span className="flex items-center px-3 py-2 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+            加载中...
+          </span>
+        )}
       </div>
+
+      {/* Special dialog for formatted commit history */}
+      {showCommitHistory && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-900 rounded-lg p-6 w-[800px] max-h-[70vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">提交历史</h2>
+              <button
+                className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xl"
+                onClick={handleCloseCommitHistory}
+              >
+                ✕
+              </button>
+            </div>
+
+            {commits.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">暂无提交历史</div>
+            ) : (
+              <div className="space-y-3">
+                {commits.map((commit) => (
+                  <div
+                    key={commit.hash}
+                    className="p-3 border border-gray-300 dark:border-gray-700 rounded hover:bg-gray-50 dark:hover:bg-gray-800"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <code
+                            className="px-2 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 rounded cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
+                            onClick={() => handleCopyHash(commit.hash)}
+                            title="点击复制哈希"
+                          >
+                            {commit.hash}
+                          </code>
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                            {commit.author}
+                          </span>
+                          <span className="text-xs text-gray-500 dark:text-gray-500">
+                            {commit.date}
+                          </span>
+                        </div>
+                        <div className="text-sm text-gray-800 dark:text-gray-200">
+                          {commit.message}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="flex justify-end mt-6">
+              <button
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                onClick={handleCloseCommitHistory}
+              >
+                关闭
+              </button>
+            </div>
+
+            {copyToast && (
+              <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-4 py-2 rounded text-sm z-50">
+                {copyToast}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Generic dialog for raw command output */}
+      {showOutputDialog && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-900 rounded-lg p-6 w-[750px] max-h-[70vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">{dialogTitle}</h2>
+              <button
+                className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xl"
+                onClick={handleCloseOutputDialog}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded overflow-auto max-h-[50vh] text-xs">
+              <pre>
+                {dialogOutput.split('\n').map((line, index) => {
+                  let className = 'block';
+                  if (line.startsWith('+')) {
+                    className = 'block bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300';
+                  } else if (line.startsWith('-')) {
+                    className = 'block bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300';
+                  } else if (line.startsWith('@')) {
+                    className = 'block bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400';
+                  }
+                  return (
+                    <div key={index} className={className}>
+                      <code>{line === '' ? '\u00A0' : line}</code>
+                    </div>
+                  );
+                })}
+              </pre>
+            </div>
+
+            <div className="flex justify-end mt-6">
+              <button
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                onClick={handleCloseOutputDialog}
+              >
+                关闭
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,15 +1,15 @@
-var Pl = Object.defineProperty;
-var Bl = (t, e, r) => e in t ? Pl(t, e, { enumerable: !0, configurable: !0, writable: !0, value: r }) : t[e] = r;
-var Kn = (t, e, r) => Bl(t, typeof e != "symbol" ? e + "" : e, r);
-import { app as hr, BrowserWindow as _s, ipcMain as gt, screen as Cl } from "electron";
-import Dl from "node:path";
+var Cl = Object.defineProperty;
+var Dl = (t, e, r) => e in t ? Cl(t, e, { enumerable: !0, configurable: !0, writable: !0, value: r }) : t[e] = r;
+var Yn = (t, e, r) => Dl(t, typeof e != "symbol" ? e + "" : e, r);
+import { app as hr, BrowserWindow as vs, ipcMain as gt, screen as Nl } from "electron";
+import Fl from "node:path";
+import { execSync as hn } from "child_process";
 import kt from "fs";
-import vn from "path";
-import Nl from "os";
-import Fl from "buffer";
-import jl from "crypto";
-import { execSync as Yn } from "child_process";
-const Ul = {
+import xn from "path";
+import jl from "os";
+import Ul from "buffer";
+import Ml from "crypto";
+const zl = {
   showHiddenFiles: !0,
   showLineNumbers: !0,
   theme: "light",
@@ -20,26 +20,26 @@ const Ul = {
     sshKeys: [],
     httpCredentials: []
   }
-}, Oi = {
-  settings: Ul,
+}, Ti = {
+  settings: zl,
   recentRepos: [],
   recentFiles: []
 };
-class Ml {
+class Ll {
   constructor() {
-    Kn(this, "storePath");
-    Kn(this, "data");
-    const e = vn.join(Nl.homedir(), ".config", "git-browser");
-    kt.existsSync(e) || kt.mkdirSync(e, { recursive: !0 }), this.storePath = vn.join(e, "config.json"), this.data = this.load();
+    Yn(this, "storePath");
+    Yn(this, "data");
+    const e = xn.join(jl.homedir(), ".config", "git-browser");
+    kt.existsSync(e) || kt.mkdirSync(e, { recursive: !0 }), this.storePath = xn.join(e, "config.json"), this.data = this.load();
   }
   load() {
     try {
       if (!kt.existsSync(this.storePath))
-        return Oi;
+        return Ti;
       const e = kt.readFileSync(this.storePath, "utf-8");
       return JSON.parse(e);
     } catch (e) {
-      return console.error("Failed to load config, using default:", e), Oi;
+      return console.error("Failed to load config, using default:", e), Ti;
     }
   }
   save() {
@@ -68,8 +68,8 @@ class Ml {
     this.data.recentFiles || (this.data.recentFiles = []), this.data.recentFiles = this.data.recentFiles.filter((n) => n !== e), this.data.recentFiles.unshift(e), this.data.recentFiles = this.data.recentFiles.slice(0, r), this.save();
   }
 }
-const Nn = new Ml();
-var bs = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : typeof global < "u" ? global : typeof self < "u" ? self : {}, P = {}, wt = function(t) {
+const Fn = new Ll();
+var xs = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : typeof global < "u" ? global : typeof self < "u" ? self : {}, P = {}, wt = function(t) {
   if (t = t || {}, this.Promise = t.Promise || Promise, this.queues = /* @__PURE__ */ Object.create(null), this.domainReentrant = t.domainReentrant || !1, this.domainReentrant) {
     if (typeof process > "u" || typeof process.domain > "u")
       throw new Error(
@@ -171,9 +171,9 @@ wt.prototype._promiseTry = function(t) {
     return this.Promise.reject(e);
   }
 };
-var zl = wt, Ll = zl, Wa = { exports: {} }, nn = { exports: {} }, Ti;
-function Hl() {
-  return Ti || (Ti = 1, typeof Object.create == "function" ? nn.exports = function(e, r) {
+var Hl = wt, Gl = Hl, qa = { exports: {} }, nn = { exports: {} }, Ii;
+function Wl() {
+  return Ii || (Ii = 1, typeof Object.create == "function" ? nn.exports = function(e, r) {
     r && (e.super_ = r, e.prototype = Object.create(r.prototype, {
       constructor: {
         value: e,
@@ -192,16 +192,16 @@ function Hl() {
   }), nn.exports;
 }
 try {
-  var Ii = require("util");
-  if (typeof Ii.inherits != "function") throw "";
-  Wa.exports = Ii.inherits;
+  var Pi = require("util");
+  if (typeof Pi.inherits != "function") throw "";
+  qa.exports = Pi.inherits;
 } catch {
-  Wa.exports = Hl();
+  qa.exports = Wl();
 }
-var Gl = Wa.exports, qa = { exports: {} };
+var ql = qa.exports, Za = { exports: {} };
 /*! safe-buffer. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> */
 (function(t, e) {
-  var r = Fl, n = r.Buffer;
+  var r = Ul, n = r.Buffer;
   function a(o, s) {
     for (var l in o)
       s[l] = o[l];
@@ -228,30 +228,30 @@ var Gl = Wa.exports, qa = { exports: {} };
       throw new TypeError("Argument must be a number");
     return r.SlowBuffer(o);
   };
-})(qa, qa.exports);
-var si = qa.exports, Wl = {}.toString, ql = Array.isArray || function(t) {
-  return Wl.call(t) == "[object Array]";
-}, kr = TypeError, vs = Object, Zl = Error, Vl = EvalError, Xl = RangeError, Kl = ReferenceError, xs = SyntaxError, Yl = URIError, Jl = Math.abs, Ql = Math.floor, tu = Math.max, eu = Math.min, ru = Math.pow, nu = Math.round, au = Number.isNaN || function(e) {
+})(Za, Za.exports);
+var ci = Za.exports, Zl = {}.toString, Vl = Array.isArray || function(t) {
+  return Zl.call(t) == "[object Array]";
+}, kr = TypeError, Es = Object, Xl = Error, Kl = EvalError, Yl = RangeError, Jl = ReferenceError, Ss = SyntaxError, Ql = URIError, tu = Math.abs, eu = Math.floor, ru = Math.max, nu = Math.min, au = Math.pow, iu = Math.round, ou = Number.isNaN || function(e) {
   return e !== e;
-}, iu = au, ou = function(e) {
-  return iu(e) || e === 0 ? e : e < 0 ? -1 : 1;
-}, su = Object.getOwnPropertyDescriptor, hn = su;
-if (hn)
-  try {
-    hn([], "length");
-  } catch {
-    hn = null;
-  }
-var Ar = hn, wn = Object.defineProperty || !1;
+}, su = ou, cu = function(e) {
+  return su(e) || e === 0 ? e : e < 0 ? -1 : 1;
+}, fu = Object.getOwnPropertyDescriptor, wn = fu;
 if (wn)
   try {
-    wn({}, "a", { value: 1 });
+    wn([], "length");
   } catch {
-    wn = !1;
+    wn = null;
   }
-var Fn = wn, Jn, Pi;
-function Es() {
-  return Pi || (Pi = 1, Jn = function() {
+var Ar = wn, pn = Object.defineProperty || !1;
+if (pn)
+  try {
+    pn({}, "a", { value: 1 });
+  } catch {
+    pn = !1;
+  }
+var jn = pn, Jn, Bi;
+function ks() {
+  return Bi || (Bi = 1, Jn = function() {
     if (typeof Symbol != "function" || typeof Object.getOwnPropertySymbols != "function")
       return !1;
     if (typeof Symbol.iterator == "symbol")
@@ -279,73 +279,77 @@ function Es() {
     return !0;
   }), Jn;
 }
-var Qn, Bi;
-function cu() {
-  if (Bi) return Qn;
-  Bi = 1;
-  var t = typeof Symbol < "u" && Symbol, e = Es();
+var Qn, Ci;
+function lu() {
+  if (Ci) return Qn;
+  Ci = 1;
+  var t = typeof Symbol < "u" && Symbol, e = ks();
   return Qn = function() {
     return typeof t != "function" || typeof Symbol != "function" || typeof t("foo") != "symbol" || typeof Symbol("bar") != "symbol" ? !1 : e();
   }, Qn;
 }
-var ta, Ci;
-function Ss() {
-  return Ci || (Ci = 1, ta = typeof Reflect < "u" && Reflect.getPrototypeOf || null), ta;
+var ta, Di;
+function As() {
+  return Di || (Di = 1, ta = typeof Reflect < "u" && Reflect.getPrototypeOf || null), ta;
 }
-var ea, Di;
-function ks() {
-  if (Di) return ea;
-  Di = 1;
-  var t = vs;
+var ea, Ni;
+function $s() {
+  if (Ni) return ea;
+  Ni = 1;
+  var t = Es;
   return ea = t.getPrototypeOf || null, ea;
 }
-var fu = "Function.prototype.bind called on incompatible ", lu = Object.prototype.toString, uu = Math.max, du = "[object Function]", Ni = function(e, r) {
+var uu = "Function.prototype.bind called on incompatible ", du = Object.prototype.toString, hu = Math.max, wu = "[object Function]", Fi = function(e, r) {
   for (var n = [], a = 0; a < e.length; a += 1)
     n[a] = e[a];
   for (var i = 0; i < r.length; i += 1)
     n[i + e.length] = r[i];
   return n;
-}, hu = function(e, r) {
+}, pu = function(e, r) {
   for (var n = [], a = r, i = 0; a < e.length; a += 1, i += 1)
     n[i] = e[a];
   return n;
-}, wu = function(t, e) {
+}, mu = function(t, e) {
   for (var r = "", n = 0; n < t.length; n += 1)
     r += t[n], n + 1 < t.length && (r += e);
   return r;
-}, pu = function(e) {
+}, gu = function(e) {
   var r = this;
-  if (typeof r != "function" || lu.apply(r) !== du)
-    throw new TypeError(fu + r);
-  for (var n = hu(arguments, 1), a, i = function() {
+  if (typeof r != "function" || du.apply(r) !== wu)
+    throw new TypeError(uu + r);
+  for (var n = pu(arguments, 1), a, i = function() {
     if (this instanceof a) {
       var f = r.apply(
         this,
-        Ni(n, arguments)
+        Fi(n, arguments)
       );
       return Object(f) === f ? f : this;
     }
     return r.apply(
       e,
-      Ni(n, arguments)
+      Fi(n, arguments)
     );
-  }, o = uu(0, r.length - n.length), s = [], l = 0; l < o; l++)
+  }, o = hu(0, r.length - n.length), s = [], l = 0; l < o; l++)
     s[l] = "$" + l;
-  if (a = Function("binder", "return function (" + wu(s, ",") + "){ return binder.apply(this,arguments); }")(i), r.prototype) {
+  if (a = Function("binder", "return function (" + mu(s, ",") + "){ return binder.apply(this,arguments); }")(i), r.prototype) {
     var c = function() {
     };
     c.prototype = r.prototype, a.prototype = new c(), c.prototype = null;
   }
   return a;
-}, mu = pu, $r = Function.prototype.bind || mu, ci = Function.prototype.call, fi = Function.prototype.apply, gu = typeof Reflect < "u" && Reflect && Reflect.apply, yu = $r, _u = fi, bu = ci, vu = gu, As = vu || yu.call(bu, _u), xu = $r, Eu = kr, Su = ci, ku = As, li = function(e) {
+}, yu = gu, $r = Function.prototype.bind || yu, fi = Function.prototype.call, ra, ji;
+function li() {
+  return ji || (ji = 1, ra = Function.prototype.apply), ra;
+}
+var _u = typeof Reflect < "u" && Reflect && Reflect.apply, bu = $r, vu = li(), xu = fi, Eu = _u, Rs = Eu || bu.call(xu, vu), Su = $r, ku = kr, Au = fi, $u = Rs, ui = function(e) {
   if (e.length < 1 || typeof e[0] != "function")
-    throw new Eu("a function is required");
-  return ku(xu, Su, e);
-}, ra, Fi;
-function Au() {
-  if (Fi) return ra;
-  Fi = 1;
-  var t = li, e = Ar, r;
+    throw new ku("a function is required");
+  return $u(Su, Au, e);
+}, na, Ui;
+function Ru() {
+  if (Ui) return na;
+  Ui = 1;
+  var t = ui, e = Ar, r;
   try {
     r = /** @type {{ __proto__?: typeof Array.prototype }} */
     [].__proto__ === Array.prototype;
@@ -358,19 +362,19 @@ function Au() {
     /** @type {keyof typeof Object.prototype} */
     "__proto__"
   ), a = Object, i = a.getPrototypeOf;
-  return ra = n && typeof n.get == "function" ? t([n.get]) : typeof i == "function" ? (
+  return na = n && typeof n.get == "function" ? t([n.get]) : typeof i == "function" ? (
     /** @type {import('./get')} */
     function(s) {
       return i(s == null ? s : a(s));
     }
-  ) : !1, ra;
+  ) : !1, na;
 }
-var na, ji;
-function $s() {
-  if (ji) return na;
-  ji = 1;
-  var t = Ss(), e = ks(), r = Au();
-  return na = t ? function(a) {
+var aa, Mi;
+function Os() {
+  if (Mi) return aa;
+  Mi = 1;
+  var t = As(), e = $s(), r = Ru();
+  return aa = t ? function(a) {
     return t(a);
   } : e ? function(a) {
     if (!a || typeof a != "object" && typeof a != "function")
@@ -378,33 +382,33 @@ function $s() {
     return e(a);
   } : r ? function(a) {
     return r(a);
-  } : null, na;
+  } : null, aa;
 }
-var aa, Ui;
-function $u() {
-  if (Ui) return aa;
-  Ui = 1;
+var ia, zi;
+function Ou() {
+  if (zi) return ia;
+  zi = 1;
   var t = Function.prototype.call, e = Object.prototype.hasOwnProperty, r = $r;
-  return aa = r.call(t, e), aa;
+  return ia = r.call(t, e), ia;
 }
-var j, Ru = vs, Ou = Zl, Tu = Vl, Iu = Xl, Pu = Kl, Ue = xs, De = kr, Bu = Yl, Cu = Jl, Du = Ql, Nu = tu, Fu = eu, ju = ru, Uu = nu, Mu = ou, Rs = Function, ia = function(t) {
+var j, Tu = Es, Iu = Xl, Pu = Kl, Bu = Yl, Cu = Jl, Ue = Ss, De = kr, Du = Ql, Nu = tu, Fu = eu, ju = ru, Uu = nu, Mu = au, zu = iu, Lu = cu, Ts = Function, oa = function(t) {
   try {
-    return Rs('"use strict"; return (' + t + ").constructor;")();
+    return Ts('"use strict"; return (' + t + ").constructor;")();
   } catch {
   }
-}, wr = Ar, zu = Fn, oa = function() {
+}, wr = Ar, Hu = jn, sa = function() {
   throw new De();
-}, Lu = wr ? function() {
+}, Gu = wr ? function() {
   try {
-    return arguments.callee, oa;
+    return arguments.callee, sa;
   } catch {
     try {
       return wr(arguments, "callee").get;
     } catch {
-      return oa;
+      return sa;
     }
   }
-}() : oa, Te = cu()(), et = $s(), Hu = ks(), Gu = Ss(), Os = fi, Rr = ci, Be = {}, Wu = typeof Uint8Array > "u" || !et ? j : et(Uint8Array), ge = {
+}() : sa, Te = lu()(), et = Os(), Wu = $s(), qu = As(), Is = li(), Rr = fi, Be = {}, Zu = typeof Uint8Array > "u" || !et ? j : et(Uint8Array), ge = {
   __proto__: null,
   "%AggregateError%": typeof AggregateError > "u" ? j : AggregateError,
   "%Array%": Array,
@@ -426,15 +430,15 @@ var j, Ru = vs, Ou = Zl, Tu = Vl, Iu = Xl, Pu = Kl, Ue = xs, De = kr, Bu = Yl, C
   "%decodeURIComponent%": decodeURIComponent,
   "%encodeURI%": encodeURI,
   "%encodeURIComponent%": encodeURIComponent,
-  "%Error%": Ou,
+  "%Error%": Iu,
   "%eval%": eval,
   // eslint-disable-line no-eval
-  "%EvalError%": Tu,
+  "%EvalError%": Pu,
   "%Float16Array%": typeof Float16Array > "u" ? j : Float16Array,
   "%Float32Array%": typeof Float32Array > "u" ? j : Float32Array,
   "%Float64Array%": typeof Float64Array > "u" ? j : Float64Array,
   "%FinalizationRegistry%": typeof FinalizationRegistry > "u" ? j : FinalizationRegistry,
-  "%Function%": Rs,
+  "%Function%": Ts,
   "%GeneratorFunction%": Be,
   "%Int8Array%": typeof Int8Array > "u" ? j : Int8Array,
   "%Int16Array%": typeof Int16Array > "u" ? j : Int16Array,
@@ -447,14 +451,14 @@ var j, Ru = vs, Ou = Zl, Tu = Vl, Iu = Xl, Pu = Kl, Ue = xs, De = kr, Bu = Yl, C
   "%MapIteratorPrototype%": typeof Map > "u" || !Te || !et ? j : et((/* @__PURE__ */ new Map())[Symbol.iterator]()),
   "%Math%": Math,
   "%Number%": Number,
-  "%Object%": Ru,
+  "%Object%": Tu,
   "%Object.getOwnPropertyDescriptor%": wr,
   "%parseFloat%": parseFloat,
   "%parseInt%": parseInt,
   "%Promise%": typeof Promise > "u" ? j : Promise,
   "%Proxy%": typeof Proxy > "u" ? j : Proxy,
-  "%RangeError%": Iu,
-  "%ReferenceError%": Pu,
+  "%RangeError%": Bu,
+  "%ReferenceError%": Cu,
   "%Reflect%": typeof Reflect > "u" ? j : Reflect,
   "%RegExp%": RegExp,
   "%Set%": typeof Set > "u" ? j : Set,
@@ -464,45 +468,45 @@ var j, Ru = vs, Ou = Zl, Tu = Vl, Iu = Xl, Pu = Kl, Ue = xs, De = kr, Bu = Yl, C
   "%StringIteratorPrototype%": Te && et ? et(""[Symbol.iterator]()) : j,
   "%Symbol%": Te ? Symbol : j,
   "%SyntaxError%": Ue,
-  "%ThrowTypeError%": Lu,
-  "%TypedArray%": Wu,
+  "%ThrowTypeError%": Gu,
+  "%TypedArray%": Zu,
   "%TypeError%": De,
   "%Uint8Array%": typeof Uint8Array > "u" ? j : Uint8Array,
   "%Uint8ClampedArray%": typeof Uint8ClampedArray > "u" ? j : Uint8ClampedArray,
   "%Uint16Array%": typeof Uint16Array > "u" ? j : Uint16Array,
   "%Uint32Array%": typeof Uint32Array > "u" ? j : Uint32Array,
-  "%URIError%": Bu,
+  "%URIError%": Du,
   "%WeakMap%": typeof WeakMap > "u" ? j : WeakMap,
   "%WeakRef%": typeof WeakRef > "u" ? j : WeakRef,
   "%WeakSet%": typeof WeakSet > "u" ? j : WeakSet,
   "%Function.prototype.call%": Rr,
-  "%Function.prototype.apply%": Os,
-  "%Object.defineProperty%": zu,
-  "%Object.getPrototypeOf%": Hu,
-  "%Math.abs%": Cu,
-  "%Math.floor%": Du,
-  "%Math.max%": Nu,
-  "%Math.min%": Fu,
-  "%Math.pow%": ju,
-  "%Math.round%": Uu,
-  "%Math.sign%": Mu,
-  "%Reflect.getPrototypeOf%": Gu
+  "%Function.prototype.apply%": Is,
+  "%Object.defineProperty%": Hu,
+  "%Object.getPrototypeOf%": Wu,
+  "%Math.abs%": Nu,
+  "%Math.floor%": Fu,
+  "%Math.max%": ju,
+  "%Math.min%": Uu,
+  "%Math.pow%": Mu,
+  "%Math.round%": zu,
+  "%Math.sign%": Lu,
+  "%Reflect.getPrototypeOf%": qu
 };
 if (et)
   try {
     null.error;
   } catch (t) {
-    var qu = et(et(t));
-    ge["%Error.prototype%"] = qu;
+    var Vu = et(et(t));
+    ge["%Error.prototype%"] = Vu;
   }
-var Zu = function t(e) {
+var Xu = function t(e) {
   var r;
   if (e === "%AsyncFunction%")
-    r = ia("async function () {}");
+    r = oa("async function () {}");
   else if (e === "%GeneratorFunction%")
-    r = ia("function* () {}");
+    r = oa("function* () {}");
   else if (e === "%AsyncGeneratorFunction%")
-    r = ia("async function* () {}");
+    r = oa("async function* () {}");
   else if (e === "%AsyncGenerator%") {
     var n = t("%AsyncGeneratorFunction%");
     n && (r = n.prototype);
@@ -511,7 +515,7 @@ var Zu = function t(e) {
     a && et && (r = et(a.prototype));
   }
   return ge[e] = r, r;
-}, Mi = {
+}, Li = {
   __proto__: null,
   "%ArrayBufferPrototype%": ["ArrayBuffer", "prototype"],
   "%ArrayPrototype%": ["Array", "prototype"],
@@ -564,21 +568,21 @@ var Zu = function t(e) {
   "%URIErrorPrototype%": ["URIError", "prototype"],
   "%WeakMapPrototype%": ["WeakMap", "prototype"],
   "%WeakSetPrototype%": ["WeakSet", "prototype"]
-}, Or = $r, xn = $u(), Vu = Or.call(Rr, Array.prototype.concat), Xu = Or.call(Os, Array.prototype.splice), zi = Or.call(Rr, String.prototype.replace), En = Or.call(Rr, String.prototype.slice), Ku = Or.call(Rr, RegExp.prototype.exec), Yu = /[^%.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|%$))/g, Ju = /\\(\\)?/g, Qu = function(e) {
-  var r = En(e, 0, 1), n = En(e, -1);
+}, Or = $r, En = Ou(), Ku = Or.call(Rr, Array.prototype.concat), Yu = Or.call(Is, Array.prototype.splice), Hi = Or.call(Rr, String.prototype.replace), Sn = Or.call(Rr, String.prototype.slice), Ju = Or.call(Rr, RegExp.prototype.exec), Qu = /[^%.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|%$))/g, td = /\\(\\)?/g, ed = function(e) {
+  var r = Sn(e, 0, 1), n = Sn(e, -1);
   if (r === "%" && n !== "%")
     throw new Ue("invalid intrinsic syntax, expected closing `%`");
   if (n === "%" && r !== "%")
     throw new Ue("invalid intrinsic syntax, expected opening `%`");
   var a = [];
-  return zi(e, Yu, function(i, o, s, l) {
-    a[a.length] = s ? zi(l, Ju, "$1") : o || i;
+  return Hi(e, Qu, function(i, o, s, l) {
+    a[a.length] = s ? Hi(l, td, "$1") : o || i;
   }), a;
-}, td = function(e, r) {
+}, rd = function(e, r) {
   var n = e, a;
-  if (xn(Mi, n) && (a = Mi[n], n = "%" + a[0] + "%"), xn(ge, n)) {
+  if (En(Li, n) && (a = Li[n], n = "%" + a[0] + "%"), En(ge, n)) {
     var i = ge[n];
-    if (i === Be && (i = Zu(n)), typeof i > "u" && !r)
+    if (i === Be && (i = Xu(n)), typeof i > "u" && !r)
       throw new De("intrinsic " + e + " exists, but is not available. Please file an issue!");
     return {
       alias: a,
@@ -587,20 +591,20 @@ var Zu = function t(e) {
     };
   }
   throw new Ue("intrinsic " + e + " does not exist!");
-}, Ts = function(e, r) {
+}, Ps = function(e, r) {
   if (typeof e != "string" || e.length === 0)
     throw new De("intrinsic name must be a non-empty string");
   if (arguments.length > 1 && typeof r != "boolean")
     throw new De('"allowMissing" argument must be a boolean');
-  if (Ku(/^%?[^%]*%?$/, e) === null)
+  if (Ju(/^%?[^%]*%?$/, e) === null)
     throw new Ue("`%` may not be present anywhere but at the beginning and end of the intrinsic name");
-  var n = Qu(e), a = n.length > 0 ? n[0] : "", i = td("%" + a + "%", r), o = i.name, s = i.value, l = !1, c = i.alias;
-  c && (a = c[0], Xu(n, Vu([0, 1], c)));
+  var n = ed(e), a = n.length > 0 ? n[0] : "", i = rd("%" + a + "%", r), o = i.name, s = i.value, l = !1, c = i.alias;
+  c && (a = c[0], Yu(n, Ku([0, 1], c)));
   for (var f = 1, u = !0; f < n.length; f += 1) {
-    var d = n[f], h = En(d, 0, 1), w = En(d, -1);
+    var d = n[f], h = Sn(d, 0, 1), w = Sn(d, -1);
     if ((h === '"' || h === "'" || h === "`" || w === '"' || w === "'" || w === "`") && h !== w)
       throw new Ue("property names with quotes must have matching quotes");
-    if ((d === "constructor" || !u) && (l = !0), a += "." + d, o = "%" + a + "%", xn(ge, o))
+    if ((d === "constructor" || !u) && (l = !0), a += "." + d, o = "%" + a + "%", En(ge, o))
       s = ge[o];
     else if (s != null) {
       if (!(d in s)) {
@@ -612,24 +616,24 @@ var Zu = function t(e) {
         var p = wr(s, d);
         u = !!p, u && "get" in p && !("originalValue" in p.get) ? s = p.get : s = s[d];
       } else
-        u = xn(s, d), s = s[d];
+        u = En(s, d), s = s[d];
       u && !l && (ge[o] = s);
     }
   }
   return s;
-}, Is = Ts, Ps = li, ed = Ps([Is("%String.prototype.indexOf%")]), Bs = function(e, r) {
+}, Bs = Ps, Cs = ui, nd = Cs([Bs("%String.prototype.indexOf%")]), Ds = function(e, r) {
   var n = (
     /** @type {(this: unknown, ...args: unknown[]) => unknown} */
-    Is(e, !!r)
+    Bs(e, !!r)
   );
-  return typeof n == "function" && ed(e, ".prototype.") > -1 ? Ps(
+  return typeof n == "function" && nd(e, ".prototype.") > -1 ? Cs(
     /** @type {const} */
     [n]
   ) : n;
-}, sa, Li;
-function rd() {
-  if (Li) return sa;
-  Li = 1;
+}, ca, Gi;
+function ad() {
+  if (Gi) return ca;
+  Gi = 1;
   var t = Function.prototype.toString, e = typeof Reflect == "object" && Reflect !== null && Reflect.apply, r, n;
   if (typeof e == "function" && typeof Object.defineProperty == "function")
     try {
@@ -673,7 +677,7 @@ function rd() {
       return !1;
     });
   }
-  return sa = e ? function(v) {
+  return ca = e ? function(v) {
     if (m(v))
       return !0;
     if (!v || typeof v != "function" && typeof v != "object")
@@ -696,13 +700,13 @@ function rd() {
       return !1;
     var S = s.call(v);
     return S !== c && S !== f && !/^\[object HTML/.test(S) ? !1 : o(v);
-  }, sa;
+  }, ca;
 }
-var ca, Hi;
-function nd() {
-  if (Hi) return ca;
-  Hi = 1;
-  var t = rd(), e = Object.prototype.toString, r = Object.prototype.hasOwnProperty, n = function(l, c, f) {
+var fa, Wi;
+function id() {
+  if (Wi) return fa;
+  Wi = 1;
+  var t = ad(), e = Object.prototype.toString, r = Object.prototype.hasOwnProperty, n = function(l, c, f) {
     for (var u = 0, d = l.length; u < d; u++)
       r.call(l, u) && (f == null ? c(l[u], u, l) : c.call(f, l[u], u, l));
   }, a = function(l, c, f) {
@@ -715,16 +719,16 @@ function nd() {
   function o(s) {
     return e.call(s) === "[object Array]";
   }
-  return ca = function(l, c, f) {
+  return fa = function(l, c, f) {
     if (!t(c))
       throw new TypeError("iterator must be a function");
     var u;
     arguments.length >= 3 && (u = f), o(l) ? n(l, c, u) : typeof l == "string" ? a(l, c, u) : i(l, c, u);
-  }, ca;
+  }, fa;
 }
-var fa, Gi;
-function ad() {
-  return Gi || (Gi = 1, fa = [
+var la, qi;
+function od() {
+  return qi || (qi = 1, la = [
     "Float16Array",
     "Float32Array",
     "Float64Array",
@@ -737,25 +741,25 @@ function ad() {
     "Uint32Array",
     "BigInt64Array",
     "BigUint64Array"
-  ]), fa;
+  ]), la;
 }
-var la, Wi;
-function id() {
-  if (Wi) return la;
-  Wi = 1;
-  var t = ad(), e = typeof globalThis > "u" ? bs : globalThis;
-  return la = function() {
+var ua, Zi;
+function sd() {
+  if (Zi) return ua;
+  Zi = 1;
+  var t = od(), e = typeof globalThis > "u" ? xs : globalThis;
+  return ua = function() {
     for (var n = [], a = 0; a < t.length; a++)
       typeof e[t[a]] == "function" && (n[n.length] = t[a]);
     return n;
-  }, la;
+  }, ua;
 }
-var ua = { exports: {} }, da, qi;
-function od() {
-  if (qi) return da;
-  qi = 1;
-  var t = Fn, e = xs, r = kr, n = Ar;
-  return da = function(i, o, s) {
+var da = { exports: {} }, ha, Vi;
+function cd() {
+  if (Vi) return ha;
+  Vi = 1;
+  var t = jn, e = Ss, r = kr, n = Ar;
+  return ha = function(i, o, s) {
     if (!i || typeof i != "object" && typeof i != "function")
       throw new r("`obj` must be an object or a function`");
     if (typeof o != "string" && typeof o != "symbol")
@@ -780,13 +784,13 @@ function od() {
       i[o] = s;
     else
       throw new e("This environment does not support defining a property as non-configurable, non-writable, or non-enumerable.");
-  }, da;
+  }, ha;
 }
-var ha, Zi;
-function sd() {
-  if (Zi) return ha;
-  Zi = 1;
-  var t = Fn, e = function() {
+var wa, Xi;
+function fd() {
+  if (Xi) return wa;
+  Xi = 1;
+  var t = jn, e = function() {
     return !!t;
   };
   return e.hasArrayLengthDefineBug = function() {
@@ -797,14 +801,14 @@ function sd() {
     } catch {
       return !0;
     }
-  }, ha = e, ha;
+  }, wa = e, wa;
 }
-var wa, Vi;
-function cd() {
-  if (Vi) return wa;
-  Vi = 1;
-  var t = Ts, e = od(), r = sd()(), n = Ar, a = kr, i = t("%Math.floor%");
-  return wa = function(s, l) {
+var pa, Ki;
+function ld() {
+  if (Ki) return pa;
+  Ki = 1;
+  var t = Ps, e = cd(), r = fd()(), n = Ar, a = kr, i = t("%Math.floor%");
+  return pa = function(s, l) {
     if (typeof s != "function")
       throw new a("`fn` is not a function");
     if (typeof l != "number" || l < 0 || l > 4294967295 || i(l) !== l)
@@ -827,21 +831,21 @@ function cd() {
       "length",
       l
     )), s;
-  }, wa;
-}
-var pa, Xi;
-function fd() {
-  if (Xi) return pa;
-  Xi = 1;
-  var t = $r, e = fi, r = As;
-  return pa = function() {
-    return r(t, e, arguments);
   }, pa;
 }
-var Ki;
-function ld() {
-  return Ki || (Ki = 1, function(t) {
-    var e = cd(), r = Fn, n = li, a = fd();
+var ma, Yi;
+function ud() {
+  if (Yi) return ma;
+  Yi = 1;
+  var t = $r, e = li(), r = Rs;
+  return ma = function() {
+    return r(t, e, arguments);
+  }, ma;
+}
+var Ji;
+function dd() {
+  return Ji || (Ji = 1, function(t) {
+    var e = ld(), r = jn, n = ui, a = ud();
     t.exports = function(o) {
       var s = n(arguments), l = 1 + o.length - (arguments.length - 1);
       return e(
@@ -850,22 +854,22 @@ function ld() {
         !0
       );
     }, r ? r(t.exports, "apply", { value: a }) : t.exports.apply = a;
-  }(ua)), ua.exports;
+  }(da)), da.exports;
 }
-var ma, Yi;
-function ud() {
-  if (Yi) return ma;
-  Yi = 1;
-  var t = Es();
-  return ma = function() {
+var ga, Qi;
+function hd() {
+  if (Qi) return ga;
+  Qi = 1;
+  var t = ks();
+  return ga = function() {
     return t() && !!Symbol.toStringTag;
-  }, ma;
+  }, ga;
 }
-var ga, Ji;
-function dd() {
-  if (Ji) return ga;
-  Ji = 1;
-  var t = nd(), e = id(), r = ld(), n = Bs, a = Ar, i = $s(), o = n("Object.prototype.toString"), s = ud()(), l = typeof globalThis > "u" ? bs : globalThis, c = e(), f = n("String.prototype.slice"), u = n("Array.prototype.indexOf", !0) || function(m, y) {
+var ya, to;
+function wd() {
+  if (to) return ya;
+  to = 1;
+  var t = id(), e = sd(), r = dd(), n = Ds, a = Ar, i = Os(), o = n("Object.prototype.toString"), s = hd()(), l = typeof globalThis > "u" ? xs : globalThis, c = e(), f = n("String.prototype.slice"), u = n("Array.prototype.indexOf", !0) || function(m, y) {
     for (var _ = 0; _ < m.length; _ += 1)
       if (m[_] === y)
         return _;
@@ -932,7 +936,7 @@ function dd() {
       }
     ), y;
   };
-  return ga = function(m) {
+  return ya = function(m) {
     if (!m || typeof m != "object")
       return !1;
     if (!s) {
@@ -940,36 +944,36 @@ function dd() {
       return u(c, y) > -1 ? y : y !== "Object" ? !1 : w(m);
     }
     return a ? h(m) : null;
-  }, ga;
-}
-var ya, Qi;
-function hd() {
-  if (Qi) return ya;
-  Qi = 1;
-  var t = dd();
-  return ya = function(r) {
-    return !!t(r);
   }, ya;
 }
-var wd = kr, pd = Bs, md = pd("TypedArray.prototype.buffer", !0), gd = hd(), yd = md || function(e) {
-  if (!gd(e))
-    throw new wd("Not a Typed Array");
+var _a, eo;
+function pd() {
+  if (eo) return _a;
+  eo = 1;
+  var t = wd();
+  return _a = function(r) {
+    return !!t(r);
+  }, _a;
+}
+var md = kr, gd = Ds, yd = gd("TypedArray.prototype.buffer", !0), _d = pd(), bd = yd || function(e) {
+  if (!_d(e))
+    throw new md("Not a Typed Array");
   return e.buffer;
-}, St = si.Buffer, _d = ql, bd = yd, vd = ArrayBuffer.isView || function(e) {
+}, St = ci.Buffer, vd = Vl, xd = bd, Ed = ArrayBuffer.isView || function(e) {
   try {
-    return bd(e), !0;
+    return xd(e), !0;
   } catch {
     return !1;
   }
-}, xd = typeof Uint8Array < "u", Cs = typeof ArrayBuffer < "u" && typeof Uint8Array < "u", Ed = Cs && (St.prototype instanceof Uint8Array || St.TYPED_ARRAY_SUPPORT), Sd = function(e, r) {
+}, Sd = typeof Uint8Array < "u", Ns = typeof ArrayBuffer < "u" && typeof Uint8Array < "u", kd = Ns && (St.prototype instanceof Uint8Array || St.TYPED_ARRAY_SUPPORT), Ad = function(e, r) {
   if (St.isBuffer(e))
     return e.constructor && !("isBuffer" in e) ? St.from(e) : e;
   if (typeof e == "string")
     return St.from(e, r);
-  if (Cs && vd(e)) {
+  if (Ns && Ed(e)) {
     if (e.byteLength === 0)
       return St.alloc(0);
-    if (Ed) {
+    if (kd) {
       var n = St.from(e.buffer, e.byteOffset, e.byteLength);
       if (n.byteLength === e.byteLength)
         return n;
@@ -978,9 +982,9 @@ var wd = kr, pd = Bs, md = pd("TypedArray.prototype.buffer", !0), gd = hd(), yd 
     if (i.length === e.byteLength)
       return i;
   }
-  if (xd && e instanceof Uint8Array)
+  if (Sd && e instanceof Uint8Array)
     return St.from(e);
-  var o = _d(e);
+  var o = vd(e);
   if (o)
     for (var s = 0; s < e.length; s += 1) {
       var l = e[s];
@@ -990,12 +994,12 @@ var wd = kr, pd = Bs, md = pd("TypedArray.prototype.buffer", !0), gd = hd(), yd 
   if (o || St.isBuffer(e) && e.constructor && typeof e.constructor.isBuffer == "function" && e.constructor.isBuffer(e))
     return St.from(e);
   throw new TypeError('The "data" argument must be a string, an Array, a Buffer, a Uint8Array, or a DataView.');
-}, kd = si.Buffer, Ad = Sd;
-function jn(t, e) {
-  this._block = kd.alloc(t), this._finalSize = e, this._blockSize = t, this._len = 0;
+}, $d = ci.Buffer, Rd = Ad;
+function Un(t, e) {
+  this._block = $d.alloc(t), this._finalSize = e, this._blockSize = t, this._len = 0;
 }
-jn.prototype.update = function(t, e) {
-  t = Ad(t, e || "utf8");
+Un.prototype.update = function(t, e) {
+  t = Rd(t, e || "utf8");
   for (var r = this._block, n = this._blockSize, a = t.length, i = this._len, o = 0; o < a; ) {
     for (var s = i % n, l = Math.min(a - o, n - s), c = 0; c < l; c++)
       r[s + c] = t[o + c];
@@ -1003,7 +1007,7 @@ jn.prototype.update = function(t, e) {
   }
   return this._len += a, this;
 };
-jn.prototype.digest = function(t) {
+Un.prototype.digest = function(t) {
   var e = this._len % this._blockSize;
   this._block[e] = 128, this._block.fill(0, e + 1), e >= this._finalSize && (this._update(this._block), this._block.fill(0));
   var r = this._len * 8;
@@ -1017,50 +1021,50 @@ jn.prototype.digest = function(t) {
   var i = this._hash();
   return t ? i.toString(t) : i;
 };
-jn.prototype._update = function() {
+Un.prototype._update = function() {
   throw new Error("_update must be implemented by subclass");
 };
-var $d = jn, Rd = Gl, Ds = $d, Od = si.Buffer, Td = [
+var Od = Un, Td = ql, Fs = Od, Id = ci.Buffer, Pd = [
   1518500249,
   1859775393,
   -1894007588,
   -899497514
-], Id = new Array(80);
+], Bd = new Array(80);
 function Tr() {
-  this.init(), this._w = Id, Ds.call(this, 64, 56);
+  this.init(), this._w = Bd, Fs.call(this, 64, 56);
 }
-Rd(Tr, Ds);
+Td(Tr, Fs);
 Tr.prototype.init = function() {
   return this._a = 1732584193, this._b = 4023233417, this._c = 2562383102, this._d = 271733878, this._e = 3285377520, this;
 };
-function Pd(t) {
+function Cd(t) {
   return t << 1 | t >>> 31;
 }
-function Bd(t) {
+function Dd(t) {
   return t << 5 | t >>> 27;
 }
-function Cd(t) {
+function Nd(t) {
   return t << 30 | t >>> 2;
 }
-function Dd(t, e, r, n) {
+function Fd(t, e, r, n) {
   return t === 0 ? e & r | ~e & n : t === 2 ? e & r | e & n | r & n : e ^ r ^ n;
 }
 Tr.prototype._update = function(t) {
   for (var e = this._w, r = this._a | 0, n = this._b | 0, a = this._c | 0, i = this._d | 0, o = this._e | 0, s = 0; s < 16; ++s)
     e[s] = t.readInt32BE(s * 4);
   for (; s < 80; ++s)
-    e[s] = Pd(e[s - 3] ^ e[s - 8] ^ e[s - 14] ^ e[s - 16]);
+    e[s] = Cd(e[s - 3] ^ e[s - 8] ^ e[s - 14] ^ e[s - 16]);
   for (var l = 0; l < 80; ++l) {
-    var c = ~~(l / 20), f = Bd(r) + Dd(c, n, a, i) + o + e[l] + Td[c] | 0;
-    o = i, i = a, a = Cd(n), n = r, r = f;
+    var c = ~~(l / 20), f = Dd(r) + Fd(c, n, a, i) + o + e[l] + Pd[c] | 0;
+    o = i, i = a, a = Nd(n), n = r, r = f;
   }
   this._a = r + this._a | 0, this._b = n + this._b | 0, this._c = a + this._c | 0, this._d = i + this._d | 0, this._e = o + this._e | 0;
 };
 Tr.prototype._hash = function() {
-  var t = Od.allocUnsafe(20);
+  var t = Id.allocUnsafe(20);
   return t.writeInt32BE(this._a | 0, 0), t.writeInt32BE(this._b | 0, 4), t.writeInt32BE(this._c | 0, 8), t.writeInt32BE(this._d | 0, 12), t.writeInt32BE(this._e | 0, 16), t;
 };
-var Nd = Tr, Ns = {};
+var jd = Tr, js = {};
 /*! crc32.js (C) 2014-present SheetJS -- http://sheetjs.com */
 (function(t) {
   (function(e) {
@@ -1099,7 +1103,7 @@ var Nd = Tr, Ns = {};
     }
     e.table = n, e.bstr = k, e.buf = O, e.str = x;
   });
-})(Ns);
+})(js);
 var Xt = {};
 (function(t) {
   var e = typeof Uint8Array < "u" && typeof Uint16Array < "u" && typeof Int32Array < "u";
@@ -1152,47 +1156,47 @@ var Xt = {};
     i ? (t.Buf8 = Uint8Array, t.Buf16 = Uint16Array, t.Buf32 = Int32Array, t.assign(t, n)) : (t.Buf8 = Array, t.Buf16 = Array, t.Buf32 = Array, t.assign(t, a));
   }, t.setTyped(e);
 })(Xt);
-var Ir = {}, Lt = {}, qe = {}, Fd = Xt, jd = 4, to = 0, eo = 1, Ud = 2;
+var Ir = {}, Lt = {}, qe = {}, Ud = Xt, Md = 4, ro = 0, no = 1, zd = 2;
 function Ze(t) {
   for (var e = t.length; --e >= 0; )
     t[e] = 0;
 }
-var Md = 0, Fs = 1, zd = 2, Ld = 3, Hd = 258, ui = 29, Pr = 256, pr = Pr + 1 + ui, Ne = 30, di = 19, js = 2 * pr + 1, we = 15, _a = 16, Gd = 7, hi = 256, Us = 16, Ms = 17, zs = 18, Za = (
+var Ld = 0, Us = 1, Hd = 2, Gd = 3, Wd = 258, di = 29, Pr = 256, pr = Pr + 1 + di, Ne = 30, hi = 19, Ms = 2 * pr + 1, we = 15, ba = 16, qd = 7, wi = 256, zs = 16, Ls = 17, Hs = 18, Va = (
   /* extra bits for each length code */
   [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0]
-), pn = (
+), mn = (
   /* extra bits for each distance code */
   [0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13]
-), Wd = (
+), Zd = (
   /* extra bits for each bit length code */
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 7]
-), Ls = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15], qd = 512, Gt = new Array((pr + 2) * 2);
+), Gs = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15], Vd = 512, Gt = new Array((pr + 2) * 2);
 Ze(Gt);
 var cr = new Array(Ne * 2);
 Ze(cr);
-var mr = new Array(qd);
+var mr = new Array(Vd);
 Ze(mr);
-var gr = new Array(Hd - Ld + 1);
+var gr = new Array(Wd - Gd + 1);
 Ze(gr);
-var wi = new Array(ui);
-Ze(wi);
-var Sn = new Array(Ne);
-Ze(Sn);
-function ba(t, e, r, n, a) {
+var pi = new Array(di);
+Ze(pi);
+var kn = new Array(Ne);
+Ze(kn);
+function va(t, e, r, n, a) {
   this.static_tree = t, this.extra_bits = e, this.extra_base = r, this.elems = n, this.max_length = a, this.has_stree = t && t.length;
 }
-var Hs, Gs, Ws;
-function va(t, e) {
+var Ws, qs, Zs;
+function xa(t, e) {
   this.dyn_tree = t, this.max_code = 0, this.stat_desc = e;
 }
-function qs(t) {
+function Vs(t) {
   return t < 256 ? mr[t] : mr[256 + (t >>> 7)];
 }
 function yr(t, e) {
   t.pending_buf[t.pending++] = e & 255, t.pending_buf[t.pending++] = e >>> 8 & 255;
 }
 function ft(t, e, r) {
-  t.bi_valid > _a - r ? (t.bi_buf |= e << t.bi_valid & 65535, yr(t, t.bi_buf), t.bi_buf = e >> _a - t.bi_valid, t.bi_valid += r - _a) : (t.bi_buf |= e << t.bi_valid & 65535, t.bi_valid += r);
+  t.bi_valid > ba - r ? (t.bi_buf |= e << t.bi_valid & 65535, yr(t, t.bi_buf), t.bi_buf = e >> ba - t.bi_valid, t.bi_valid += r - ba) : (t.bi_buf |= e << t.bi_valid & 65535, t.bi_valid += r);
 }
 function jt(t, e, r) {
   ft(
@@ -1202,21 +1206,21 @@ function jt(t, e, r) {
     /*.Len*/
   );
 }
-function Zs(t, e) {
+function Xs(t, e) {
   var r = 0;
   do
     r |= t & 1, t >>>= 1, r <<= 1;
   while (--e > 0);
   return r >>> 1;
 }
-function Zd(t) {
+function Xd(t) {
   t.bi_valid === 16 ? (yr(t, t.bi_buf), t.bi_buf = 0, t.bi_valid = 0) : t.bi_valid >= 8 && (t.pending_buf[t.pending++] = t.bi_buf & 255, t.bi_buf >>= 8, t.bi_valid -= 8);
 }
-function Vd(t, e) {
+function Kd(t, e) {
   var r = e.dyn_tree, n = e.max_code, a = e.stat_desc.static_tree, i = e.stat_desc.has_stree, o = e.stat_desc.extra_bits, s = e.stat_desc.extra_base, l = e.stat_desc.max_length, c, f, u, d, h, w, p = 0;
   for (d = 0; d <= we; d++)
     t.bl_count[d] = 0;
-  for (r[t.heap[t.heap_max] * 2 + 1] = 0, c = t.heap_max + 1; c < js; c++)
+  for (r[t.heap[t.heap_max] * 2 + 1] = 0, c = t.heap_max + 1; c < Ms; c++)
     f = t.heap[c], d = r[r[f * 2 + 1] * 2 + 1] + 1, d > l && (d = l, p++), r[f * 2 + 1] = d, !(f > n) && (t.bl_count[d]++, h = 0, f >= s && (h = o[f - s]), w = r[f * 2], t.opt_len += w * (d + h), i && (t.static_len += w * (a[f * 2 + 1] + h)));
   if (p !== 0) {
     do {
@@ -1229,25 +1233,25 @@ function Vd(t, e) {
         u = t.heap[--c], !(u > n) && (r[u * 2 + 1] !== d && (t.opt_len += (d - r[u * 2 + 1]) * r[u * 2], r[u * 2 + 1] = d), f--);
   }
 }
-function Vs(t, e, r) {
+function Ks(t, e, r) {
   var n = new Array(we + 1), a = 0, i, o;
   for (i = 1; i <= we; i++)
     n[i] = a = a + r[i - 1] << 1;
   for (o = 0; o <= e; o++) {
     var s = t[o * 2 + 1];
-    s !== 0 && (t[o * 2] = Zs(n[s]++, s));
+    s !== 0 && (t[o * 2] = Xs(n[s]++, s));
   }
 }
-function Xd() {
+function Yd() {
   var t, e, r, n, a, i = new Array(we + 1);
-  for (r = 0, n = 0; n < ui - 1; n++)
-    for (wi[n] = r, t = 0; t < 1 << Za[n]; t++)
+  for (r = 0, n = 0; n < di - 1; n++)
+    for (pi[n] = r, t = 0; t < 1 << Va[n]; t++)
       gr[r++] = n;
   for (gr[r - 1] = n, a = 0, n = 0; n < 16; n++)
-    for (Sn[n] = a, t = 0; t < 1 << pn[n]; t++)
+    for (kn[n] = a, t = 0; t < 1 << mn[n]; t++)
       mr[a++] = n;
   for (a >>= 7; n < Ne; n++)
-    for (Sn[n] = a << 7, t = 0; t < 1 << pn[n] - 7; t++)
+    for (kn[n] = a << 7, t = 0; t < 1 << mn[n] - 7; t++)
       mr[256 + a++] = n;
   for (e = 0; e <= we; e++)
     i[e] = 0;
@@ -1259,51 +1263,51 @@ function Xd() {
     Gt[t * 2 + 1] = 7, t++, i[7]++;
   for (; t <= 287; )
     Gt[t * 2 + 1] = 8, t++, i[8]++;
-  for (Vs(Gt, pr + 1, i), t = 0; t < Ne; t++)
-    cr[t * 2 + 1] = 5, cr[t * 2] = Zs(t, 5);
-  Hs = new ba(Gt, Za, Pr + 1, pr, we), Gs = new ba(cr, pn, 0, Ne, we), Ws = new ba(new Array(0), Wd, 0, di, Gd);
+  for (Ks(Gt, pr + 1, i), t = 0; t < Ne; t++)
+    cr[t * 2 + 1] = 5, cr[t * 2] = Xs(t, 5);
+  Ws = new va(Gt, Va, Pr + 1, pr, we), qs = new va(cr, mn, 0, Ne, we), Zs = new va(new Array(0), Zd, 0, hi, qd);
 }
-function Xs(t) {
+function Ys(t) {
   var e;
   for (e = 0; e < pr; e++)
     t.dyn_ltree[e * 2] = 0;
   for (e = 0; e < Ne; e++)
     t.dyn_dtree[e * 2] = 0;
-  for (e = 0; e < di; e++)
+  for (e = 0; e < hi; e++)
     t.bl_tree[e * 2] = 0;
-  t.dyn_ltree[hi * 2] = 1, t.opt_len = t.static_len = 0, t.last_lit = t.matches = 0;
+  t.dyn_ltree[wi * 2] = 1, t.opt_len = t.static_len = 0, t.last_lit = t.matches = 0;
 }
-function Ks(t) {
+function Js(t) {
   t.bi_valid > 8 ? yr(t, t.bi_buf) : t.bi_valid > 0 && (t.pending_buf[t.pending++] = t.bi_buf), t.bi_buf = 0, t.bi_valid = 0;
 }
-function Kd(t, e, r, n) {
-  Ks(t), yr(t, r), yr(t, ~r), Fd.arraySet(t.pending_buf, t.window, e, r, t.pending), t.pending += r;
+function Jd(t, e, r, n) {
+  Js(t), yr(t, r), yr(t, ~r), Ud.arraySet(t.pending_buf, t.window, e, r, t.pending), t.pending += r;
 }
-function ro(t, e, r, n) {
+function ao(t, e, r, n) {
   var a = e * 2, i = r * 2;
   return t[a] < t[i] || t[a] === t[i] && n[e] <= n[r];
 }
-function xa(t, e, r) {
-  for (var n = t.heap[r], a = r << 1; a <= t.heap_len && (a < t.heap_len && ro(e, t.heap[a + 1], t.heap[a], t.depth) && a++, !ro(e, n, t.heap[a], t.depth)); )
+function Ea(t, e, r) {
+  for (var n = t.heap[r], a = r << 1; a <= t.heap_len && (a < t.heap_len && ao(e, t.heap[a + 1], t.heap[a], t.depth) && a++, !ao(e, n, t.heap[a], t.depth)); )
     t.heap[r] = t.heap[a], r = a, a <<= 1;
   t.heap[r] = n;
 }
-function no(t, e, r) {
+function io(t, e, r) {
   var n, a, i = 0, o, s;
   if (t.last_lit !== 0)
     do
-      n = t.pending_buf[t.d_buf + i * 2] << 8 | t.pending_buf[t.d_buf + i * 2 + 1], a = t.pending_buf[t.l_buf + i], i++, n === 0 ? jt(t, a, e) : (o = gr[a], jt(t, o + Pr + 1, e), s = Za[o], s !== 0 && (a -= wi[o], ft(t, a, s)), n--, o = qs(n), jt(t, o, r), s = pn[o], s !== 0 && (n -= Sn[o], ft(t, n, s)));
+      n = t.pending_buf[t.d_buf + i * 2] << 8 | t.pending_buf[t.d_buf + i * 2 + 1], a = t.pending_buf[t.l_buf + i], i++, n === 0 ? jt(t, a, e) : (o = gr[a], jt(t, o + Pr + 1, e), s = Va[o], s !== 0 && (a -= pi[o], ft(t, a, s)), n--, o = Vs(n), jt(t, o, r), s = mn[o], s !== 0 && (n -= kn[o], ft(t, n, s)));
     while (i < t.last_lit);
-  jt(t, hi, e);
+  jt(t, wi, e);
 }
-function Va(t, e) {
+function Xa(t, e) {
   var r = e.dyn_tree, n = e.stat_desc.static_tree, a = e.stat_desc.has_stree, i = e.stat_desc.elems, o, s, l = -1, c;
-  for (t.heap_len = 0, t.heap_max = js, o = 0; o < i; o++)
+  for (t.heap_len = 0, t.heap_max = Ms, o = 0; o < i; o++)
     r[o * 2] !== 0 ? (t.heap[++t.heap_len] = l = o, t.depth[o] = 0) : r[o * 2 + 1] = 0;
   for (; t.heap_len < 2; )
     c = t.heap[++t.heap_len] = l < 2 ? ++l : 0, r[c * 2] = 1, t.depth[c] = 0, t.opt_len--, a && (t.static_len -= n[c * 2 + 1]);
   for (e.max_code = l, o = t.heap_len >> 1; o >= 1; o--)
-    xa(t, r, o);
+    Ea(t, r, o);
   c = i;
   do
     o = t.heap[
@@ -1312,7 +1316,7 @@ function Va(t, e) {
     ], t.heap[
       1
       /*SMALLEST*/
-    ] = t.heap[t.heap_len--], xa(
+    ] = t.heap[t.heap_len--], Ea(
       t,
       r,
       1
@@ -1323,7 +1327,7 @@ function Va(t, e) {
     ], t.heap[--t.heap_max] = o, t.heap[--t.heap_max] = s, r[c * 2] = r[o * 2] + r[s * 2], t.depth[c] = (t.depth[o] >= t.depth[s] ? t.depth[o] : t.depth[s]) + 1, r[o * 2 + 1] = r[s * 2 + 1] = c, t.heap[
       1
       /*SMALLEST*/
-    ] = c++, xa(
+    ] = c++, Ea(
       t,
       r,
       1
@@ -1333,14 +1337,14 @@ function Va(t, e) {
   t.heap[--t.heap_max] = t.heap[
     1
     /*SMALLEST*/
-  ], Vd(t, e), Vs(r, l, t.bl_count);
+  ], Kd(t, e), Ks(r, l, t.bl_count);
 }
-function ao(t, e, r) {
+function oo(t, e, r) {
   var n, a = -1, i, o = e[0 * 2 + 1], s = 0, l = 7, c = 4;
   for (o === 0 && (l = 138, c = 3), e[(r + 1) * 2 + 1] = 65535, n = 0; n <= r; n++)
-    i = o, o = e[(n + 1) * 2 + 1], !(++s < l && i === o) && (s < c ? t.bl_tree[i * 2] += s : i !== 0 ? (i !== a && t.bl_tree[i * 2]++, t.bl_tree[Us * 2]++) : s <= 10 ? t.bl_tree[Ms * 2]++ : t.bl_tree[zs * 2]++, s = 0, a = i, o === 0 ? (l = 138, c = 3) : i === o ? (l = 6, c = 3) : (l = 7, c = 4));
+    i = o, o = e[(n + 1) * 2 + 1], !(++s < l && i === o) && (s < c ? t.bl_tree[i * 2] += s : i !== 0 ? (i !== a && t.bl_tree[i * 2]++, t.bl_tree[zs * 2]++) : s <= 10 ? t.bl_tree[Ls * 2]++ : t.bl_tree[Hs * 2]++, s = 0, a = i, o === 0 ? (l = 138, c = 3) : i === o ? (l = 6, c = 3) : (l = 7, c = 4));
 }
-function io(t, e, r) {
+function so(t, e, r) {
   var n, a = -1, i, o = e[0 * 2 + 1], s = 0, l = 7, c = 4;
   for (o === 0 && (l = 138, c = 3), n = 0; n <= r; n++)
     if (i = o, o = e[(n + 1) * 2 + 1], !(++s < l && i === o)) {
@@ -1348,57 +1352,57 @@ function io(t, e, r) {
         do
           jt(t, i, t.bl_tree);
         while (--s !== 0);
-      else i !== 0 ? (i !== a && (jt(t, i, t.bl_tree), s--), jt(t, Us, t.bl_tree), ft(t, s - 3, 2)) : s <= 10 ? (jt(t, Ms, t.bl_tree), ft(t, s - 3, 3)) : (jt(t, zs, t.bl_tree), ft(t, s - 11, 7));
+      else i !== 0 ? (i !== a && (jt(t, i, t.bl_tree), s--), jt(t, zs, t.bl_tree), ft(t, s - 3, 2)) : s <= 10 ? (jt(t, Ls, t.bl_tree), ft(t, s - 3, 3)) : (jt(t, Hs, t.bl_tree), ft(t, s - 11, 7));
       s = 0, a = i, o === 0 ? (l = 138, c = 3) : i === o ? (l = 6, c = 3) : (l = 7, c = 4);
     }
 }
-function Yd(t) {
+function Qd(t) {
   var e;
-  for (ao(t, t.dyn_ltree, t.l_desc.max_code), ao(t, t.dyn_dtree, t.d_desc.max_code), Va(t, t.bl_desc), e = di - 1; e >= 3 && t.bl_tree[Ls[e] * 2 + 1] === 0; e--)
+  for (oo(t, t.dyn_ltree, t.l_desc.max_code), oo(t, t.dyn_dtree, t.d_desc.max_code), Xa(t, t.bl_desc), e = hi - 1; e >= 3 && t.bl_tree[Gs[e] * 2 + 1] === 0; e--)
     ;
   return t.opt_len += 3 * (e + 1) + 5 + 5 + 4, e;
 }
-function Jd(t, e, r, n) {
+function th(t, e, r, n) {
   var a;
   for (ft(t, e - 257, 5), ft(t, r - 1, 5), ft(t, n - 4, 4), a = 0; a < n; a++)
-    ft(t, t.bl_tree[Ls[a] * 2 + 1], 3);
-  io(t, t.dyn_ltree, e - 1), io(t, t.dyn_dtree, r - 1);
+    ft(t, t.bl_tree[Gs[a] * 2 + 1], 3);
+  so(t, t.dyn_ltree, e - 1), so(t, t.dyn_dtree, r - 1);
 }
-function Qd(t) {
+function eh(t) {
   var e = 4093624447, r;
   for (r = 0; r <= 31; r++, e >>>= 1)
     if (e & 1 && t.dyn_ltree[r * 2] !== 0)
-      return to;
+      return ro;
   if (t.dyn_ltree[9 * 2] !== 0 || t.dyn_ltree[10 * 2] !== 0 || t.dyn_ltree[13 * 2] !== 0)
-    return eo;
+    return no;
   for (r = 32; r < Pr; r++)
     if (t.dyn_ltree[r * 2] !== 0)
-      return eo;
-  return to;
+      return no;
+  return ro;
 }
-var oo = !1;
-function th(t) {
-  oo || (Xd(), oo = !0), t.l_desc = new va(t.dyn_ltree, Hs), t.d_desc = new va(t.dyn_dtree, Gs), t.bl_desc = new va(t.bl_tree, Ws), t.bi_buf = 0, t.bi_valid = 0, Xs(t);
+var co = !1;
+function rh(t) {
+  co || (Yd(), co = !0), t.l_desc = new xa(t.dyn_ltree, Ws), t.d_desc = new xa(t.dyn_dtree, qs), t.bl_desc = new xa(t.bl_tree, Zs), t.bi_buf = 0, t.bi_valid = 0, Ys(t);
 }
-function Ys(t, e, r, n) {
-  ft(t, (Md << 1) + (n ? 1 : 0), 3), Kd(t, e, r);
+function Qs(t, e, r, n) {
+  ft(t, (Ld << 1) + (n ? 1 : 0), 3), Jd(t, e, r);
 }
-function eh(t) {
-  ft(t, Fs << 1, 3), jt(t, hi, Gt), Zd(t);
+function nh(t) {
+  ft(t, Us << 1, 3), jt(t, wi, Gt), Xd(t);
 }
-function rh(t, e, r, n) {
-  var a, i, o = 0;
-  t.level > 0 ? (t.strm.data_type === Ud && (t.strm.data_type = Qd(t)), Va(t, t.l_desc), Va(t, t.d_desc), o = Yd(t), a = t.opt_len + 3 + 7 >>> 3, i = t.static_len + 3 + 7 >>> 3, i <= a && (a = i)) : a = i = r + 5, r + 4 <= a && e !== -1 ? Ys(t, e, r, n) : t.strategy === jd || i === a ? (ft(t, (Fs << 1) + (n ? 1 : 0), 3), no(t, Gt, cr)) : (ft(t, (zd << 1) + (n ? 1 : 0), 3), Jd(t, t.l_desc.max_code + 1, t.d_desc.max_code + 1, o + 1), no(t, t.dyn_ltree, t.dyn_dtree)), Xs(t), n && Ks(t);
-}
-function nh(t, e, r) {
-  return t.pending_buf[t.d_buf + t.last_lit * 2] = e >>> 8 & 255, t.pending_buf[t.d_buf + t.last_lit * 2 + 1] = e & 255, t.pending_buf[t.l_buf + t.last_lit] = r & 255, t.last_lit++, e === 0 ? t.dyn_ltree[r * 2]++ : (t.matches++, e--, t.dyn_ltree[(gr[r] + Pr + 1) * 2]++, t.dyn_dtree[qs(e) * 2]++), t.last_lit === t.lit_bufsize - 1;
-}
-qe._tr_init = th;
-qe._tr_stored_block = Ys;
-qe._tr_flush_block = rh;
-qe._tr_tally = nh;
-qe._tr_align = eh;
 function ah(t, e, r, n) {
+  var a, i, o = 0;
+  t.level > 0 ? (t.strm.data_type === zd && (t.strm.data_type = eh(t)), Xa(t, t.l_desc), Xa(t, t.d_desc), o = Qd(t), a = t.opt_len + 3 + 7 >>> 3, i = t.static_len + 3 + 7 >>> 3, i <= a && (a = i)) : a = i = r + 5, r + 4 <= a && e !== -1 ? Qs(t, e, r, n) : t.strategy === Md || i === a ? (ft(t, (Us << 1) + (n ? 1 : 0), 3), io(t, Gt, cr)) : (ft(t, (Hd << 1) + (n ? 1 : 0), 3), th(t, t.l_desc.max_code + 1, t.d_desc.max_code + 1, o + 1), io(t, t.dyn_ltree, t.dyn_dtree)), Ys(t), n && Js(t);
+}
+function ih(t, e, r) {
+  return t.pending_buf[t.d_buf + t.last_lit * 2] = e >>> 8 & 255, t.pending_buf[t.d_buf + t.last_lit * 2 + 1] = e & 255, t.pending_buf[t.l_buf + t.last_lit] = r & 255, t.last_lit++, e === 0 ? t.dyn_ltree[r * 2]++ : (t.matches++, e--, t.dyn_ltree[(gr[r] + Pr + 1) * 2]++, t.dyn_dtree[Vs(e) * 2]++), t.last_lit === t.lit_bufsize - 1;
+}
+qe._tr_init = rh;
+qe._tr_stored_block = Qs;
+qe._tr_flush_block = ah;
+qe._tr_tally = ih;
+qe._tr_align = nh;
+function oh(t, e, r, n) {
   for (var a = t & 65535 | 0, i = t >>> 16 & 65535 | 0, o = 0; r !== 0; ) {
     o = r > 2e3 ? 2e3 : r, r -= o;
     do
@@ -1408,8 +1412,8 @@ function ah(t, e, r, n) {
   }
   return a | i << 16 | 0;
 }
-var Js = ah;
-function ih() {
+var tc = oh;
+function sh() {
   for (var t, e = [], r = 0; r < 256; r++) {
     t = r;
     for (var n = 0; n < 8; n++)
@@ -1418,15 +1422,15 @@ function ih() {
   }
   return e;
 }
-var oh = ih();
-function sh(t, e, r, n) {
-  var a = oh, i = n + r;
+var ch = sh();
+function fh(t, e, r, n) {
+  var a = ch, i = n + r;
   t ^= -1;
   for (var o = n; o < i; o++)
     t = t >>> 8 ^ a[(t ^ e[o]) & 255];
   return t ^ -1;
 }
-var Qs = sh, pi = {
+var ec = fh, mi = {
   2: "need dictionary",
   /* Z_NEED_DICT       2  */
   1: "stream end",
@@ -1445,11 +1449,11 @@ var Qs = sh, pi = {
   /* Z_BUF_ERROR     (-5) */
   "-6": "incompatible version"
   /* Z_VERSION_ERROR (-6) */
-}, ot = Xt, bt = qe, tc = Js, Jt = Qs, ch = pi, ke = 0, fh = 1, lh = 3, ae = 4, so = 5, Ut = 0, co = 1, vt = -2, uh = -3, Ea = -5, dh = -1, hh = 1, an = 2, wh = 3, ph = 4, mh = 0, gh = 2, Un = 8, yh = 9, _h = 15, bh = 8, vh = 29, xh = 256, Xa = xh + 1 + vh, Eh = 30, Sh = 19, kh = 2 * Xa + 1, Ah = 15, M = 3, ee = 258, At = ee + M + 1, $h = 32, Mn = 42, Ka = 69, mn = 73, gn = 91, yn = 103, pe = 113, sr = 666, tt = 1, Br = 2, ye = 3, Ve = 4, Rh = 3;
+}, ot = Xt, bt = qe, rc = tc, Jt = ec, lh = mi, ke = 0, uh = 1, dh = 3, ae = 4, fo = 5, Ut = 0, lo = 1, vt = -2, hh = -3, Sa = -5, wh = -1, ph = 1, an = 2, mh = 3, gh = 4, yh = 0, _h = 2, Mn = 8, bh = 9, vh = 15, xh = 8, Eh = 29, Sh = 256, Ka = Sh + 1 + Eh, kh = 30, Ah = 19, $h = 2 * Ka + 1, Rh = 15, M = 3, ee = 258, At = ee + M + 1, Oh = 32, zn = 42, Ya = 69, gn = 73, yn = 91, _n = 103, pe = 113, sr = 666, tt = 1, Br = 2, ye = 3, Ve = 4, Th = 3;
 function re(t, e) {
-  return t.msg = ch[e], e;
+  return t.msg = lh[e], e;
 }
-function fo(t) {
+function uo(t) {
   return (t << 1) - (t > 4 ? 9 : 0);
 }
 function te(t) {
@@ -1469,11 +1473,11 @@ function z(t, e) {
 function ir(t, e) {
   t.pending_buf[t.pending++] = e >>> 8 & 255, t.pending_buf[t.pending++] = e & 255;
 }
-function Oh(t, e, r, n) {
+function Ih(t, e, r, n) {
   var a = t.avail_in;
-  return a > n && (a = n), a === 0 ? 0 : (t.avail_in -= a, ot.arraySet(e, t.input, t.next_in, a, r), t.state.wrap === 1 ? t.adler = tc(t.adler, e, a, r) : t.state.wrap === 2 && (t.adler = Jt(t.adler, e, a, r)), t.next_in += a, t.total_in += a, a);
+  return a > n && (a = n), a === 0 ? 0 : (t.avail_in -= a, ot.arraySet(e, t.input, t.next_in, a, r), t.state.wrap === 1 ? t.adler = rc(t.adler, e, a, r) : t.state.wrap === 2 && (t.adler = Jt(t.adler, e, a, r)), t.next_in += a, t.total_in += a, a);
 }
-function ec(t, e) {
+function nc(t, e) {
   var r = t.max_chain_length, n = t.strstart, a, i, o = t.prev_length, s = t.nice_match, l = t.strstart > t.w_size - At ? t.strstart - (t.w_size - At) : 0, c = t.window, f = t.w_mask, u = t.prev, d = t.strstart + ee, h = c[n + o - 1], w = c[n + o];
   t.prev_length >= t.good_match && (r >>= 2), s > t.lookahead && (s = t.lookahead);
   do
@@ -1507,12 +1511,12 @@ function _e(t) {
     }
     if (t.strm.avail_in === 0)
       break;
-    if (n = Oh(t.strm, t.window, t.strstart + t.lookahead, i), t.lookahead += n, t.lookahead + t.insert >= M)
+    if (n = Ih(t.strm, t.window, t.strstart + t.lookahead, i), t.lookahead += n, t.lookahead + t.insert >= M)
       for (o = t.strstart - t.insert, t.ins_h = t.window[o], t.ins_h = (t.ins_h << t.hash_shift ^ t.window[o + 1]) & t.hash_mask; t.insert && (t.ins_h = (t.ins_h << t.hash_shift ^ t.window[o + M - 1]) & t.hash_mask, t.prev[o & t.w_mask] = t.head[t.ins_h], t.head[t.ins_h] = o, o++, t.insert--, !(t.lookahead + t.insert < M)); )
         ;
   } while (t.lookahead < At && t.strm.avail_in !== 0);
 }
-function Th(t, e) {
+function Ph(t, e) {
   var r = 65535;
   for (r > t.pending_buf_size - 5 && (r = t.pending_buf_size - 5); ; ) {
     if (t.lookahead <= 1) {
@@ -1528,7 +1532,7 @@ function Th(t, e) {
   }
   return t.insert = 0, e === ae ? (nt(t, !0), t.strm.avail_out === 0 ? ye : Ve) : (t.strstart > t.block_start && (nt(t, !1), t.strm.avail_out === 0), tt);
 }
-function Sa(t, e) {
+function ka(t, e) {
   for (var r, n; ; ) {
     if (t.lookahead < At) {
       if (_e(t), t.lookahead < At && e === ke)
@@ -1536,7 +1540,7 @@ function Sa(t, e) {
       if (t.lookahead === 0)
         break;
     }
-    if (r = 0, t.lookahead >= M && (t.ins_h = (t.ins_h << t.hash_shift ^ t.window[t.strstart + M - 1]) & t.hash_mask, r = t.prev[t.strstart & t.w_mask] = t.head[t.ins_h], t.head[t.ins_h] = t.strstart), r !== 0 && t.strstart - r <= t.w_size - At && (t.match_length = ec(t, r)), t.match_length >= M)
+    if (r = 0, t.lookahead >= M && (t.ins_h = (t.ins_h << t.hash_shift ^ t.window[t.strstart + M - 1]) & t.hash_mask, r = t.prev[t.strstart & t.w_mask] = t.head[t.ins_h], t.head[t.ins_h] = t.strstart), r !== 0 && t.strstart - r <= t.w_size - At && (t.match_length = nc(t, r)), t.match_length >= M)
       if (n = bt._tr_tally(t, t.strstart - t.match_start, t.match_length - M), t.lookahead -= t.match_length, t.match_length <= t.max_lazy_match && t.lookahead >= M) {
         t.match_length--;
         do
@@ -1560,7 +1564,7 @@ function Ie(t, e) {
       if (t.lookahead === 0)
         break;
     }
-    if (r = 0, t.lookahead >= M && (t.ins_h = (t.ins_h << t.hash_shift ^ t.window[t.strstart + M - 1]) & t.hash_mask, r = t.prev[t.strstart & t.w_mask] = t.head[t.ins_h], t.head[t.ins_h] = t.strstart), t.prev_length = t.match_length, t.prev_match = t.match_start, t.match_length = M - 1, r !== 0 && t.prev_length < t.max_lazy_match && t.strstart - r <= t.w_size - At && (t.match_length = ec(t, r), t.match_length <= 5 && (t.strategy === hh || t.match_length === M && t.strstart - t.match_start > 4096) && (t.match_length = M - 1)), t.prev_length >= M && t.match_length <= t.prev_length) {
+    if (r = 0, t.lookahead >= M && (t.ins_h = (t.ins_h << t.hash_shift ^ t.window[t.strstart + M - 1]) & t.hash_mask, r = t.prev[t.strstart & t.w_mask] = t.head[t.ins_h], t.head[t.ins_h] = t.strstart), t.prev_length = t.match_length, t.prev_match = t.match_start, t.match_length = M - 1, r !== 0 && t.prev_length < t.max_lazy_match && t.strstart - r <= t.w_size - At && (t.match_length = nc(t, r), t.match_length <= 5 && (t.strategy === ph || t.match_length === M && t.strstart - t.match_start > 4096) && (t.match_length = M - 1)), t.prev_length >= M && t.match_length <= t.prev_length) {
       a = t.strstart + t.lookahead - M, n = bt._tr_tally(t, t.strstart - 1 - t.prev_match, t.prev_length - M), t.lookahead -= t.prev_length - 1, t.prev_length -= 2;
       do
         ++t.strstart <= a && (t.ins_h = (t.ins_h << t.hash_shift ^ t.window[t.strstart + M - 1]) & t.hash_mask, r = t.prev[t.strstart & t.w_mask] = t.head[t.ins_h], t.head[t.ins_h] = t.strstart);
@@ -1575,7 +1579,7 @@ function Ie(t, e) {
   }
   return t.match_available && (n = bt._tr_tally(t, 0, t.window[t.strstart - 1]), t.match_available = 0), t.insert = t.strstart < M - 1 ? t.strstart : M - 1, e === ae ? (nt(t, !0), t.strm.avail_out === 0 ? ye : Ve) : t.last_lit && (nt(t, !1), t.strm.avail_out === 0) ? tt : Br;
 }
-function Ih(t, e) {
+function Bh(t, e) {
   for (var r, n, a, i, o = t.window; ; ) {
     if (t.lookahead <= ee) {
       if (_e(t), t.lookahead <= ee && e === ke)
@@ -1595,7 +1599,7 @@ function Ih(t, e) {
   }
   return t.insert = 0, e === ae ? (nt(t, !0), t.strm.avail_out === 0 ? ye : Ve) : t.last_lit && (nt(t, !1), t.strm.avail_out === 0) ? tt : Br;
 }
-function Ph(t, e) {
+function Ch(t, e) {
   for (var r; ; ) {
     if (t.lookahead === 0 && (_e(t), t.lookahead === 0)) {
       if (e === ke)
@@ -1613,13 +1617,13 @@ function Bt(t, e, r, n, a) {
 var Ce;
 Ce = [
   /*      good lazy nice chain */
-  new Bt(0, 0, 0, 0, Th),
+  new Bt(0, 0, 0, 0, Ph),
   /* 0 store only */
-  new Bt(4, 4, 8, 4, Sa),
+  new Bt(4, 4, 8, 4, ka),
   /* 1 max speed, no lazy matches */
-  new Bt(4, 5, 16, 8, Sa),
+  new Bt(4, 5, 16, 8, ka),
   /* 2 */
-  new Bt(4, 6, 32, 32, Sa),
+  new Bt(4, 6, 32, 32, ka),
   /* 3 */
   new Bt(4, 4, 16, 16, Ie),
   /* 4 lazy matches */
@@ -1634,60 +1638,60 @@ Ce = [
   new Bt(32, 258, 258, 4096, Ie)
   /* 9 max compression */
 ];
-function Bh(t) {
+function Dh(t) {
   t.window_size = 2 * t.w_size, te(t.head), t.max_lazy_match = Ce[t.level].max_lazy, t.good_match = Ce[t.level].good_length, t.nice_match = Ce[t.level].nice_length, t.max_chain_length = Ce[t.level].max_chain, t.strstart = 0, t.block_start = 0, t.lookahead = 0, t.insert = 0, t.match_length = t.prev_length = M - 1, t.match_available = 0, t.ins_h = 0;
 }
-function Ch() {
-  this.strm = null, this.status = 0, this.pending_buf = null, this.pending_buf_size = 0, this.pending_out = 0, this.pending = 0, this.wrap = 0, this.gzhead = null, this.gzindex = 0, this.method = Un, this.last_flush = -1, this.w_size = 0, this.w_bits = 0, this.w_mask = 0, this.window = null, this.window_size = 0, this.prev = null, this.head = null, this.ins_h = 0, this.hash_size = 0, this.hash_bits = 0, this.hash_mask = 0, this.hash_shift = 0, this.block_start = 0, this.match_length = 0, this.prev_match = 0, this.match_available = 0, this.strstart = 0, this.match_start = 0, this.lookahead = 0, this.prev_length = 0, this.max_chain_length = 0, this.max_lazy_match = 0, this.level = 0, this.strategy = 0, this.good_match = 0, this.nice_match = 0, this.dyn_ltree = new ot.Buf16(kh * 2), this.dyn_dtree = new ot.Buf16((2 * Eh + 1) * 2), this.bl_tree = new ot.Buf16((2 * Sh + 1) * 2), te(this.dyn_ltree), te(this.dyn_dtree), te(this.bl_tree), this.l_desc = null, this.d_desc = null, this.bl_desc = null, this.bl_count = new ot.Buf16(Ah + 1), this.heap = new ot.Buf16(2 * Xa + 1), te(this.heap), this.heap_len = 0, this.heap_max = 0, this.depth = new ot.Buf16(2 * Xa + 1), te(this.depth), this.l_buf = 0, this.lit_bufsize = 0, this.last_lit = 0, this.d_buf = 0, this.opt_len = 0, this.static_len = 0, this.matches = 0, this.insert = 0, this.bi_buf = 0, this.bi_valid = 0;
+function Nh() {
+  this.strm = null, this.status = 0, this.pending_buf = null, this.pending_buf_size = 0, this.pending_out = 0, this.pending = 0, this.wrap = 0, this.gzhead = null, this.gzindex = 0, this.method = Mn, this.last_flush = -1, this.w_size = 0, this.w_bits = 0, this.w_mask = 0, this.window = null, this.window_size = 0, this.prev = null, this.head = null, this.ins_h = 0, this.hash_size = 0, this.hash_bits = 0, this.hash_mask = 0, this.hash_shift = 0, this.block_start = 0, this.match_length = 0, this.prev_match = 0, this.match_available = 0, this.strstart = 0, this.match_start = 0, this.lookahead = 0, this.prev_length = 0, this.max_chain_length = 0, this.max_lazy_match = 0, this.level = 0, this.strategy = 0, this.good_match = 0, this.nice_match = 0, this.dyn_ltree = new ot.Buf16($h * 2), this.dyn_dtree = new ot.Buf16((2 * kh + 1) * 2), this.bl_tree = new ot.Buf16((2 * Ah + 1) * 2), te(this.dyn_ltree), te(this.dyn_dtree), te(this.bl_tree), this.l_desc = null, this.d_desc = null, this.bl_desc = null, this.bl_count = new ot.Buf16(Rh + 1), this.heap = new ot.Buf16(2 * Ka + 1), te(this.heap), this.heap_len = 0, this.heap_max = 0, this.depth = new ot.Buf16(2 * Ka + 1), te(this.depth), this.l_buf = 0, this.lit_bufsize = 0, this.last_lit = 0, this.d_buf = 0, this.opt_len = 0, this.static_len = 0, this.matches = 0, this.insert = 0, this.bi_buf = 0, this.bi_valid = 0;
 }
-function rc(t) {
+function ac(t) {
   var e;
-  return !t || !t.state ? re(t, vt) : (t.total_in = t.total_out = 0, t.data_type = gh, e = t.state, e.pending = 0, e.pending_out = 0, e.wrap < 0 && (e.wrap = -e.wrap), e.status = e.wrap ? Mn : pe, t.adler = e.wrap === 2 ? 0 : 1, e.last_flush = ke, bt._tr_init(e), Ut);
+  return !t || !t.state ? re(t, vt) : (t.total_in = t.total_out = 0, t.data_type = _h, e = t.state, e.pending = 0, e.pending_out = 0, e.wrap < 0 && (e.wrap = -e.wrap), e.status = e.wrap ? zn : pe, t.adler = e.wrap === 2 ? 0 : 1, e.last_flush = ke, bt._tr_init(e), Ut);
 }
-function nc(t) {
-  var e = rc(t);
-  return e === Ut && Bh(t.state), e;
+function ic(t) {
+  var e = ac(t);
+  return e === Ut && Dh(t.state), e;
 }
-function Dh(t, e) {
+function Fh(t, e) {
   return !t || !t.state || t.state.wrap !== 2 ? vt : (t.state.gzhead = e, Ut);
 }
-function ac(t, e, r, n, a, i) {
+function oc(t, e, r, n, a, i) {
   if (!t)
     return vt;
   var o = 1;
-  if (e === dh && (e = 6), n < 0 ? (o = 0, n = -n) : n > 15 && (o = 2, n -= 16), a < 1 || a > yh || r !== Un || n < 8 || n > 15 || e < 0 || e > 9 || i < 0 || i > ph)
+  if (e === wh && (e = 6), n < 0 ? (o = 0, n = -n) : n > 15 && (o = 2, n -= 16), a < 1 || a > bh || r !== Mn || n < 8 || n > 15 || e < 0 || e > 9 || i < 0 || i > gh)
     return re(t, vt);
   n === 8 && (n = 9);
-  var s = new Ch();
-  return t.state = s, s.strm = t, s.wrap = o, s.gzhead = null, s.w_bits = n, s.w_size = 1 << s.w_bits, s.w_mask = s.w_size - 1, s.hash_bits = a + 7, s.hash_size = 1 << s.hash_bits, s.hash_mask = s.hash_size - 1, s.hash_shift = ~~((s.hash_bits + M - 1) / M), s.window = new ot.Buf8(s.w_size * 2), s.head = new ot.Buf16(s.hash_size), s.prev = new ot.Buf16(s.w_size), s.lit_bufsize = 1 << a + 6, s.pending_buf_size = s.lit_bufsize * 4, s.pending_buf = new ot.Buf8(s.pending_buf_size), s.d_buf = 1 * s.lit_bufsize, s.l_buf = 3 * s.lit_bufsize, s.level = e, s.strategy = i, s.method = r, nc(t);
+  var s = new Nh();
+  return t.state = s, s.strm = t, s.wrap = o, s.gzhead = null, s.w_bits = n, s.w_size = 1 << s.w_bits, s.w_mask = s.w_size - 1, s.hash_bits = a + 7, s.hash_size = 1 << s.hash_bits, s.hash_mask = s.hash_size - 1, s.hash_shift = ~~((s.hash_bits + M - 1) / M), s.window = new ot.Buf8(s.w_size * 2), s.head = new ot.Buf16(s.hash_size), s.prev = new ot.Buf16(s.w_size), s.lit_bufsize = 1 << a + 6, s.pending_buf_size = s.lit_bufsize * 4, s.pending_buf = new ot.Buf8(s.pending_buf_size), s.d_buf = 1 * s.lit_bufsize, s.l_buf = 3 * s.lit_bufsize, s.level = e, s.strategy = i, s.method = r, ic(t);
 }
-function Nh(t, e) {
-  return ac(t, e, Un, _h, bh, mh);
+function jh(t, e) {
+  return oc(t, e, Mn, vh, xh, yh);
 }
-function Fh(t, e) {
+function Uh(t, e) {
   var r, n, a, i;
-  if (!t || !t.state || e > so || e < 0)
+  if (!t || !t.state || e > fo || e < 0)
     return t ? re(t, vt) : vt;
   if (n = t.state, !t.output || !t.input && t.avail_in !== 0 || n.status === sr && e !== ae)
-    return re(t, t.avail_out === 0 ? Ea : vt);
-  if (n.strm = t, r = n.last_flush, n.last_flush = e, n.status === Mn)
+    return re(t, t.avail_out === 0 ? Sa : vt);
+  if (n.strm = t, r = n.last_flush, n.last_flush = e, n.status === zn)
     if (n.wrap === 2)
       t.adler = 0, z(n, 31), z(n, 139), z(n, 8), n.gzhead ? (z(
         n,
         (n.gzhead.text ? 1 : 0) + (n.gzhead.hcrc ? 2 : 0) + (n.gzhead.extra ? 4 : 0) + (n.gzhead.name ? 8 : 0) + (n.gzhead.comment ? 16 : 0)
-      ), z(n, n.gzhead.time & 255), z(n, n.gzhead.time >> 8 & 255), z(n, n.gzhead.time >> 16 & 255), z(n, n.gzhead.time >> 24 & 255), z(n, n.level === 9 ? 2 : n.strategy >= an || n.level < 2 ? 4 : 0), z(n, n.gzhead.os & 255), n.gzhead.extra && n.gzhead.extra.length && (z(n, n.gzhead.extra.length & 255), z(n, n.gzhead.extra.length >> 8 & 255)), n.gzhead.hcrc && (t.adler = Jt(t.adler, n.pending_buf, n.pending, 0)), n.gzindex = 0, n.status = Ka) : (z(n, 0), z(n, 0), z(n, 0), z(n, 0), z(n, 0), z(n, n.level === 9 ? 2 : n.strategy >= an || n.level < 2 ? 4 : 0), z(n, Rh), n.status = pe);
+      ), z(n, n.gzhead.time & 255), z(n, n.gzhead.time >> 8 & 255), z(n, n.gzhead.time >> 16 & 255), z(n, n.gzhead.time >> 24 & 255), z(n, n.level === 9 ? 2 : n.strategy >= an || n.level < 2 ? 4 : 0), z(n, n.gzhead.os & 255), n.gzhead.extra && n.gzhead.extra.length && (z(n, n.gzhead.extra.length & 255), z(n, n.gzhead.extra.length >> 8 & 255)), n.gzhead.hcrc && (t.adler = Jt(t.adler, n.pending_buf, n.pending, 0)), n.gzindex = 0, n.status = Ya) : (z(n, 0), z(n, 0), z(n, 0), z(n, 0), z(n, 0), z(n, n.level === 9 ? 2 : n.strategy >= an || n.level < 2 ? 4 : 0), z(n, Th), n.status = pe);
     else {
-      var o = Un + (n.w_bits - 8 << 4) << 8, s = -1;
-      n.strategy >= an || n.level < 2 ? s = 0 : n.level < 6 ? s = 1 : n.level === 6 ? s = 2 : s = 3, o |= s << 6, n.strstart !== 0 && (o |= $h), o += 31 - o % 31, n.status = pe, ir(n, o), n.strstart !== 0 && (ir(n, t.adler >>> 16), ir(n, t.adler & 65535)), t.adler = 1;
+      var o = Mn + (n.w_bits - 8 << 4) << 8, s = -1;
+      n.strategy >= an || n.level < 2 ? s = 0 : n.level < 6 ? s = 1 : n.level === 6 ? s = 2 : s = 3, o |= s << 6, n.strstart !== 0 && (o |= Oh), o += 31 - o % 31, n.status = pe, ir(n, o), n.strstart !== 0 && (ir(n, t.adler >>> 16), ir(n, t.adler & 65535)), t.adler = 1;
     }
-  if (n.status === Ka)
+  if (n.status === Ya)
     if (n.gzhead.extra) {
       for (a = n.pending; n.gzindex < (n.gzhead.extra.length & 65535) && !(n.pending === n.pending_buf_size && (n.gzhead.hcrc && n.pending > a && (t.adler = Jt(t.adler, n.pending_buf, n.pending - a, a)), Qt(t), a = n.pending, n.pending === n.pending_buf_size)); )
         z(n, n.gzhead.extra[n.gzindex] & 255), n.gzindex++;
-      n.gzhead.hcrc && n.pending > a && (t.adler = Jt(t.adler, n.pending_buf, n.pending - a, a)), n.gzindex === n.gzhead.extra.length && (n.gzindex = 0, n.status = mn);
+      n.gzhead.hcrc && n.pending > a && (t.adler = Jt(t.adler, n.pending_buf, n.pending - a, a)), n.gzindex === n.gzhead.extra.length && (n.gzindex = 0, n.status = gn);
     } else
-      n.status = mn;
-  if (n.status === mn)
+      n.status = gn;
+  if (n.status === gn)
     if (n.gzhead.name) {
       a = n.pending;
       do {
@@ -1697,10 +1701,10 @@ function Fh(t, e) {
         }
         n.gzindex < n.gzhead.name.length ? i = n.gzhead.name.charCodeAt(n.gzindex++) & 255 : i = 0, z(n, i);
       } while (i !== 0);
-      n.gzhead.hcrc && n.pending > a && (t.adler = Jt(t.adler, n.pending_buf, n.pending - a, a)), i === 0 && (n.gzindex = 0, n.status = gn);
+      n.gzhead.hcrc && n.pending > a && (t.adler = Jt(t.adler, n.pending_buf, n.pending - a, a)), i === 0 && (n.gzindex = 0, n.status = yn);
     } else
-      n.status = gn;
-  if (n.status === gn)
+      n.status = yn;
+  if (n.status === yn)
     if (n.gzhead.comment) {
       a = n.pending;
       do {
@@ -1710,34 +1714,34 @@ function Fh(t, e) {
         }
         n.gzindex < n.gzhead.comment.length ? i = n.gzhead.comment.charCodeAt(n.gzindex++) & 255 : i = 0, z(n, i);
       } while (i !== 0);
-      n.gzhead.hcrc && n.pending > a && (t.adler = Jt(t.adler, n.pending_buf, n.pending - a, a)), i === 0 && (n.status = yn);
+      n.gzhead.hcrc && n.pending > a && (t.adler = Jt(t.adler, n.pending_buf, n.pending - a, a)), i === 0 && (n.status = _n);
     } else
-      n.status = yn;
-  if (n.status === yn && (n.gzhead.hcrc ? (n.pending + 2 > n.pending_buf_size && Qt(t), n.pending + 2 <= n.pending_buf_size && (z(n, t.adler & 255), z(n, t.adler >> 8 & 255), t.adler = 0, n.status = pe)) : n.status = pe), n.pending !== 0) {
+      n.status = _n;
+  if (n.status === _n && (n.gzhead.hcrc ? (n.pending + 2 > n.pending_buf_size && Qt(t), n.pending + 2 <= n.pending_buf_size && (z(n, t.adler & 255), z(n, t.adler >> 8 & 255), t.adler = 0, n.status = pe)) : n.status = pe), n.pending !== 0) {
     if (Qt(t), t.avail_out === 0)
       return n.last_flush = -1, Ut;
-  } else if (t.avail_in === 0 && fo(e) <= fo(r) && e !== ae)
-    return re(t, Ea);
+  } else if (t.avail_in === 0 && uo(e) <= uo(r) && e !== ae)
+    return re(t, Sa);
   if (n.status === sr && t.avail_in !== 0)
-    return re(t, Ea);
+    return re(t, Sa);
   if (t.avail_in !== 0 || n.lookahead !== 0 || e !== ke && n.status !== sr) {
-    var l = n.strategy === an ? Ph(n, e) : n.strategy === wh ? Ih(n, e) : Ce[n.level].func(n, e);
+    var l = n.strategy === an ? Ch(n, e) : n.strategy === mh ? Bh(n, e) : Ce[n.level].func(n, e);
     if ((l === ye || l === Ve) && (n.status = sr), l === tt || l === ye)
       return t.avail_out === 0 && (n.last_flush = -1), Ut;
-    if (l === Br && (e === fh ? bt._tr_align(n) : e !== so && (bt._tr_stored_block(n, 0, 0, !1), e === lh && (te(n.head), n.lookahead === 0 && (n.strstart = 0, n.block_start = 0, n.insert = 0))), Qt(t), t.avail_out === 0))
+    if (l === Br && (e === uh ? bt._tr_align(n) : e !== fo && (bt._tr_stored_block(n, 0, 0, !1), e === dh && (te(n.head), n.lookahead === 0 && (n.strstart = 0, n.block_start = 0, n.insert = 0))), Qt(t), t.avail_out === 0))
       return n.last_flush = -1, Ut;
   }
-  return e !== ae ? Ut : n.wrap <= 0 ? co : (n.wrap === 2 ? (z(n, t.adler & 255), z(n, t.adler >> 8 & 255), z(n, t.adler >> 16 & 255), z(n, t.adler >> 24 & 255), z(n, t.total_in & 255), z(n, t.total_in >> 8 & 255), z(n, t.total_in >> 16 & 255), z(n, t.total_in >> 24 & 255)) : (ir(n, t.adler >>> 16), ir(n, t.adler & 65535)), Qt(t), n.wrap > 0 && (n.wrap = -n.wrap), n.pending !== 0 ? Ut : co);
+  return e !== ae ? Ut : n.wrap <= 0 ? lo : (n.wrap === 2 ? (z(n, t.adler & 255), z(n, t.adler >> 8 & 255), z(n, t.adler >> 16 & 255), z(n, t.adler >> 24 & 255), z(n, t.total_in & 255), z(n, t.total_in >> 8 & 255), z(n, t.total_in >> 16 & 255), z(n, t.total_in >> 24 & 255)) : (ir(n, t.adler >>> 16), ir(n, t.adler & 65535)), Qt(t), n.wrap > 0 && (n.wrap = -n.wrap), n.pending !== 0 ? Ut : lo);
 }
-function jh(t) {
+function Mh(t) {
   var e;
-  return !t || !t.state ? vt : (e = t.state.status, e !== Mn && e !== Ka && e !== mn && e !== gn && e !== yn && e !== pe && e !== sr ? re(t, vt) : (t.state = null, e === pe ? re(t, uh) : Ut));
+  return !t || !t.state ? vt : (e = t.state.status, e !== zn && e !== Ya && e !== gn && e !== yn && e !== _n && e !== pe && e !== sr ? re(t, vt) : (t.state = null, e === pe ? re(t, hh) : Ut));
 }
-function Uh(t, e) {
+function zh(t, e) {
   var r = e.length, n, a, i, o, s, l, c, f;
-  if (!t || !t.state || (n = t.state, o = n.wrap, o === 2 || o === 1 && n.status !== Mn || n.lookahead))
+  if (!t || !t.state || (n = t.state, o = n.wrap, o === 2 || o === 1 && n.status !== zn || n.lookahead))
     return vt;
-  for (o === 1 && (t.adler = tc(t.adler, e, r, 0)), n.wrap = 0, r >= n.w_size && (o === 0 && (te(n.head), n.strstart = 0, n.block_start = 0, n.insert = 0), f = new ot.Buf8(n.w_size), ot.arraySet(f, e, r - n.w_size, n.w_size, 0), e = f, r = n.w_size), s = t.avail_in, l = t.next_in, c = t.input, t.avail_in = r, t.next_in = 0, t.input = e, _e(n); n.lookahead >= M; ) {
+  for (o === 1 && (t.adler = rc(t.adler, e, r, 0)), n.wrap = 0, r >= n.w_size && (o === 0 && (te(n.head), n.strstart = 0, n.block_start = 0, n.insert = 0), f = new ot.Buf8(n.w_size), ot.arraySet(f, e, r - n.w_size, n.w_size, 0), e = f, r = n.w_size), s = t.avail_in, l = t.next_in, c = t.input, t.avail_in = r, t.next_in = 0, t.input = e, _e(n); n.lookahead >= M; ) {
     a = n.strstart, i = n.lookahead - (M - 1);
     do
       n.ins_h = (n.ins_h << n.hash_shift ^ n.window[a + M - 1]) & n.hash_mask, n.prev[a & n.w_mask] = n.head[n.ins_h], n.head[n.ins_h] = a, a++;
@@ -1746,27 +1750,27 @@ function Uh(t, e) {
   }
   return n.strstart += n.lookahead, n.block_start = n.strstart, n.insert = n.lookahead, n.lookahead = 0, n.match_length = n.prev_length = M - 1, n.match_available = 0, t.next_in = l, t.input = c, t.avail_in = s, n.wrap = o, Ut;
 }
-Lt.deflateInit = Nh;
-Lt.deflateInit2 = ac;
-Lt.deflateReset = nc;
-Lt.deflateResetKeep = rc;
-Lt.deflateSetHeader = Dh;
-Lt.deflate = Fh;
-Lt.deflateEnd = jh;
-Lt.deflateSetDictionary = Uh;
+Lt.deflateInit = jh;
+Lt.deflateInit2 = oc;
+Lt.deflateReset = ic;
+Lt.deflateResetKeep = ac;
+Lt.deflateSetHeader = Fh;
+Lt.deflate = Uh;
+Lt.deflateEnd = Mh;
+Lt.deflateSetDictionary = zh;
 Lt.deflateInfo = "pako deflate (from Nodeca project)";
-var Ae = {}, zn = Xt, ic = !0, oc = !0;
+var Ae = {}, Ln = Xt, sc = !0, cc = !0;
 try {
   String.fromCharCode.apply(null, [0]);
 } catch {
-  ic = !1;
+  sc = !1;
 }
 try {
   String.fromCharCode.apply(null, new Uint8Array(1));
 } catch {
-  oc = !1;
+  cc = !1;
 }
-var _r = new zn.Buf8(256);
+var _r = new Ln.Buf8(256);
 for (var Kt = 0; Kt < 256; Kt++)
   _r[Kt] = Kt >= 252 ? 6 : Kt >= 248 ? 5 : Kt >= 240 ? 4 : Kt >= 224 ? 3 : Kt >= 192 ? 2 : 1;
 _r[254] = _r[254] = 1;
@@ -1774,22 +1778,22 @@ Ae.string2buf = function(t) {
   var e, r, n, a, i, o = t.length, s = 0;
   for (a = 0; a < o; a++)
     r = t.charCodeAt(a), (r & 64512) === 55296 && a + 1 < o && (n = t.charCodeAt(a + 1), (n & 64512) === 56320 && (r = 65536 + (r - 55296 << 10) + (n - 56320), a++)), s += r < 128 ? 1 : r < 2048 ? 2 : r < 65536 ? 3 : 4;
-  for (e = new zn.Buf8(s), i = 0, a = 0; i < s; a++)
+  for (e = new Ln.Buf8(s), i = 0, a = 0; i < s; a++)
     r = t.charCodeAt(a), (r & 64512) === 55296 && a + 1 < o && (n = t.charCodeAt(a + 1), (n & 64512) === 56320 && (r = 65536 + (r - 55296 << 10) + (n - 56320), a++)), r < 128 ? e[i++] = r : r < 2048 ? (e[i++] = 192 | r >>> 6, e[i++] = 128 | r & 63) : r < 65536 ? (e[i++] = 224 | r >>> 12, e[i++] = 128 | r >>> 6 & 63, e[i++] = 128 | r & 63) : (e[i++] = 240 | r >>> 18, e[i++] = 128 | r >>> 12 & 63, e[i++] = 128 | r >>> 6 & 63, e[i++] = 128 | r & 63);
   return e;
 };
-function sc(t, e) {
-  if (e < 65534 && (t.subarray && oc || !t.subarray && ic))
-    return String.fromCharCode.apply(null, zn.shrinkBuf(t, e));
+function fc(t, e) {
+  if (e < 65534 && (t.subarray && cc || !t.subarray && sc))
+    return String.fromCharCode.apply(null, Ln.shrinkBuf(t, e));
   for (var r = "", n = 0; n < e; n++)
     r += String.fromCharCode(t[n]);
   return r;
 }
 Ae.buf2binstring = function(t) {
-  return sc(t, t.length);
+  return fc(t, t.length);
 };
 Ae.binstring2buf = function(t) {
-  for (var e = new zn.Buf8(t.length), r = 0, n = e.length; r < n; r++)
+  for (var e = new Ln.Buf8(t.length), r = 0, n = e.length; r < n; r++)
     e[r] = t.charCodeAt(r);
   return e;
 };
@@ -1812,7 +1816,7 @@ Ae.buf2string = function(t, e) {
     }
     a < 65536 ? s[n++] = a : (a -= 65536, s[n++] = 55296 | a >> 10 & 1023, s[n++] = 56320 | a & 1023);
   }
-  return sc(s, n);
+  return fc(s, n);
 };
 Ae.utf8border = function(t, e) {
   var r;
@@ -1820,23 +1824,23 @@ Ae.utf8border = function(t, e) {
     r--;
   return r < 0 || r === 0 ? e : r + _r[t[r]] > e ? r : e;
 };
-function Mh() {
+function Lh() {
   this.input = null, this.next_in = 0, this.avail_in = 0, this.total_in = 0, this.output = null, this.next_out = 0, this.avail_out = 0, this.total_out = 0, this.msg = "", this.state = null, this.data_type = 2, this.adler = 0;
 }
-var cc = Mh, fr = Lt, lr = Xt, Ya = Ae, Ja = pi, zh = cc, fc = Object.prototype.toString, Lh = 0, ka = 4, Fe = 0, lo = 1, uo = 2, Hh = -1, Gh = 0, Wh = 8;
+var lc = Lh, fr = Lt, lr = Xt, Ja = Ae, Qa = mi, Hh = lc, uc = Object.prototype.toString, Gh = 0, Aa = 4, Fe = 0, ho = 1, wo = 2, Wh = -1, qh = 0, Zh = 8;
 function be(t) {
   if (!(this instanceof be)) return new be(t);
   this.options = lr.assign({
-    level: Hh,
-    method: Wh,
+    level: Wh,
+    method: Zh,
     chunkSize: 16384,
     windowBits: 15,
     memLevel: 8,
-    strategy: Gh,
+    strategy: qh,
     to: ""
   }, t || {});
   var e = this.options;
-  e.raw && e.windowBits > 0 ? e.windowBits = -e.windowBits : e.gzip && e.windowBits > 0 && e.windowBits < 16 && (e.windowBits += 16), this.err = 0, this.msg = "", this.ended = !1, this.chunks = [], this.strm = new zh(), this.strm.avail_out = 0;
+  e.raw && e.windowBits > 0 ? e.windowBits = -e.windowBits : e.gzip && e.windowBits > 0 && e.windowBits < 16 && (e.windowBits += 16), this.err = 0, this.msg = "", this.ended = !1, this.chunks = [], this.strm = new Hh(), this.strm.avail_out = 0;
   var r = fr.deflateInit2(
     this.strm,
     e.level,
@@ -1846,11 +1850,11 @@ function be(t) {
     e.strategy
   );
   if (r !== Fe)
-    throw new Error(Ja[r]);
+    throw new Error(Qa[r]);
   if (e.header && fr.deflateSetHeader(this.strm, e.header), e.dictionary) {
     var n;
-    if (typeof e.dictionary == "string" ? n = Ya.string2buf(e.dictionary) : fc.call(e.dictionary) === "[object ArrayBuffer]" ? n = new Uint8Array(e.dictionary) : n = e.dictionary, r = fr.deflateSetDictionary(this.strm, n), r !== Fe)
-      throw new Error(Ja[r]);
+    if (typeof e.dictionary == "string" ? n = Ja.string2buf(e.dictionary) : uc.call(e.dictionary) === "[object ArrayBuffer]" ? n = new Uint8Array(e.dictionary) : n = e.dictionary, r = fr.deflateSetDictionary(this.strm, n), r !== Fe)
+      throw new Error(Qa[r]);
     this._dict_set = !0;
   }
 }
@@ -1858,13 +1862,13 @@ be.prototype.push = function(t, e) {
   var r = this.strm, n = this.options.chunkSize, a, i;
   if (this.ended)
     return !1;
-  i = e === ~~e ? e : e === !0 ? ka : Lh, typeof t == "string" ? r.input = Ya.string2buf(t) : fc.call(t) === "[object ArrayBuffer]" ? r.input = new Uint8Array(t) : r.input = t, r.next_in = 0, r.avail_in = r.input.length;
+  i = e === ~~e ? e : e === !0 ? Aa : Gh, typeof t == "string" ? r.input = Ja.string2buf(t) : uc.call(t) === "[object ArrayBuffer]" ? r.input = new Uint8Array(t) : r.input = t, r.next_in = 0, r.avail_in = r.input.length;
   do {
-    if (r.avail_out === 0 && (r.output = new lr.Buf8(n), r.next_out = 0, r.avail_out = n), a = fr.deflate(r, i), a !== lo && a !== Fe)
+    if (r.avail_out === 0 && (r.output = new lr.Buf8(n), r.next_out = 0, r.avail_out = n), a = fr.deflate(r, i), a !== ho && a !== Fe)
       return this.onEnd(a), this.ended = !0, !1;
-    (r.avail_out === 0 || r.avail_in === 0 && (i === ka || i === uo)) && (this.options.to === "string" ? this.onData(Ya.buf2binstring(lr.shrinkBuf(r.output, r.next_out))) : this.onData(lr.shrinkBuf(r.output, r.next_out)));
-  } while ((r.avail_in > 0 || r.avail_out === 0) && a !== lo);
-  return i === ka ? (a = fr.deflateEnd(this.strm), this.onEnd(a), this.ended = !0, a === Fe) : (i === uo && (this.onEnd(Fe), r.avail_out = 0), !0);
+    (r.avail_out === 0 || r.avail_in === 0 && (i === Aa || i === wo)) && (this.options.to === "string" ? this.onData(Ja.buf2binstring(lr.shrinkBuf(r.output, r.next_out))) : this.onData(lr.shrinkBuf(r.output, r.next_out)));
+  } while ((r.avail_in > 0 || r.avail_out === 0) && a !== ho);
+  return i === Aa ? (a = fr.deflateEnd(this.strm), this.onEnd(a), this.ended = !0, a === Fe) : (i === wo && (this.onEnd(Fe), r.avail_out = 0), !0);
 };
 be.prototype.onData = function(t) {
   this.chunks.push(t);
@@ -1872,23 +1876,23 @@ be.prototype.onData = function(t) {
 be.prototype.onEnd = function(t) {
   t === Fe && (this.options.to === "string" ? this.result = this.chunks.join("") : this.result = lr.flattenChunks(this.chunks)), this.chunks = [], this.err = t, this.msg = this.strm.msg;
 };
-function mi(t, e) {
+function gi(t, e) {
   var r = new be(e);
   if (r.push(t, !0), r.err)
-    throw r.msg || Ja[r.err];
+    throw r.msg || Qa[r.err];
   return r.result;
 }
-function qh(t, e) {
-  return e = e || {}, e.raw = !0, mi(t, e);
+function Vh(t, e) {
+  return e = e || {}, e.raw = !0, gi(t, e);
 }
-function Zh(t, e) {
-  return e = e || {}, e.gzip = !0, mi(t, e);
+function Xh(t, e) {
+  return e = e || {}, e.gzip = !0, gi(t, e);
 }
 Ir.Deflate = be;
-Ir.deflate = mi;
-Ir.deflateRaw = qh;
-Ir.gzip = Zh;
-var Cr = {}, Rt = {}, on = 30, Vh = 12, Xh = function(e, r) {
+Ir.deflate = gi;
+Ir.deflateRaw = Vh;
+Ir.gzip = Xh;
+var Cr = {}, Rt = {}, on = 30, Kh = 12, Yh = function(e, r) {
   var n, a, i, o, s, l, c, f, u, d, h, w, p, m, y, _, v, S, k, O, x, g, E, A, $;
   n = e.state, a = e.next_in, A = e.input, i = a + (e.avail_in - 5), o = e.next_out, $ = e.output, s = o - (r - e.avail_out), l = o + (e.avail_out - 257), c = n.dmax, f = n.wsize, u = n.whave, d = n.wnext, h = n.window, w = n.hold, p = n.bits, m = n.lencode, y = n.distcode, _ = (1 << n.lenbits) - 1, v = (1 << n.distbits) - 1;
   t:
@@ -1962,7 +1966,7 @@ var Cr = {}, Rt = {}, on = 30, Vh = 12, Xh = function(e, r) {
               }
           } else if (k & 64)
             if (k & 32) {
-              n.mode = Vh;
+              n.mode = Kh;
               break t;
             } else {
               e.msg = "invalid literal/length code", n.mode = on;
@@ -1976,7 +1980,7 @@ var Cr = {}, Rt = {}, on = 30, Vh = 12, Xh = function(e, r) {
         }
     } while (a < i && o < l);
   O = p >> 3, a -= O, p -= O << 3, w &= (1 << p) - 1, e.next_in = a, e.next_out = o, e.avail_in = a < i ? 5 + (i - a) : 5 - (a - i), e.avail_out = o < l ? 257 + (l - o) : 257 - (o - l), n.hold = w, n.bits = p;
-}, ho = Xt, Pe = 15, wo = 852, po = 592, mo = 0, Aa = 1, go = 2, Kh = [
+}, po = Xt, Pe = 15, mo = 852, go = 592, yo = 0, $a = 1, _o = 2, Jh = [
   /* Length codes 257..285 base */
   3,
   4,
@@ -2009,7 +2013,7 @@ var Cr = {}, Rt = {}, on = 30, Vh = 12, Xh = function(e, r) {
   258,
   0,
   0
-], Yh = [
+], Qh = [
   /* Length codes 257..285 extra */
   16,
   16,
@@ -2042,7 +2046,7 @@ var Cr = {}, Rt = {}, on = 30, Vh = 12, Xh = function(e, r) {
   16,
   72,
   78
-], Jh = [
+], t0 = [
   /* Distance codes 0..29 base */
   1,
   2,
@@ -2076,7 +2080,7 @@ var Cr = {}, Rt = {}, on = 30, Vh = 12, Xh = function(e, r) {
   24577,
   0,
   0
-], Qh = [
+], e0 = [
   /* Distance codes 0..29 extra */
   16,
   16,
@@ -2110,8 +2114,8 @@ var Cr = {}, Rt = {}, on = 30, Vh = 12, Xh = function(e, r) {
   29,
   64,
   64
-], t0 = function(e, r, n, a, i, o, s, l) {
-  var c = l.bits, f = 0, u = 0, d = 0, h = 0, w = 0, p = 0, m = 0, y = 0, _ = 0, v = 0, S, k, O, x, g, E = null, A = 0, $, I = new ho.Buf16(Pe + 1), B = new ho.Buf16(Pe + 1), N = null, K = 0, Tt, yt, Et;
+], r0 = function(e, r, n, a, i, o, s, l) {
+  var c = l.bits, f = 0, u = 0, d = 0, h = 0, w = 0, p = 0, m = 0, y = 0, _ = 0, v = 0, S, k, O, x, g, E = null, A = 0, $, I = new po.Buf16(Pe + 1), B = new po.Buf16(Pe + 1), N = null, K = 0, Tt, yt, Et;
   for (f = 0; f <= Pe; f++)
     I[f] = 0;
   for (u = 0; u < a; u++)
@@ -2125,13 +2129,13 @@ var Cr = {}, Rt = {}, on = 30, Vh = 12, Xh = function(e, r) {
   for (w < d && (w = d), y = 1, f = 1; f <= Pe; f++)
     if (y <<= 1, y -= I[f], y < 0)
       return -1;
-  if (y > 0 && (e === mo || h !== 1))
+  if (y > 0 && (e === yo || h !== 1))
     return -1;
   for (B[1] = 0, f = 1; f < Pe; f++)
     B[f + 1] = B[f] + I[f];
   for (u = 0; u < a; u++)
     r[n + u] !== 0 && (s[B[r[n + u]]++] = u);
-  if (e === mo ? (E = N = s, $ = 19) : e === Aa ? (E = Kh, A -= 257, N = Yh, K -= 257, $ = 256) : (E = Jh, N = Qh, $ = -1), v = 0, u = 0, f = d, g = o, p = w, m = 0, O = -1, _ = 1 << w, x = _ - 1, e === Aa && _ > wo || e === go && _ > po)
+  if (e === yo ? (E = N = s, $ = 19) : e === $a ? (E = Jh, A -= 257, N = Qh, K -= 257, $ = 256) : (E = t0, N = e0, $ = -1), v = 0, u = 0, f = d, g = o, p = w, m = 0, O = -1, _ = 1 << w, x = _ - 1, e === $a && _ > mo || e === _o && _ > go)
     return 1;
   for (; ; ) {
     Tt = f - m, s[u] < $ ? (yt = 0, Et = s[u]) : s[u] > $ ? (yt = N[K + s[u]], Et = E[A + s[u]]) : (yt = 96, Et = 0), S = 1 << f - m, k = 1 << p, d = k;
@@ -2148,43 +2152,43 @@ var Cr = {}, Rt = {}, on = 30, Vh = 12, Xh = function(e, r) {
     if (f > w && (v & x) !== O) {
       for (m === 0 && (m = w), g += d, p = f - m, y = 1 << p; p + m < h && (y -= I[p + m], !(y <= 0)); )
         p++, y <<= 1;
-      if (_ += 1 << p, e === Aa && _ > wo || e === go && _ > po)
+      if (_ += 1 << p, e === $a && _ > mo || e === _o && _ > go)
         return 1;
       O = v & x, i[O] = w << 24 | p << 16 | g - o | 0;
     }
   }
   return v !== 0 && (i[g + v] = f - m << 24 | 64 << 16 | 0), l.bits = w, 0;
-}, pt = Xt, Qa = Js, Ct = Qs, e0 = Xh, ur = t0, r0 = 0, lc = 1, uc = 2, yo = 4, n0 = 5, sn = 6, ve = 0, a0 = 1, i0 = 2, xt = -2, dc = -3, hc = -4, o0 = -5, _o = 8, wc = 1, bo = 2, vo = 3, xo = 4, Eo = 5, So = 6, ko = 7, Ao = 8, $o = 9, Ro = 10, kn = 11, Ht = 12, $a = 13, Oo = 14, Ra = 15, To = 16, Io = 17, Po = 18, Bo = 19, cn = 20, fn = 21, Co = 22, Do = 23, No = 24, Fo = 25, jo = 26, Oa = 27, Uo = 28, Mo = 29, W = 30, pc = 31, s0 = 32, c0 = 852, f0 = 592, l0 = 15, u0 = l0;
-function zo(t) {
+}, pt = Xt, ti = tc, Ct = ec, n0 = Yh, ur = r0, a0 = 0, dc = 1, hc = 2, bo = 4, i0 = 5, sn = 6, ve = 0, o0 = 1, s0 = 2, xt = -2, wc = -3, pc = -4, c0 = -5, vo = 8, mc = 1, xo = 2, Eo = 3, So = 4, ko = 5, Ao = 6, $o = 7, Ro = 8, Oo = 9, To = 10, An = 11, Ht = 12, Ra = 13, Io = 14, Oa = 15, Po = 16, Bo = 17, Co = 18, Do = 19, cn = 20, fn = 21, No = 22, Fo = 23, jo = 24, Uo = 25, Mo = 26, Ta = 27, zo = 28, Lo = 29, W = 30, gc = 31, f0 = 32, l0 = 852, u0 = 592, d0 = 15, h0 = d0;
+function Ho(t) {
   return (t >>> 24 & 255) + (t >>> 8 & 65280) + ((t & 65280) << 8) + ((t & 255) << 24);
 }
-function d0() {
+function w0() {
   this.mode = 0, this.last = !1, this.wrap = 0, this.havedict = !1, this.flags = 0, this.dmax = 0, this.check = 0, this.total = 0, this.head = null, this.wbits = 0, this.wsize = 0, this.whave = 0, this.wnext = 0, this.window = null, this.hold = 0, this.bits = 0, this.length = 0, this.offset = 0, this.extra = 0, this.lencode = null, this.distcode = null, this.lenbits = 0, this.distbits = 0, this.ncode = 0, this.nlen = 0, this.ndist = 0, this.have = 0, this.next = null, this.lens = new pt.Buf16(320), this.work = new pt.Buf16(288), this.lendyn = null, this.distdyn = null, this.sane = 0, this.back = 0, this.was = 0;
 }
-function mc(t) {
+function yc(t) {
   var e;
-  return !t || !t.state ? xt : (e = t.state, t.total_in = t.total_out = e.total = 0, t.msg = "", e.wrap && (t.adler = e.wrap & 1), e.mode = wc, e.last = 0, e.havedict = 0, e.dmax = 32768, e.head = null, e.hold = 0, e.bits = 0, e.lencode = e.lendyn = new pt.Buf32(c0), e.distcode = e.distdyn = new pt.Buf32(f0), e.sane = 1, e.back = -1, ve);
+  return !t || !t.state ? xt : (e = t.state, t.total_in = t.total_out = e.total = 0, t.msg = "", e.wrap && (t.adler = e.wrap & 1), e.mode = mc, e.last = 0, e.havedict = 0, e.dmax = 32768, e.head = null, e.hold = 0, e.bits = 0, e.lencode = e.lendyn = new pt.Buf32(l0), e.distcode = e.distdyn = new pt.Buf32(u0), e.sane = 1, e.back = -1, ve);
 }
-function gc(t) {
+function _c(t) {
   var e;
-  return !t || !t.state ? xt : (e = t.state, e.wsize = 0, e.whave = 0, e.wnext = 0, mc(t));
+  return !t || !t.state ? xt : (e = t.state, e.wsize = 0, e.whave = 0, e.wnext = 0, yc(t));
 }
-function yc(t, e) {
+function bc(t, e) {
   var r, n;
-  return !t || !t.state || (n = t.state, e < 0 ? (r = 0, e = -e) : (r = (e >> 4) + 1, e < 48 && (e &= 15)), e && (e < 8 || e > 15)) ? xt : (n.window !== null && n.wbits !== e && (n.window = null), n.wrap = r, n.wbits = e, gc(t));
+  return !t || !t.state || (n = t.state, e < 0 ? (r = 0, e = -e) : (r = (e >> 4) + 1, e < 48 && (e &= 15)), e && (e < 8 || e > 15)) ? xt : (n.window !== null && n.wbits !== e && (n.window = null), n.wrap = r, n.wbits = e, _c(t));
 }
-function _c(t, e) {
+function vc(t, e) {
   var r, n;
-  return t ? (n = new d0(), t.state = n, n.window = null, r = yc(t, e), r !== ve && (t.state = null), r) : xt;
+  return t ? (n = new w0(), t.state = n, n.window = null, r = bc(t, e), r !== ve && (t.state = null), r) : xt;
 }
-function h0(t) {
-  return _c(t, u0);
+function p0(t) {
+  return vc(t, h0);
 }
-var Lo = !0, Ta, Ia;
-function w0(t) {
-  if (Lo) {
+var Go = !0, Ia, Pa;
+function m0(t) {
+  if (Go) {
     var e;
-    for (Ta = new pt.Buf32(512), Ia = new pt.Buf32(32), e = 0; e < 144; )
+    for (Ia = new pt.Buf32(512), Pa = new pt.Buf32(32), e = 0; e < 144; )
       t.lens[e++] = 8;
     for (; e < 256; )
       t.lens[e++] = 9;
@@ -2192,30 +2196,30 @@ function w0(t) {
       t.lens[e++] = 7;
     for (; e < 288; )
       t.lens[e++] = 8;
-    for (ur(lc, t.lens, 0, 288, Ta, 0, t.work, { bits: 9 }), e = 0; e < 32; )
+    for (ur(dc, t.lens, 0, 288, Ia, 0, t.work, { bits: 9 }), e = 0; e < 32; )
       t.lens[e++] = 5;
-    ur(uc, t.lens, 0, 32, Ia, 0, t.work, { bits: 5 }), Lo = !1;
+    ur(hc, t.lens, 0, 32, Pa, 0, t.work, { bits: 5 }), Go = !1;
   }
-  t.lencode = Ta, t.lenbits = 9, t.distcode = Ia, t.distbits = 5;
+  t.lencode = Ia, t.lenbits = 9, t.distcode = Pa, t.distbits = 5;
 }
-function bc(t, e, r, n) {
+function xc(t, e, r, n) {
   var a, i = t.state;
   return i.window === null && (i.wsize = 1 << i.wbits, i.wnext = 0, i.whave = 0, i.window = new pt.Buf8(i.wsize)), n >= i.wsize ? (pt.arraySet(i.window, e, r - i.wsize, i.wsize, 0), i.wnext = 0, i.whave = i.wsize) : (a = i.wsize - i.wnext, a > n && (a = n), pt.arraySet(i.window, e, r - n, a, i.wnext), n -= a, n ? (pt.arraySet(i.window, e, r - n, n, 0), i.wnext = n, i.whave = i.wsize) : (i.wnext += a, i.wnext === i.wsize && (i.wnext = 0), i.whave < i.wsize && (i.whave += a))), 0;
 }
-function p0(t, e) {
+function g0(t, e) {
   var r, n, a, i, o, s, l, c, f, u, d, h, w, p, m = 0, y, _, v, S, k, O, x, g, E = new pt.Buf8(4), A, $, I = (
     /* permutation of code lengths */
     [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15]
   );
   if (!t || !t.state || !t.output || !t.input && t.avail_in !== 0)
     return xt;
-  r = t.state, r.mode === Ht && (r.mode = $a), o = t.next_out, a = t.output, l = t.avail_out, i = t.next_in, n = t.input, s = t.avail_in, c = r.hold, f = r.bits, u = s, d = l, g = ve;
+  r = t.state, r.mode === Ht && (r.mode = Ra), o = t.next_out, a = t.output, l = t.avail_out, i = t.next_in, n = t.input, s = t.avail_in, c = r.hold, f = r.bits, u = s, d = l, g = ve;
   t:
     for (; ; )
       switch (r.mode) {
-        case wc:
+        case mc:
           if (r.wrap === 0) {
-            r.mode = $a;
+            r.mode = Ra;
             break;
           }
           for (; f < 16; ) {
@@ -2224,7 +2228,7 @@ function p0(t, e) {
             s--, c += n[i++] << f, f += 8;
           }
           if (r.wrap & 2 && c === 35615) {
-            r.check = 0, E[0] = c & 255, E[1] = c >>> 8 & 255, r.check = Ct(r.check, E, 2, 0), c = 0, f = 0, r.mode = bo;
+            r.check = 0, E[0] = c & 255, E[1] = c >>> 8 & 255, r.check = Ct(r.check, E, 2, 0), c = 0, f = 0, r.mode = xo;
             break;
           }
           if (r.flags = 0, r.head && (r.head.done = !1), !(r.wrap & 1) || /* check if zlib header allowed */
@@ -2232,7 +2236,7 @@ function p0(t, e) {
             t.msg = "incorrect header check", r.mode = W;
             break;
           }
-          if ((c & 15) !== _o) {
+          if ((c & 15) !== vo) {
             t.msg = "unknown compression method", r.mode = W;
             break;
           }
@@ -2242,15 +2246,15 @@ function p0(t, e) {
             t.msg = "invalid window size", r.mode = W;
             break;
           }
-          r.dmax = 1 << x, t.adler = r.check = 1, r.mode = c & 512 ? Ro : Ht, c = 0, f = 0;
+          r.dmax = 1 << x, t.adler = r.check = 1, r.mode = c & 512 ? To : Ht, c = 0, f = 0;
           break;
-        case bo:
+        case xo:
           for (; f < 16; ) {
             if (s === 0)
               break t;
             s--, c += n[i++] << f, f += 8;
           }
-          if (r.flags = c, (r.flags & 255) !== _o) {
+          if (r.flags = c, (r.flags & 255) !== vo) {
             t.msg = "unknown compression method", r.mode = W;
             break;
           }
@@ -2258,22 +2262,22 @@ function p0(t, e) {
             t.msg = "unknown header flags set", r.mode = W;
             break;
           }
-          r.head && (r.head.text = c >> 8 & 1), r.flags & 512 && (E[0] = c & 255, E[1] = c >>> 8 & 255, r.check = Ct(r.check, E, 2, 0)), c = 0, f = 0, r.mode = vo;
-        case vo:
+          r.head && (r.head.text = c >> 8 & 1), r.flags & 512 && (E[0] = c & 255, E[1] = c >>> 8 & 255, r.check = Ct(r.check, E, 2, 0)), c = 0, f = 0, r.mode = Eo;
+        case Eo:
           for (; f < 32; ) {
             if (s === 0)
               break t;
             s--, c += n[i++] << f, f += 8;
           }
-          r.head && (r.head.time = c), r.flags & 512 && (E[0] = c & 255, E[1] = c >>> 8 & 255, E[2] = c >>> 16 & 255, E[3] = c >>> 24 & 255, r.check = Ct(r.check, E, 4, 0)), c = 0, f = 0, r.mode = xo;
-        case xo:
+          r.head && (r.head.time = c), r.flags & 512 && (E[0] = c & 255, E[1] = c >>> 8 & 255, E[2] = c >>> 16 & 255, E[3] = c >>> 24 & 255, r.check = Ct(r.check, E, 4, 0)), c = 0, f = 0, r.mode = So;
+        case So:
           for (; f < 16; ) {
             if (s === 0)
               break t;
             s--, c += n[i++] << f, f += 8;
           }
-          r.head && (r.head.xflags = c & 255, r.head.os = c >> 8), r.flags & 512 && (E[0] = c & 255, E[1] = c >>> 8 & 255, r.check = Ct(r.check, E, 2, 0)), c = 0, f = 0, r.mode = Eo;
-        case Eo:
+          r.head && (r.head.xflags = c & 255, r.head.os = c >> 8), r.flags & 512 && (E[0] = c & 255, E[1] = c >>> 8 & 255, r.check = Ct(r.check, E, 2, 0)), c = 0, f = 0, r.mode = ko;
+        case ko:
           if (r.flags & 1024) {
             for (; f < 16; ) {
               if (s === 0)
@@ -2282,8 +2286,8 @@ function p0(t, e) {
             }
             r.length = c, r.head && (r.head.extra_len = c), r.flags & 512 && (E[0] = c & 255, E[1] = c >>> 8 & 255, r.check = Ct(r.check, E, 2, 0)), c = 0, f = 0;
           } else r.head && (r.head.extra = null);
-          r.mode = So;
-        case So:
+          r.mode = Ao;
+        case Ao:
           if (r.flags & 1024 && (h = r.length, h > s && (h = s), h && (r.head && (x = r.head.extra_len - r.length, r.head.extra || (r.head.extra = new Array(r.head.extra_len)), pt.arraySet(
             r.head.extra,
             n,
@@ -2295,8 +2299,8 @@ function p0(t, e) {
             x
           )), r.flags & 512 && (r.check = Ct(r.check, n, h, i)), s -= h, i += h, r.length -= h), r.length))
             break t;
-          r.length = 0, r.mode = ko;
-        case ko:
+          r.length = 0, r.mode = $o;
+        case $o:
           if (r.flags & 2048) {
             if (s === 0)
               break t;
@@ -2307,8 +2311,8 @@ function p0(t, e) {
             if (r.flags & 512 && (r.check = Ct(r.check, n, h, i)), s -= h, i += h, x)
               break t;
           } else r.head && (r.head.name = null);
-          r.length = 0, r.mode = Ao;
-        case Ao:
+          r.length = 0, r.mode = Ro;
+        case Ro:
           if (r.flags & 4096) {
             if (s === 0)
               break t;
@@ -2319,8 +2323,8 @@ function p0(t, e) {
             if (r.flags & 512 && (r.check = Ct(r.check, n, h, i)), s -= h, i += h, x)
               break t;
           } else r.head && (r.head.comment = null);
-          r.mode = $o;
-        case $o:
+          r.mode = Oo;
+        case Oo:
           if (r.flags & 512) {
             for (; f < 16; ) {
               if (s === 0)
@@ -2335,23 +2339,23 @@ function p0(t, e) {
           }
           r.head && (r.head.hcrc = r.flags >> 9 & 1, r.head.done = !0), t.adler = r.check = 0, r.mode = Ht;
           break;
-        case Ro:
+        case To:
           for (; f < 32; ) {
             if (s === 0)
               break t;
             s--, c += n[i++] << f, f += 8;
           }
-          t.adler = r.check = zo(c), c = 0, f = 0, r.mode = kn;
-        case kn:
+          t.adler = r.check = Ho(c), c = 0, f = 0, r.mode = An;
+        case An:
           if (r.havedict === 0)
-            return t.next_out = o, t.avail_out = l, t.next_in = i, t.avail_in = s, r.hold = c, r.bits = f, i0;
+            return t.next_out = o, t.avail_out = l, t.next_in = i, t.avail_in = s, r.hold = c, r.bits = f, s0;
           t.adler = r.check = 1, r.mode = Ht;
         case Ht:
-          if (e === n0 || e === sn)
+          if (e === i0 || e === sn)
             break t;
-        case $a:
+        case Ra:
           if (r.last) {
-            c >>>= f & 7, f -= f & 7, r.mode = Oa;
+            c >>>= f & 7, f -= f & 7, r.mode = Ta;
             break;
           }
           for (; f < 3; ) {
@@ -2361,23 +2365,23 @@ function p0(t, e) {
           }
           switch (r.last = c & 1, c >>>= 1, f -= 1, c & 3) {
             case 0:
-              r.mode = Oo;
+              r.mode = Io;
               break;
             case 1:
-              if (w0(r), r.mode = cn, e === sn) {
+              if (m0(r), r.mode = cn, e === sn) {
                 c >>>= 2, f -= 2;
                 break t;
               }
               break;
             case 2:
-              r.mode = Io;
+              r.mode = Bo;
               break;
             case 3:
               t.msg = "invalid block type", r.mode = W;
           }
           c >>>= 2, f -= 2;
           break;
-        case Oo:
+        case Io:
           for (c >>>= f & 7, f -= f & 7; f < 32; ) {
             if (s === 0)
               break t;
@@ -2387,11 +2391,11 @@ function p0(t, e) {
             t.msg = "invalid stored block lengths", r.mode = W;
             break;
           }
-          if (r.length = c & 65535, c = 0, f = 0, r.mode = Ra, e === sn)
+          if (r.length = c & 65535, c = 0, f = 0, r.mode = Oa, e === sn)
             break t;
-        case Ra:
-          r.mode = To;
-        case To:
+        case Oa:
+          r.mode = Po;
+        case Po:
           if (h = r.length, h) {
             if (h > s && (h = s), h > l && (h = l), h === 0)
               break t;
@@ -2400,7 +2404,7 @@ function p0(t, e) {
           }
           r.mode = Ht;
           break;
-        case Io:
+        case Bo:
           for (; f < 14; ) {
             if (s === 0)
               break t;
@@ -2410,8 +2414,8 @@ function p0(t, e) {
             t.msg = "too many length or distance symbols", r.mode = W;
             break;
           }
-          r.have = 0, r.mode = Po;
-        case Po:
+          r.have = 0, r.mode = Co;
+        case Co:
           for (; r.have < r.ncode; ) {
             for (; f < 3; ) {
               if (s === 0)
@@ -2422,12 +2426,12 @@ function p0(t, e) {
           }
           for (; r.have < 19; )
             r.lens[I[r.have++]] = 0;
-          if (r.lencode = r.lendyn, r.lenbits = 7, A = { bits: r.lenbits }, g = ur(r0, r.lens, 0, 19, r.lencode, 0, r.work, A), r.lenbits = A.bits, g) {
+          if (r.lencode = r.lendyn, r.lenbits = 7, A = { bits: r.lenbits }, g = ur(a0, r.lens, 0, 19, r.lencode, 0, r.work, A), r.lenbits = A.bits, g) {
             t.msg = "invalid code lengths set", r.mode = W;
             break;
           }
-          r.have = 0, r.mode = Bo;
-        case Bo:
+          r.have = 0, r.mode = Do;
+        case Do:
           for (; r.have < r.nlen + r.ndist; ) {
             for (; m = r.lencode[c & (1 << r.lenbits) - 1], y = m >>> 24, _ = m >>> 16 & 255, v = m & 65535, !(y <= f); ) {
               if (s === 0)
@@ -2477,11 +2481,11 @@ function p0(t, e) {
             t.msg = "invalid code -- missing end-of-block", r.mode = W;
             break;
           }
-          if (r.lenbits = 9, A = { bits: r.lenbits }, g = ur(lc, r.lens, 0, r.nlen, r.lencode, 0, r.work, A), r.lenbits = A.bits, g) {
+          if (r.lenbits = 9, A = { bits: r.lenbits }, g = ur(dc, r.lens, 0, r.nlen, r.lencode, 0, r.work, A), r.lenbits = A.bits, g) {
             t.msg = "invalid literal/lengths set", r.mode = W;
             break;
           }
-          if (r.distbits = 6, r.distcode = r.distdyn, A = { bits: r.distbits }, g = ur(uc, r.lens, r.nlen, r.ndist, r.distcode, 0, r.work, A), r.distbits = A.bits, g) {
+          if (r.distbits = 6, r.distcode = r.distdyn, A = { bits: r.distbits }, g = ur(hc, r.lens, r.nlen, r.ndist, r.distcode, 0, r.work, A), r.distbits = A.bits, g) {
             t.msg = "invalid distances set", r.mode = W;
             break;
           }
@@ -2491,7 +2495,7 @@ function p0(t, e) {
           r.mode = fn;
         case fn:
           if (s >= 6 && l >= 258) {
-            t.next_out = o, t.avail_out = l, t.next_in = i, t.avail_in = s, r.hold = c, r.bits = f, e0(t, d), o = t.next_out, a = t.output, l = t.avail_out, i = t.next_in, n = t.input, s = t.avail_in, c = r.hold, f = r.bits, r.mode === Ht && (r.back = -1);
+            t.next_out = o, t.avail_out = l, t.next_in = i, t.avail_in = s, r.hold = c, r.bits = f, n0(t, d), o = t.next_out, a = t.output, l = t.avail_out, i = t.next_in, n = t.input, s = t.avail_in, c = r.hold, f = r.bits, r.mode === Ht && (r.back = -1);
             break;
           }
           for (r.back = 0; m = r.lencode[c & (1 << r.lenbits) - 1], y = m >>> 24, _ = m >>> 16 & 255, v = m & 65535, !(y <= f); ) {
@@ -2508,7 +2512,7 @@ function p0(t, e) {
             c >>>= S, f -= S, r.back += S;
           }
           if (c >>>= y, f -= y, r.back += y, r.length = v, _ === 0) {
-            r.mode = jo;
+            r.mode = Mo;
             break;
           }
           if (_ & 32) {
@@ -2519,8 +2523,8 @@ function p0(t, e) {
             t.msg = "invalid literal/length code", r.mode = W;
             break;
           }
-          r.extra = _ & 15, r.mode = Co;
-        case Co:
+          r.extra = _ & 15, r.mode = No;
+        case No:
           if (r.extra) {
             for ($ = r.extra; f < $; ) {
               if (s === 0)
@@ -2529,8 +2533,8 @@ function p0(t, e) {
             }
             r.length += c & (1 << r.extra) - 1, c >>>= r.extra, f -= r.extra, r.back += r.extra;
           }
-          r.was = r.length, r.mode = Do;
-        case Do:
+          r.was = r.length, r.mode = Fo;
+        case Fo:
           for (; m = r.distcode[c & (1 << r.distbits) - 1], y = m >>> 24, _ = m >>> 16 & 255, v = m & 65535, !(y <= f); ) {
             if (s === 0)
               break t;
@@ -2548,8 +2552,8 @@ function p0(t, e) {
             t.msg = "invalid distance code", r.mode = W;
             break;
           }
-          r.offset = v, r.extra = _ & 15, r.mode = No;
-        case No:
+          r.offset = v, r.extra = _ & 15, r.mode = jo;
+        case jo:
           if (r.extra) {
             for ($ = r.extra; f < $; ) {
               if (s === 0)
@@ -2562,8 +2566,8 @@ function p0(t, e) {
             t.msg = "invalid distance too far back", r.mode = W;
             break;
           }
-          r.mode = Fo;
-        case Fo:
+          r.mode = Uo;
+        case Uo:
           if (l === 0)
             break t;
           if (h = d - l, r.offset > h) {
@@ -2580,12 +2584,12 @@ function p0(t, e) {
           while (--h);
           r.length === 0 && (r.mode = fn);
           break;
-        case jo:
+        case Mo:
           if (l === 0)
             break t;
           a[o++] = r.length, l--, r.mode = fn;
           break;
-        case Oa:
+        case Ta:
           if (r.wrap) {
             for (; f < 32; ) {
               if (s === 0)
@@ -2593,14 +2597,14 @@ function p0(t, e) {
               s--, c |= n[i++] << f, f += 8;
             }
             if (d -= l, t.total_out += d, r.total += d, d && (t.adler = r.check = /*UPDATE(state.check, put - _out, _out);*/
-            r.flags ? Ct(r.check, a, d, o - d) : Qa(r.check, a, d, o - d)), d = l, (r.flags ? c : zo(c)) !== r.check) {
+            r.flags ? Ct(r.check, a, d, o - d) : ti(r.check, a, d, o - d)), d = l, (r.flags ? c : Ho(c)) !== r.check) {
               t.msg = "incorrect data check", r.mode = W;
               break;
             }
             c = 0, f = 0;
           }
-          r.mode = Uo;
-        case Uo:
+          r.mode = zo;
+        case zo:
           if (r.wrap && r.flags) {
             for (; f < 32; ) {
               if (s === 0)
@@ -2613,47 +2617,47 @@ function p0(t, e) {
             }
             c = 0, f = 0;
           }
-          r.mode = Mo;
-        case Mo:
-          g = a0;
+          r.mode = Lo;
+        case Lo:
+          g = o0;
           break t;
         case W:
-          g = dc;
+          g = wc;
           break t;
-        case pc:
-          return hc;
-        case s0:
+        case gc:
+          return pc;
+        case f0:
         default:
           return xt;
       }
-  return t.next_out = o, t.avail_out = l, t.next_in = i, t.avail_in = s, r.hold = c, r.bits = f, (r.wsize || d !== t.avail_out && r.mode < W && (r.mode < Oa || e !== yo)) && bc(t, t.output, t.next_out, d - t.avail_out), u -= t.avail_in, d -= t.avail_out, t.total_in += u, t.total_out += d, r.total += d, r.wrap && d && (t.adler = r.check = /*UPDATE(state.check, strm.next_out - _out, _out);*/
-  r.flags ? Ct(r.check, a, d, t.next_out - d) : Qa(r.check, a, d, t.next_out - d)), t.data_type = r.bits + (r.last ? 64 : 0) + (r.mode === Ht ? 128 : 0) + (r.mode === cn || r.mode === Ra ? 256 : 0), (u === 0 && d === 0 || e === yo) && g === ve && (g = o0), g;
+  return t.next_out = o, t.avail_out = l, t.next_in = i, t.avail_in = s, r.hold = c, r.bits = f, (r.wsize || d !== t.avail_out && r.mode < W && (r.mode < Ta || e !== bo)) && xc(t, t.output, t.next_out, d - t.avail_out), u -= t.avail_in, d -= t.avail_out, t.total_in += u, t.total_out += d, r.total += d, r.wrap && d && (t.adler = r.check = /*UPDATE(state.check, strm.next_out - _out, _out);*/
+  r.flags ? Ct(r.check, a, d, t.next_out - d) : ti(r.check, a, d, t.next_out - d)), t.data_type = r.bits + (r.last ? 64 : 0) + (r.mode === Ht ? 128 : 0) + (r.mode === cn || r.mode === Oa ? 256 : 0), (u === 0 && d === 0 || e === bo) && g === ve && (g = c0), g;
 }
-function m0(t) {
+function y0(t) {
   if (!t || !t.state)
     return xt;
   var e = t.state;
   return e.window && (e.window = null), t.state = null, ve;
 }
-function g0(t, e) {
+function _0(t, e) {
   var r;
   return !t || !t.state || (r = t.state, !(r.wrap & 2)) ? xt : (r.head = e, e.done = !1, ve);
 }
-function y0(t, e) {
+function b0(t, e) {
   var r = e.length, n, a, i;
-  return !t || !t.state || (n = t.state, n.wrap !== 0 && n.mode !== kn) ? xt : n.mode === kn && (a = 1, a = Qa(a, e, r, 0), a !== n.check) ? dc : (i = bc(t, e, r, r), i ? (n.mode = pc, hc) : (n.havedict = 1, ve));
+  return !t || !t.state || (n = t.state, n.wrap !== 0 && n.mode !== An) ? xt : n.mode === An && (a = 1, a = ti(a, e, r, 0), a !== n.check) ? wc : (i = xc(t, e, r, r), i ? (n.mode = gc, pc) : (n.havedict = 1, ve));
 }
-Rt.inflateReset = gc;
-Rt.inflateReset2 = yc;
-Rt.inflateResetKeep = mc;
-Rt.inflateInit = h0;
-Rt.inflateInit2 = _c;
-Rt.inflate = p0;
-Rt.inflateEnd = m0;
-Rt.inflateGetHeader = g0;
-Rt.inflateSetDictionary = y0;
+Rt.inflateReset = _c;
+Rt.inflateReset2 = bc;
+Rt.inflateResetKeep = yc;
+Rt.inflateInit = p0;
+Rt.inflateInit2 = vc;
+Rt.inflate = g0;
+Rt.inflateEnd = y0;
+Rt.inflateGetHeader = _0;
+Rt.inflateSetDictionary = b0;
 Rt.inflateInfo = "pako inflate (from Nodeca project)";
-var vc = {
+var Ec = {
   /* Allowed flush values; see deflate() and inflate() below for details */
   Z_NO_FLUSH: 0,
   Z_PARTIAL_FLUSH: 1,
@@ -2693,10 +2697,10 @@ var vc = {
   Z_DEFLATED: 8
   //Z_NULL:                 null // Use -1 or null inline, depending on var type
 };
-function _0() {
+function v0() {
   this.text = 0, this.time = 0, this.xflags = 0, this.os = 0, this.extra = null, this.extra_len = 0, this.name = "", this.comment = "", this.hcrc = 0, this.done = !1;
 }
-var b0 = _0, je = Rt, dr = Xt, _n = Ae, V = vc, ti = pi, v0 = cc, x0 = b0, xc = Object.prototype.toString;
+var x0 = v0, je = Rt, dr = Xt, bn = Ae, V = Ec, ei = mi, E0 = lc, S0 = x0, Sc = Object.prototype.toString;
 function xe(t) {
   if (!(this instanceof xe)) return new xe(t);
   this.options = dr.assign({
@@ -2705,25 +2709,25 @@ function xe(t) {
     to: ""
   }, t || {});
   var e = this.options;
-  e.raw && e.windowBits >= 0 && e.windowBits < 16 && (e.windowBits = -e.windowBits, e.windowBits === 0 && (e.windowBits = -15)), e.windowBits >= 0 && e.windowBits < 16 && !(t && t.windowBits) && (e.windowBits += 32), e.windowBits > 15 && e.windowBits < 48 && (e.windowBits & 15 || (e.windowBits |= 15)), this.err = 0, this.msg = "", this.ended = !1, this.chunks = [], this.strm = new v0(), this.strm.avail_out = 0;
+  e.raw && e.windowBits >= 0 && e.windowBits < 16 && (e.windowBits = -e.windowBits, e.windowBits === 0 && (e.windowBits = -15)), e.windowBits >= 0 && e.windowBits < 16 && !(t && t.windowBits) && (e.windowBits += 32), e.windowBits > 15 && e.windowBits < 48 && (e.windowBits & 15 || (e.windowBits |= 15)), this.err = 0, this.msg = "", this.ended = !1, this.chunks = [], this.strm = new E0(), this.strm.avail_out = 0;
   var r = je.inflateInit2(
     this.strm,
     e.windowBits
   );
   if (r !== V.Z_OK)
-    throw new Error(ti[r]);
-  if (this.header = new x0(), je.inflateGetHeader(this.strm, this.header), e.dictionary && (typeof e.dictionary == "string" ? e.dictionary = _n.string2buf(e.dictionary) : xc.call(e.dictionary) === "[object ArrayBuffer]" && (e.dictionary = new Uint8Array(e.dictionary)), e.raw && (r = je.inflateSetDictionary(this.strm, e.dictionary), r !== V.Z_OK)))
-    throw new Error(ti[r]);
+    throw new Error(ei[r]);
+  if (this.header = new S0(), je.inflateGetHeader(this.strm, this.header), e.dictionary && (typeof e.dictionary == "string" ? e.dictionary = bn.string2buf(e.dictionary) : Sc.call(e.dictionary) === "[object ArrayBuffer]" && (e.dictionary = new Uint8Array(e.dictionary)), e.raw && (r = je.inflateSetDictionary(this.strm, e.dictionary), r !== V.Z_OK)))
+    throw new Error(ei[r]);
 }
 xe.prototype.push = function(t, e) {
   var r = this.strm, n = this.options.chunkSize, a = this.options.dictionary, i, o, s, l, c, f = !1;
   if (this.ended)
     return !1;
-  o = e === ~~e ? e : e === !0 ? V.Z_FINISH : V.Z_NO_FLUSH, typeof t == "string" ? r.input = _n.binstring2buf(t) : xc.call(t) === "[object ArrayBuffer]" ? r.input = new Uint8Array(t) : r.input = t, r.next_in = 0, r.avail_in = r.input.length;
+  o = e === ~~e ? e : e === !0 ? V.Z_FINISH : V.Z_NO_FLUSH, typeof t == "string" ? r.input = bn.binstring2buf(t) : Sc.call(t) === "[object ArrayBuffer]" ? r.input = new Uint8Array(t) : r.input = t, r.next_in = 0, r.avail_in = r.input.length;
   do {
     if (r.avail_out === 0 && (r.output = new dr.Buf8(n), r.next_out = 0, r.avail_out = n), i = je.inflate(r, V.Z_NO_FLUSH), i === V.Z_NEED_DICT && a && (i = je.inflateSetDictionary(this.strm, a)), i === V.Z_BUF_ERROR && f === !0 && (i = V.Z_OK, f = !1), i !== V.Z_STREAM_END && i !== V.Z_OK)
       return this.onEnd(i), this.ended = !0, !1;
-    r.next_out && (r.avail_out === 0 || i === V.Z_STREAM_END || r.avail_in === 0 && (o === V.Z_FINISH || o === V.Z_SYNC_FLUSH)) && (this.options.to === "string" ? (s = _n.utf8border(r.output, r.next_out), l = r.next_out - s, c = _n.buf2string(r.output, s), r.next_out = l, r.avail_out = n - l, l && dr.arraySet(r.output, r.output, s, l, 0), this.onData(c)) : this.onData(dr.shrinkBuf(r.output, r.next_out))), r.avail_in === 0 && r.avail_out === 0 && (f = !0);
+    r.next_out && (r.avail_out === 0 || i === V.Z_STREAM_END || r.avail_in === 0 && (o === V.Z_FINISH || o === V.Z_SYNC_FLUSH)) && (this.options.to === "string" ? (s = bn.utf8border(r.output, r.next_out), l = r.next_out - s, c = bn.buf2string(r.output, s), r.next_out = l, r.avail_out = n - l, l && dr.arraySet(r.output, r.output, s, l, 0), this.onData(c)) : this.onData(dr.shrinkBuf(r.output, r.next_out))), r.avail_in === 0 && r.avail_out === 0 && (f = !0);
   } while ((r.avail_in > 0 || r.avail_out === 0) && i !== V.Z_STREAM_END);
   return i === V.Z_STREAM_END && (o = V.Z_FINISH), o === V.Z_FINISH ? (i = je.inflateEnd(this.strm), this.onEnd(i), this.ended = !0, i === V.Z_OK) : (o === V.Z_SYNC_FLUSH && (this.onEnd(V.Z_OK), r.avail_out = 0), !0);
 };
@@ -2733,23 +2737,23 @@ xe.prototype.onData = function(t) {
 xe.prototype.onEnd = function(t) {
   t === V.Z_OK && (this.options.to === "string" ? this.result = this.chunks.join("") : this.result = dr.flattenChunks(this.chunks)), this.chunks = [], this.err = t, this.msg = this.strm.msg;
 };
-function gi(t, e) {
+function yi(t, e) {
   var r = new xe(e);
   if (r.push(t, !0), r.err)
-    throw r.msg || ti[r.err];
+    throw r.msg || ei[r.err];
   return r.result;
 }
-function E0(t, e) {
-  return e = e || {}, e.raw = !0, gi(t, e);
+function k0(t, e) {
+  return e = e || {}, e.raw = !0, yi(t, e);
 }
 Cr.Inflate = xe;
-Cr.inflate = gi;
-Cr.inflateRaw = E0;
-Cr.ungzip = gi;
-var S0 = Xt.assign, k0 = Ir, A0 = Cr, $0 = vc, Ec = {};
-S0(Ec, k0, A0, $0);
-var R0 = Ec;
-const Ho = (t, e) => function(...r) {
+Cr.inflate = yi;
+Cr.inflateRaw = k0;
+Cr.ungzip = yi;
+var A0 = Xt.assign, $0 = Ir, R0 = Cr, O0 = Ec, kc = {};
+A0(kc, $0, R0, O0);
+var T0 = kc;
+const Wo = (t, e) => function(...r) {
   const n = e.promiseModule;
   return new n((a, i) => {
     e.multiArgs ? r.push((...o) => {
@@ -2759,7 +2763,7 @@ const Ho = (t, e) => function(...r) {
     }) : r.push(a), t.apply(this, r);
   });
 };
-var O0 = (t, e) => {
+var I0 = (t, e) => {
   e = Object.assign({
     exclude: [/.+(Sync|Stream)$/],
     errorFirst: !0,
@@ -2774,33 +2778,33 @@ var O0 = (t, e) => {
   };
   let a;
   r === "function" ? a = function(...i) {
-    return e.excludeMain ? t(...i) : Ho(t, e).apply(this, i);
+    return e.excludeMain ? t(...i) : Wo(t, e).apply(this, i);
   } : a = Object.create(Object.getPrototypeOf(t));
   for (const i in t) {
     const o = t[i];
-    a[i] = typeof o == "function" && n(i) ? Ho(o, e) : o;
+    a[i] = typeof o == "function" && n(i) ? Wo(o, e) : o;
   }
   return a;
 };
-function Go(t) {
+function qo(t) {
   return Array.isArray(t) ? t : [t];
 }
-const ei = "", Wo = " ", Pa = "\\", T0 = /^\s+$/, I0 = /(?:[^\\]|^)\\$/, P0 = /^\\!/, B0 = /^\\#/, C0 = /\r?\n/g, D0 = /^\.*\/|^\.+$/, Ba = "/";
-let Sc = "node-ignore";
-typeof Symbol < "u" && (Sc = Symbol.for("node-ignore"));
-const qo = Sc, N0 = (t, e, r) => Object.defineProperty(t, e, { value: r }), F0 = /([0-z])-([0-z])/g, kc = () => !1, j0 = (t) => t.replace(
-  F0,
-  (e, r, n) => r.charCodeAt(0) <= n.charCodeAt(0) ? e : ei
-), U0 = (t) => {
+const ri = "", Zo = " ", Ba = "\\", P0 = /^\s+$/, B0 = /(?:[^\\]|^)\\$/, C0 = /^\\!/, D0 = /^\\#/, N0 = /\r?\n/g, F0 = /^\.*\/|^\.+$/, Ca = "/";
+let Ac = "node-ignore";
+typeof Symbol < "u" && (Ac = Symbol.for("node-ignore"));
+const Vo = Ac, j0 = (t, e, r) => Object.defineProperty(t, e, { value: r }), U0 = /([0-z])-([0-z])/g, $c = () => !1, M0 = (t) => t.replace(
+  U0,
+  (e, r, n) => r.charCodeAt(0) <= n.charCodeAt(0) ? e : ri
+), z0 = (t) => {
   const { length: e } = t;
   return t.slice(0, e - e % 2);
-}, M0 = [
+}, L0 = [
   [
     // remove BOM
     // TODO:
     // Other similar zero-width characters?
     /^\uFEFF/,
-    () => ei
+    () => ri
   ],
   // > Trailing spaces are ignored unless they are quoted with backslash ("\")
   [
@@ -2809,7 +2813,7 @@ const qo = Sc, N0 = (t, e, r) => Object.defineProperty(t, e, { value: r }), F0 =
     // (a ) -> (a)
     // (a \ ) -> (a  )
     /((?:\\\\)*?)(\\?\s+)$/,
-    (t, e, r) => e + (r.indexOf("\\") === 0 ? Wo : ei)
+    (t, e, r) => e + (r.indexOf("\\") === 0 ? Zo : ri)
   ],
   // replace (\ ) with ' '
   // (\ ) -> ' '
@@ -2819,7 +2823,7 @@ const qo = Sc, N0 = (t, e, r) => Object.defineProperty(t, e, { value: r }), F0 =
     /(\\+?)\s/g,
     (t, e) => {
       const { length: r } = e;
-      return e.slice(0, r - r % 2) + Wo;
+      return e.slice(0, r - r % 2) + Zo;
     }
   ],
   // Escape metacharacters
@@ -2910,19 +2914,19 @@ const qo = Sc, N0 = (t, e, r) => Object.defineProperty(t, e, { value: r }), F0 =
     // For example, if a user escape a '\\*',
     // after step 3, the result will be '\\\\\\*'
     /\\\\\\(?=[$.|*+(){^])/g,
-    () => Pa
+    () => Ba
   ],
   [
     // '\\\\' -> '\\'
     /\\\\/g,
-    () => Pa
+    () => Ba
   ],
   [
     // > The range notation, e.g. [a-zA-Z],
     // > can be used to match one of the characters in a range.
     // `\` is escaped by step 3
     /(\\)?\[([^\]/]*?)(\\*)($|\])/g,
-    (t, e, r, n, a) => e === Pa ? `\\[${r}${U0(n)}${a}` : a === "]" && n.length % 2 === 0 ? `[${j0(r)}${n}]` : "[]"
+    (t, e, r, n, a) => e === Ba ? `\\[${r}${z0(n)}${a}` : a === "]" && n.length % 2 === 0 ? `[${M0(r)}${n}]` : "[]"
   ],
   // ending
   [
@@ -2946,65 +2950,65 @@ const qo = Sc, N0 = (t, e, r) => Object.defineProperty(t, e, { value: r }), F0 =
     /(\^|\\\/)?\\\*$/,
     (t, e) => `${e ? `${e}[^/]+` : "[^/]*"}(?=$|\\/$)`
   ]
-], Zo = /* @__PURE__ */ Object.create(null), z0 = (t, e) => {
-  let r = Zo[t];
-  return r || (r = M0.reduce(
+], Xo = /* @__PURE__ */ Object.create(null), H0 = (t, e) => {
+  let r = Xo[t];
+  return r || (r = L0.reduce(
     (n, [a, i]) => n.replace(a, i.bind(t)),
     t
-  ), Zo[t] = r), e ? new RegExp(r, "i") : new RegExp(r);
-}, yi = (t) => typeof t == "string", L0 = (t) => t && yi(t) && !T0.test(t) && !I0.test(t) && t.indexOf("#") !== 0, H0 = (t) => t.split(C0);
-class G0 {
+  ), Xo[t] = r), e ? new RegExp(r, "i") : new RegExp(r);
+}, _i = (t) => typeof t == "string", G0 = (t) => t && _i(t) && !P0.test(t) && !B0.test(t) && t.indexOf("#") !== 0, W0 = (t) => t.split(N0);
+class q0 {
   constructor(e, r, n, a) {
     this.origin = e, this.pattern = r, this.negative = n, this.regex = a;
   }
 }
-const W0 = (t, e) => {
+const Z0 = (t, e) => {
   const r = t;
   let n = !1;
-  t.indexOf("!") === 0 && (n = !0, t = t.substr(1)), t = t.replace(P0, "!").replace(B0, "#");
-  const a = z0(t, e);
-  return new G0(
+  t.indexOf("!") === 0 && (n = !0, t = t.substr(1)), t = t.replace(C0, "!").replace(D0, "#");
+  const a = H0(t, e);
+  return new q0(
     r,
     t,
     n,
     a
   );
-}, q0 = (t, e) => {
+}, V0 = (t, e) => {
   throw new e(t);
-}, Zt = (t, e, r) => yi(t) ? t ? Zt.isNotRelative(t) ? r(
+}, Zt = (t, e, r) => _i(t) ? t ? Zt.isNotRelative(t) ? r(
   `path should be a \`path.relative()\`d string, but got "${e}"`,
   RangeError
 ) : !0 : r("path must not be empty", TypeError) : r(
   `path must be a string, but got \`${e}\``,
   TypeError
-), Ac = (t) => D0.test(t);
-Zt.isNotRelative = Ac;
+), Rc = (t) => F0.test(t);
+Zt.isNotRelative = Rc;
 Zt.convert = (t) => t;
-class Z0 {
+class X0 {
   constructor({
     ignorecase: e = !0,
     ignoreCase: r = e,
     allowRelativePaths: n = !1
   } = {}) {
-    N0(this, qo, !0), this._rules = [], this._ignoreCase = r, this._allowRelativePaths = n, this._initCache();
+    j0(this, Vo, !0), this._rules = [], this._ignoreCase = r, this._allowRelativePaths = n, this._initCache();
   }
   _initCache() {
     this._ignoreCache = /* @__PURE__ */ Object.create(null), this._testCache = /* @__PURE__ */ Object.create(null);
   }
   _addPattern(e) {
-    if (e && e[qo]) {
+    if (e && e[Vo]) {
       this._rules = this._rules.concat(e._rules), this._added = !0;
       return;
     }
-    if (L0(e)) {
-      const r = W0(e, this._ignoreCase);
+    if (G0(e)) {
+      const r = Z0(e, this._ignoreCase);
       this._added = !0, this._rules.push(r);
     }
   }
   // @param {Array<string> | string | Ignore} pattern
   add(e) {
-    return this._added = !1, Go(
-      yi(e) ? H0(e) : e
+    return this._added = !1, qo(
+      _i(e) ? W0(e) : e
     ).forEach(this._addPattern, this), this._added && this._initCache(), this;
   }
   // legacy
@@ -3042,16 +3046,16 @@ class Z0 {
     return Zt(
       i,
       e,
-      this._allowRelativePaths ? kc : q0
+      this._allowRelativePaths ? $c : V0
     ), this._t(i, r, n, a);
   }
   _t(e, r, n, a) {
     if (e in r)
       return r[e];
-    if (a || (a = e.split(Ba)), a.pop(), !a.length)
+    if (a || (a = e.split(Ca)), a.pop(), !a.length)
       return r[e] = this._testOne(e, n);
     const i = this._t(
-      a.join(Ba) + Ba,
+      a.join(Ca) + Ca,
       r,
       n,
       a
@@ -3065,17 +3069,17 @@ class Z0 {
     return (e) => !this.ignores(e);
   }
   filter(e) {
-    return Go(e).filter(this.createFilter());
+    return qo(e).filter(this.createFilter());
   }
   // @returns {TestResult}
   test(e) {
     return this._test(e, this._testCache, !0);
   }
 }
-const An = (t) => new Z0(t), V0 = (t) => Zt(t && Zt.convert(t), t, kc);
-An.isPathValid = V0;
-An.default = An;
-var X0 = An;
+const $n = (t) => new X0(t), K0 = (t) => Zt(t && Zt.convert(t), t, $c);
+$n.isPathValid = K0;
+$n.default = $n;
+var Y0 = $n;
 if (
   // Detect `process` so that it can run in browsers.
   typeof process < "u" && (process.env && process.env.IGNORE_TEST_WIN32 || process.platform === "win32")
@@ -3083,21 +3087,21 @@ if (
   const t = (r) => /^\\\\\?\\/.test(r) || /["<>|\u0000-\u001F]+/u.test(r) ? r : r.replace(/\\/g, "/");
   Zt.convert = t;
   const e = /^[a-z]:\//i;
-  Zt.isNotRelative = (r) => e.test(r) || Ac(r);
+  Zt.isNotRelative = (r) => e.test(r) || Rc(r);
 }
-function K0(t) {
+function J0(t) {
   return t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 function Dt(t, e, r) {
-  return e = e instanceof RegExp ? e : new RegExp(K0(e), "g"), t.replace(e, r);
+  return e = e instanceof RegExp ? e : new RegExp(J0(e), "g"), t.replace(e, r);
 }
-var Y0 = {
+var Q0 = {
   clean: function(e) {
     if (typeof e != "string")
       throw new Error("Expected a string, received: " + e);
     return e = Dt(e, "./", "/"), e = Dt(e, "..", "."), e = Dt(e, " ", "-"), e = Dt(e, /^[~^:?*\\\-]/g, ""), e = Dt(e, /[~^:?*\\]/g, "-"), e = Dt(e, /[~^:?*\\\-]$/g, ""), e = Dt(e, "@{", "-"), e = Dt(e, /\.$/g, ""), e = Dt(e, /\/$/g, ""), e = Dt(e, /\.lock$/g, ""), e;
   }
-}, J0 = Y0, Q0 = function(t, e) {
+}, tw = Q0, ew = function(t, e) {
   var r = t, n = e, a = r.length, i = n.length, o = !1, s = null, l = a + 1, c = [], f = [], u = [], d = "", h = -1, w = 0, p = 1, m, y, _ = function() {
     a >= i && (m = r, y = a, r = n, n = m, a = i, i = y, o = !0, l = a + 1);
   }, v = function(x, g, E) {
@@ -3152,9 +3156,9 @@ var Y0 = {
       O(I);
     }
   };
-}, tw = Q0;
-function ew(t, e) {
-  var r = new tw(t, e);
+}, rw = ew;
+function nw(t, e) {
+  var r = new rw(t, e);
   r.compose();
   for (var n = r.getses(), a, i, o = t.length - 1, s = e.length - 1, l = n.length - 1; l >= 0; --l)
     n[l].t === r.SES_COMMON ? (i ? (i.chain = {
@@ -3173,8 +3177,8 @@ function ew(t, e) {
   };
   return i ? (i.chain = c, a) : c;
 }
-function Vo(t, e) {
-  for (var r = [], n = t.length, a = e.length, i = ew(t, e); i !== null; i = i.chain) {
+function Ko(t, e) {
+  for (var r = [], n = t.length, a = e.length, i = nw(t, e); i !== null; i = i.chain) {
     var o = n - i.file1index - 1, s = a - i.file2index - 1;
     n = i.file1index, a = i.file2index, (o || s) && r.push({
       file1: [n + 1, o],
@@ -3183,8 +3187,8 @@ function Vo(t, e) {
   }
   return r.reverse(), r;
 }
-function rw(t, e, r) {
-  var n, a = Vo(e, t), i = Vo(e, r), o = [];
+function aw(t, e, r) {
+  var n, a = Ko(e, t), i = Ko(e, r), o = [];
   function s(B, N) {
     o.push([B.file1[0], N, B.file1[1], B.file2[0], B.file2[1]]);
   }
@@ -3232,8 +3236,8 @@ function rw(t, e, r) {
   }
   return f(e.length), l;
 }
-function nw(t, e, r) {
-  var n = [], a = [t, e, r], i = rw(t, e, r), o = [];
+function iw(t, e, r) {
+  var n = [], a = [t, e, r], i = aw(t, e, r), o = [];
   function s() {
     o.length && n.push({
       ok: o
@@ -3264,12 +3268,12 @@ function nw(t, e, r) {
   }
   return s(), n;
 }
-var aw = nw;
+var ow = iw;
 Object.defineProperty(P, "__esModule", { value: !0 });
 function fe(t) {
   return t && typeof t == "object" && "default" in t ? t.default : t;
 }
-var br = fe(Ll), $c = fe(Nd), iw = fe(Ns), _i = fe(R0), ow = jl, ln = fe(O0), sw = fe(X0), vr = fe(J0), cw = fe(aw);
+var br = fe(Gl), Oc = fe(jd), sw = fe(js), bi = fe(T0), cw = Ml, ln = fe(I0), fw = fe(Y0), vr = fe(tw), lw = fe(ow);
 class U extends Error {
   constructor(e) {
     super(e), this.caller = "";
@@ -3380,20 +3384,20 @@ class Mt {
     return this._start += 4, r;
   }
 }
-function Ln(t, e) {
+function Hn(t, e) {
   return -(t < e) || +(t > e);
 }
-function Rc(t, e) {
-  return Ln(t.path, e.path);
+function Tc(t, e) {
+  return Hn(t.path, e.path);
 }
-function Oc(t) {
+function Ic(t) {
   let e = t > 0 ? t >> 12 : 0;
   e !== 4 && e !== 8 && e !== 10 && e !== 14 && (e = 8);
   let r = t & 511;
   return r & 73 ? r = 493 : r = 420, e !== 8 && (r = 0), (e << 12) + r;
 }
 const Nt = 2 ** 32;
-function Xo(t, e, r, n) {
+function Yo(t, e, r, n) {
   if (t !== void 0 && e !== void 0)
     return [t, e];
   r === void 0 && (r = n.valueOf());
@@ -3401,12 +3405,12 @@ function Xo(t, e, r, n) {
   return [a, i];
 }
 function Me(t) {
-  const [e, r] = Xo(
+  const [e, r] = Yo(
     t.ctimeSeconds,
     t.ctimeNanoseconds,
     t.ctimeMs,
     t.ctime
-  ), [n, a] = Xo(
+  ), [n, a] = Yo(
     t.mtimeSeconds,
     t.mtimeNanoseconds,
     t.mtimeMs,
@@ -3419,7 +3423,7 @@ function Me(t) {
     mtimeNanoseconds: a % Nt,
     dev: t.dev % Nt,
     ino: t.ino % Nt,
-    mode: Oc(t.mode % Nt),
+    mode: Ic(t.mode % Nt),
     uid: t.uid % Nt,
     gid: t.gid % Nt,
     // size of -1 happens over a BrowserFS HTTP Backend that doesn't serve Content-Length headers
@@ -3427,31 +3431,31 @@ function Me(t) {
     size: t.size > -1 ? t.size % Nt : 0
   };
 }
-function fw(t) {
+function uw(t) {
   let e = "";
   for (const r of new Uint8Array(t))
     r < 16 && (e += "0"), e += r.toString(16);
   return e;
 }
-let Ca = null;
+let Da = null;
 async function Vt(t) {
-  return Ca === null && (Ca = await uw()), Ca ? Tc(t) : lw(t);
+  return Da === null && (Da = await hw()), Da ? Pc(t) : dw(t);
 }
-function lw(t) {
-  return new $c().update(t).digest("hex");
+function dw(t) {
+  return new Oc().update(t).digest("hex");
 }
-async function Tc(t) {
+async function Pc(t) {
   const e = await crypto.subtle.digest("SHA-1", t);
-  return fw(e);
+  return uw(e);
 }
-async function uw() {
+async function hw() {
   try {
-    return await Tc(new Uint8Array([])) === "da39a3ee5e6b4b0d3255bfef95601890afd80709";
+    return await Pc(new Uint8Array([])) === "da39a3ee5e6b4b0d3255bfef95601890afd80709";
   } catch {
   }
   return !1;
 }
-function dw(t) {
+function ww(t) {
   return {
     assumeValid: !!(t & 32768),
     extended: !!(t & 16384),
@@ -3459,7 +3463,7 @@ function dw(t) {
     nameLength: t & 4095
   };
 }
-function hw(t) {
+function pw(t) {
   const e = t.flags;
   return e.extended = !1, e.nameLength = Math.min(Buffer.from(t.path).length, 4095), (e.assumeValid ? 32768 : 0) + (e.extended ? 16384 : 0) + ((e.stage & 3) << 12) + (e.nameLength & 4095);
 }
@@ -3506,7 +3510,7 @@ class he {
       const f = {};
       f.ctimeSeconds = n.readUInt32BE(), f.ctimeNanoseconds = n.readUInt32BE(), f.mtimeSeconds = n.readUInt32BE(), f.mtimeNanoseconds = n.readUInt32BE(), f.dev = n.readUInt32BE(), f.ino = n.readUInt32BE(), f.mode = n.readUInt32BE(), f.uid = n.readUInt32BE(), f.gid = n.readUInt32BE(), f.size = n.readUInt32BE(), f.oid = n.slice(20).toString("hex");
       const u = n.readUInt16BE();
-      f.flags = dw(u);
+      f.flags = ww(u);
       const d = e.indexOf(0, n.tell() + 1) - n.tell();
       if (d < 1)
         throw new F(`Got a path length of: ${d}`);
@@ -3530,7 +3534,7 @@ class he {
     return [...this._unmergedPaths];
   }
   get entries() {
-    return [...this._entries.values()].sort(Rc);
+    return [...this._entries.values()].sort(Tc);
   }
   get entriesMap() {
     return this._entries;
@@ -3601,7 +3605,7 @@ class he {
   }
   static async _entryToBuffer(e) {
     const r = Buffer.from(e.path), n = Math.ceil((62 + r.length + 1) / 8) * 8, a = Buffer.alloc(n), i = new Mt(a), o = Me(e);
-    return i.writeUInt32BE(o.ctimeSeconds), i.writeUInt32BE(o.ctimeNanoseconds), i.writeUInt32BE(o.mtimeSeconds), i.writeUInt32BE(o.mtimeNanoseconds), i.writeUInt32BE(o.dev), i.writeUInt32BE(o.ino), i.writeUInt32BE(o.mode), i.writeUInt32BE(o.uid), i.writeUInt32BE(o.gid), i.writeUInt32BE(o.size), i.write(e.oid, 20, "hex"), i.writeUInt16BE(hw(e)), i.write(e.path, r.length, "utf8"), a;
+    return i.writeUInt32BE(o.ctimeSeconds), i.writeUInt32BE(o.ctimeNanoseconds), i.writeUInt32BE(o.mtimeSeconds), i.writeUInt32BE(o.mtimeNanoseconds), i.writeUInt32BE(o.dev), i.writeUInt32BE(o.ino), i.writeUInt32BE(o.mode), i.writeUInt32BE(o.uid), i.writeUInt32BE(o.gid), i.writeUInt32BE(o.size), i.write(e.oid, 20, "hex"), i.writeUInt16BE(pw(e)), i.write(e.path, r.length, "utf8"), a;
   }
   async toObject() {
     const e = Buffer.alloc(12), r = new Mt(e);
@@ -3616,31 +3620,31 @@ class he {
     return Buffer.concat([i, Buffer.from(o, "hex")]);
   }
 }
-function $n(t, e, r = !0, n = !0) {
+function Rn(t, e, r = !0, n = !0) {
   const a = Me(t), i = Me(e);
   return r && a.mode !== i.mode || a.mtimeSeconds !== i.mtimeSeconds || a.ctimeSeconds !== i.ctimeSeconds || a.uid !== i.uid || a.gid !== i.gid || n && a.ino !== i.ino || a.size !== i.size;
 }
-let Da = null;
-const Na = Symbol("IndexCache");
-function ww() {
+let Na = null;
+const Fa = Symbol("IndexCache");
+function mw() {
   return {
     map: /* @__PURE__ */ new Map(),
     stats: /* @__PURE__ */ new Map()
   };
 }
-async function pw(t, e, r) {
+async function gw(t, e, r) {
   const [n, a] = await Promise.all([
     t.lstat(e),
     t.read(e)
   ]), i = await he.from(a);
   r.map.set(e, i), r.stats.set(e, n);
 }
-async function mw(t, e, r) {
+async function yw(t, e, r) {
   const n = r.stats.get(e);
   if (n === void 0) return !0;
   if (n === null) return !1;
   const a = await t.lstat(e);
-  return a === null ? !1 : $n(n, a);
+  return a === null ? !1 : Rn(n, a);
 }
 class Y {
   /**
@@ -3656,13 +3660,13 @@ class Y {
    * @throws {UnmergedPathsError} If unmerged paths exist and `allowUnmerged` is `false`.
    */
   static async acquire({ fs: e, gitdir: r, cache: n, allowUnmerged: a = !0 }, i) {
-    n[Na] || (n[Na] = ww());
+    n[Fa] || (n[Fa] = mw());
     const o = `${r}/index`;
-    Da === null && (Da = new br({ maxPending: 1 / 0 }));
+    Na === null && (Na = new br({ maxPending: 1 / 0 }));
     let s, l = [];
-    return await Da.acquire(o, async () => {
-      const c = n[Na];
-      await mw(e, o, c) && await pw(e, o, c);
+    return await Na.acquire(o, async () => {
+      const c = n[Fa];
+      await yw(e, o, c) && await gw(e, o, c);
       const f = c.map.get(o);
       if (l = f.unmergedPaths, l.length && !a)
         throw new Dr(l);
@@ -3673,7 +3677,7 @@ class Y {
     }), s;
   }
 }
-function Rn(t) {
+function On(t) {
   const e = Math.max(t.lastIndexOf("/"), t.lastIndexOf("\\"));
   return e > -1 && (t = t.slice(e + 1)), t;
 }
@@ -3681,13 +3685,13 @@ function Ee(t) {
   const e = Math.max(t.lastIndexOf("/"), t.lastIndexOf("\\"));
   return e === -1 ? "." : e === 0 ? "/" : t.slice(0, e);
 }
-function Ic(t) {
+function Bc(t) {
   const e = /* @__PURE__ */ new Map(), r = function(a) {
     if (!e.has(a)) {
       const i = {
         type: "tree",
         fullpath: a,
-        basename: Rn(a),
+        basename: On(a),
         metadata: {},
         children: []
       };
@@ -3699,7 +3703,7 @@ function Ic(t) {
       const o = {
         type: "blob",
         fullpath: a,
-        basename: Rn(a),
+        basename: On(a),
         metadata: i,
         // This recursively generates any missing parent folders.
         parent: r(Ee(a)),
@@ -3714,7 +3718,7 @@ function Ic(t) {
     n(a.path, a);
   return e;
 }
-function gw(t) {
+function _w(t) {
   switch (t) {
     case 16384:
       return "tree";
@@ -3729,12 +3733,12 @@ function gw(t) {
   }
   throw new F(`Unexpected GitTree entry mode: ${t.toString(8)}`);
 }
-class yw {
+class bw {
   constructor({ fs: e, gitdir: r, cache: n }) {
     this.treePromise = Y.acquire(
       { fs: e, gitdir: r, cache: n },
       async function(i) {
-        return Ic(i.entries);
+        return Bc(i.entries);
       }
     );
     const a = this;
@@ -3765,7 +3769,7 @@ class yw {
     if (a.type !== "tree")
       throw new Error(`ENOTDIR: not a directory, scandir '${r}'`);
     const i = a.children.map((o) => o.fullpath);
-    return i.sort(Ln), i;
+    return i.sort(Hn), i;
   }
   async type(e) {
     return e._type === !1 && await e.stat(), e._type;
@@ -3781,7 +3785,7 @@ class yw {
           `ENOENT: no such file or directory, lstat '${e._fullpath}'`
         );
       const a = n.type === "tree" ? {} : Me(n.metadata);
-      e._type = n.type === "tree" ? "tree" : gw(a.mode), e._mode = a.mode, n.type === "tree" ? e._stat = void 0 : e._stat = a;
+      e._type = n.type === "tree" ? "tree" : _w(a.mode), e._mode = a.mode, n.type === "tree" ? e._stat = void 0 : e._stat = a;
     }
     return e._stat;
   }
@@ -3795,12 +3799,12 @@ class yw {
     return e._oid;
   }
 }
-const Hn = Symbol("GitWalkSymbol");
+const Gn = Symbol("GitWalkSymbol");
 function $e() {
   const t = /* @__PURE__ */ Object.create(null);
-  return Object.defineProperty(t, Hn, {
+  return Object.defineProperty(t, Gn, {
     value: function({ fs: e, gitdir: r, cache: n }) {
-      return new yw({ fs: e, gitdir: r, cache: n });
+      return new bw({ fs: e, gitdir: r, cache: n });
     }
   }), Object.freeze(t), t;
 }
@@ -3848,7 +3852,7 @@ class Nr extends U {
   }
 }
 Nr.code = "NoRefspecError";
-class On {
+class Tn {
   constructor(e) {
     if (this.refs = /* @__PURE__ */ new Map(), this.parsedConfig = [], e) {
       let r = null;
@@ -3869,7 +3873,7 @@ class On {
     return this;
   }
   static from(e) {
-    return new On(e);
+    return new Tn(e);
   }
   delete(e) {
     this.parsedConfig = this.parsedConfig.filter((r) => r.ref !== e), this.refs.delete(e);
@@ -3880,7 +3884,7 @@ class On {
 `;
   }
 }
-class Tn {
+class In {
   constructor({ remotePath: e, localPath: r, force: n, matchPrefix: a }) {
     Object.assign(this, {
       remotePath: e,
@@ -3893,7 +3897,7 @@ class Tn {
     const [r, n, a, i, o] = e.match(/^(\+?)(.*?)(\*?):(.*?)(\*?)$/).slice(1), s = r === "+", l = a === "*";
     if (l !== (o === "*"))
       throw new F("Invalid refspec");
-    return new Tn({
+    return new In({
       remotePath: n,
       localPath: i,
       force: s,
@@ -3915,18 +3919,18 @@ class Tn {
     return null;
   }
 }
-class bi {
+class vi {
   constructor(e = []) {
     this.rules = e;
   }
   static from(e) {
     const r = [];
     for (const n of e)
-      r.push(Tn.from(n));
-    return new bi(r);
+      r.push(In.from(n));
+    return new vi(r);
   }
   add(e) {
-    const r = Tn.from(e);
+    const r = In.from(e);
     this.rules.push(r);
   }
   translate(e) {
@@ -3950,7 +3954,7 @@ class bi {
     return this.rules.filter((e) => e.matchPrefix).map((e) => e.localPath.replace(/\/$/, ""));
   }
 }
-function _w(t, e) {
+function vw(t, e) {
   const r = t.replace(/\^\{\}$/, ""), n = e.replace(/\^\{\}$/, ""), a = -(r < n) || +(r > n);
   return a === 0 ? t.endsWith("^{}") ? 1 : -1 : a;
 }
@@ -3959,7 +3963,7 @@ function _w(t, e) {
  * SPDX-License-Identifier: LGPL-3.0-or-later
  * Copyright (c) James Prevett and other ZenFS contributors.
  */
-function bw(t, e) {
+function xw(t, e) {
   let r = "", n = 0, a = -1, i = 0, o = "\0";
   for (let s = 0; s <= t.length; ++s) {
     if (s < t.length) o = t[s];
@@ -3987,10 +3991,10 @@ function bw(t, e) {
   }
   return r;
 }
-function vw(t) {
+function Ew(t) {
   if (!t.length) return ".";
   const e = t[0] === "/", r = t.at(-1) === "/";
-  return t = bw(t, !e), t.length ? (r && (t += "/"), e ? `/${t}` : t) : e ? "/" : r ? "./" : ".";
+  return t = xw(t, !e), t.length ? (r && (t += "/"), e ? `/${t}` : t) : e ? "/" : r ? "./" : ".";
 }
 function R(...t) {
   if (t.length === 0) return ".";
@@ -3999,9 +4003,9 @@ function R(...t) {
     const n = t[r];
     n.length > 0 && (e === void 0 ? e = n : e += "/" + n);
   }
-  return e === void 0 ? "." : vw(e);
+  return e === void 0 ? "." : Ew(e);
 }
-const xw = (t) => {
+const Sw = (t) => {
   if (typeof t == "number")
     return t;
   t = t.toLowerCase();
@@ -4015,72 +4019,72 @@ const xw = (t) => {
   throw Error(
     `Expected 'true', 'false', 'yes', 'no', 'on', or 'off', but got ${t}`
   );
-}, Ko = {
+}, Jo = {
   core: {
     filemode: or,
     bare: or,
     logallrefupdates: or,
     symlinks: or,
     ignorecase: or,
-    bigFileThreshold: xw
+    bigFileThreshold: Sw
   }
-}, Ew = /^\[([A-Za-z0-9-.]+)(?: "(.*)")?\]$/, Sw = /^[A-Za-z0-9-.]+$/, kw = /^([A-Za-z][A-Za-z-]*)(?: *= *(.*))?$/, Aw = /^[A-Za-z][A-Za-z-]*$/, $w = /^(.*?)( *[#;].*)$/, Rw = (t) => {
-  const e = Ew.exec(t);
+}, kw = /^\[([A-Za-z0-9-.]+)(?: "(.*)")?\]$/, Aw = /^[A-Za-z0-9-.]+$/, $w = /^([A-Za-z][A-Za-z-]*)(?: *= *(.*))?$/, Rw = /^[A-Za-z][A-Za-z-]*$/, Ow = /^(.*?)( *[#;].*)$/, Tw = (t) => {
+  const e = kw.exec(t);
   if (e != null) {
     const [r, n] = e.slice(1);
     return [r, n];
   }
   return null;
-}, Ow = (t) => {
-  const e = kw.exec(t);
+}, Iw = (t) => {
+  const e = $w.exec(t);
   if (e != null) {
-    const [r, n = "true"] = e.slice(1), a = Tw(n), i = Iw(a);
+    const [r, n = "true"] = e.slice(1), a = Pw(n), i = Bw(a);
     return [r, i];
   }
   return null;
-}, Tw = (t) => {
-  const e = $w.exec(t);
+}, Pw = (t) => {
+  const e = Ow.exec(t);
   if (e == null)
     return t;
   const [r, n] = e.slice(1);
-  return Yo(r) && Yo(n) ? `${r}${n}` : r;
-}, Yo = (t) => (t.match(/(?:^|[^\\])"/g) || []).length % 2 !== 0, Iw = (t) => t.split("").reduce((e, r, n, a) => {
+  return Qo(r) && Qo(n) ? `${r}${n}` : r;
+}, Qo = (t) => (t.match(/(?:^|[^\\])"/g) || []).length % 2 !== 0, Bw = (t) => t.split("").reduce((e, r, n, a) => {
   const i = r === '"' && a[n - 1] !== "\\", o = r === "\\" && a[n + 1] === '"';
   return i || o ? e : e + r;
-}, ""), Jo = (t) => t != null ? t.toLowerCase() : null, ri = (t, e, r) => [Jo(t), e, Jo(r)].filter((n) => n != null).join("."), Qo = (t) => {
+}, ""), ts = (t) => t != null ? t.toLowerCase() : null, ni = (t, e, r) => [ts(t), e, ts(r)].filter((n) => n != null).join("."), es = (t) => {
   const e = t.split("."), r = e.shift(), n = e.pop(), a = e.length ? e.join(".") : void 0;
   return {
     section: r,
     subsection: a,
     name: n,
-    path: ri(r, a, n),
-    sectionPath: ri(r, a, null),
+    path: ni(r, a, n),
+    sectionPath: ni(r, a, null),
     isSection: !!r
   };
-}, Pw = (t, e) => t.reduce((r, n, a) => e(n) ? a : r, -1);
-class vi {
+}, Cw = (t, e) => t.reduce((r, n, a) => e(n) ? a : r, -1);
+class xi {
   constructor(e) {
     let r = null, n = null;
     this.parsedConfig = e ? e.split(`
 `).map((a) => {
       let i = null, o = null;
-      const s = a.trim(), l = Rw(s), c = l != null;
+      const s = a.trim(), l = Tw(s), c = l != null;
       if (c)
         [r, n] = l;
       else {
-        const u = Ow(s);
+        const u = Iw(s);
         u != null && ([i, o] = u);
       }
-      const f = ri(r, n, i);
+      const f = ni(r, n, i);
       return { line: a, isSection: c, section: r, subsection: n, name: i, value: o, path: f };
     }) : [];
   }
   static from(e) {
-    return new vi(e);
+    return new xi(e);
   }
   async get(e, r = !1) {
-    const n = Qo(e).path, a = this.parsedConfig.filter((i) => i.path === n).map(({ section: i, name: o, value: s }) => {
-      const l = Ko[i] && Ko[i][o];
+    const n = es(e).path, a = this.parsedConfig.filter((i) => i.path === n).map(({ section: i, name: o, value: s }) => {
+      const l = Jo[i] && Jo[i][o];
       return l ? l(s) : s;
     });
     return r ? a : a.pop();
@@ -4107,7 +4111,7 @@ class vi {
       path: s,
       sectionPath: l,
       isSection: c
-    } = Qo(e), f = Pw(
+    } = es(e), f = Cw(
       this.parsedConfig,
       (u) => u.path === s
     );
@@ -4131,7 +4135,7 @@ class vi {
         modified: !0,
         path: s
       };
-      if (Sw.test(a) && Aw.test(o))
+      if (Aw.test(a) && Rw.test(o))
         if (u >= 0)
           this.parsedConfig.splice(u + 1, 0, d);
         else {
@@ -4162,7 +4166,7 @@ class J {
    */
   static async get({ fs: e, gitdir: r }) {
     const n = await e.read(`${r}/config`, { encoding: "utf8" });
-    return vi.from(n);
+    return xi.from(n);
   }
   /**
    * Saves the provided Git configuration to the specified `.git` directory.
@@ -4186,10 +4190,10 @@ const un = (t) => [
   `refs/heads/${t}`,
   `refs/remotes/${t}`,
   `refs/remotes/${t}/HEAD`
-], Bw = ["config", "description", "index", "shallow", "commondir"];
-let Fa;
+], Dw = ["config", "description", "index", "shallow", "commondir"];
+let ja;
 async function Yt(t, e) {
-  return Fa === void 0 && (Fa = new br()), Fa.acquire(t, e);
+  return ja === void 0 && (ja = new br()), ja.acquire(t, e);
 }
 class T {
   /**
@@ -4227,7 +4231,7 @@ class T {
         throw new Nr(n);
       s.unshift(`+HEAD:refs/remotes/${n}/HEAD`);
     }
-    const u = bi.from(s), d = /* @__PURE__ */ new Map();
+    const u = vi.from(s), d = /* @__PURE__ */ new Map();
     if (c) {
       const m = await T.listRefs({
         fs: e,
@@ -4342,7 +4346,7 @@ class T {
       "packed-refs",
       async () => e.read(`${r}/packed-refs`, { encoding: "utf8" })
     );
-    const i = On.from(a), o = i.refs.size;
+    const i = Tn.from(a), o = i.refs.size;
     for (const s of n)
       i.refs.has(s) && i.delete(s);
     i.refs.size < o && (a = i.toString(), await Yt(
@@ -4367,7 +4371,7 @@ class T {
       return n = n.slice(5), T.resolve({ fs: e, gitdir: r, ref: n, depth: a });
     if (n.length === 40 && /[0-9a-f]{40}/.test(n))
       return n;
-    const i = await T.packedRefs({ fs: e, gitdir: r }), o = un(n).filter((s) => !Bw.includes(s));
+    const i = await T.packedRefs({ fs: e, gitdir: r }), o = un(n).filter((s) => !Dw.includes(s));
     for (const s of o) {
       const l = await Yt(
         s,
@@ -4471,7 +4475,7 @@ class T {
       "packed-refs",
       async () => e.read(`${r}/packed-refs`, { encoding: "utf8" })
     );
-    return On.from(n).refs;
+    return Tn.from(n).refs;
   }
   /**
    * Lists all refs matching a given filepath prefix.
@@ -4492,7 +4496,7 @@ class T {
     }
     for (let o of (await a).keys())
       o.startsWith(n) && (o = o.replace(n + "/", ""), i.includes(o) || i.push(o));
-    return i.sort(_w), i;
+    return i.sort(vw), i;
   }
   /**
    * Lists all branches, optionally filtered by remote.
@@ -4526,13 +4530,13 @@ class T {
     })).filter((a) => !a.endsWith("^{}"));
   }
 }
-function Cw(t, e) {
-  return Ln(ts(t), ts(e));
+function Nw(t, e) {
+  return Hn(rs(t), rs(e));
 }
-function ts(t) {
+function rs(t) {
   return t.mode === "040000" ? t.path + "/" : t.path;
 }
-function Pc(t) {
+function Cc(t) {
   switch (t) {
     case "040000":
       return "tree";
@@ -4547,7 +4551,7 @@ function Pc(t) {
   }
   throw new F(`Unexpected GitTree entry mode: ${t}`);
 }
-function Dw(t) {
+function Fw(t) {
   const e = [];
   let r = 0;
   for (; r < t.length; ) {
@@ -4563,7 +4567,7 @@ function Dw(t) {
       );
     let i = t.slice(r, n).toString("utf8");
     i === "40000" && (i = "040000");
-    const o = Pc(i), s = t.slice(n + 1, a).toString("utf8");
+    const o = Cc(i), s = t.slice(n + 1, a).toString("utf8");
     if (s.includes("\\") || s.includes("/"))
       throw new Xe(s);
     const l = t.slice(a + 1, a + 21).toString("hex");
@@ -4571,7 +4575,7 @@ function Dw(t) {
   }
   return e;
 }
-function Nw(t) {
+function jw(t) {
   if (typeof t == "number" && (t = t.toString(8)), t.match(/^0?4.*/)) return "040000";
   if (t.match(/^1006.*/)) return "100644";
   if (t.match(/^1007.*/)) return "100755";
@@ -4579,18 +4583,18 @@ function Nw(t) {
   if (t.match(/^160.*/)) return "160000";
   throw new F(`Could not understand file mode: ${t}`);
 }
-function Fw(t) {
-  return !t.oid && t.sha && (t.oid = t.sha), t.mode = Nw(t.mode), t.type || (t.type = Pc(t.mode)), t;
+function Uw(t) {
+  return !t.oid && t.sha && (t.oid = t.sha), t.mode = jw(t.mode), t.type || (t.type = Cc(t.mode)), t;
 }
 class ut {
   constructor(e) {
     if (Buffer.isBuffer(e))
-      this._entries = Dw(e);
+      this._entries = Fw(e);
     else if (Array.isArray(e))
-      this._entries = e.map(Fw);
+      this._entries = e.map(Uw);
     else
       throw new F("invalid type passed to GitTree constructor");
-    this._entries.sort(Rc);
+    this._entries.sort(Tc);
   }
   static from(e) {
     return new ut(e);
@@ -4601,7 +4605,7 @@ class ut {
   }
   toObject() {
     const e = [...this._entries];
-    return e.sort(Cw), Buffer.concat(
+    return e.sort(Nw), Buffer.concat(
       e.map((r) => {
         const n = Buffer.from(r.mode.replace(/^0/, "")), a = Buffer.from(" "), i = Buffer.from(r.path, "utf8"), o = Buffer.from([0]), s = Buffer.from(r.oid, "hex");
         return Buffer.concat([n, a, i, o, s]);
@@ -4653,26 +4657,26 @@ class Ke {
     };
   }
 }
-async function Bc({ fs: t, gitdir: e, oid: r }) {
+async function Dc({ fs: t, gitdir: e, oid: r }) {
   const n = `objects/${r.slice(0, 2)}/${r.slice(2)}`, a = await t.read(`${e}/${n}`);
   return a ? { object: a, format: "deflated", source: n } : null;
 }
-function jw(t, e) {
-  const r = new Mt(t), n = es(r);
+function Mw(t, e) {
+  const r = new Mt(t), n = ns(r);
   if (n !== e.byteLength)
     throw new F(
       `applyDelta expected source buffer to be ${n} bytes but the provided buffer was ${e.length} bytes`
     );
-  const a = es(r);
+  const a = ns(r);
   let i;
-  const o = ns(r, e);
+  const o = is(r, e);
   if (o.byteLength === a)
     i = o;
   else {
     i = Buffer.alloc(a);
     const s = new Mt(i);
     for (s.copy(o); !r.eof(); )
-      s.copy(ns(r, e));
+      s.copy(is(r, e));
     const l = s.tell();
     if (a !== l)
       throw new F(
@@ -4681,29 +4685,29 @@ function jw(t, e) {
   }
   return i;
 }
-function es(t) {
+function ns(t) {
   let e = 0, r = 0, n = null;
   do
     n = t.readUInt8(), e |= (n & 127) << r, r += 7;
   while (n & 128);
   return e;
 }
-function rs(t, e, r) {
+function as(t, e, r) {
   let n = 0, a = 0;
   for (; r--; )
     e & 1 && (n |= t.readUInt8() << a), e >>= 1, a += 8;
   return n;
 }
-function ns(t, e) {
+function is(t, e) {
   const r = t.readUInt8(), n = 128, a = 15, i = 112;
   if (r & n) {
-    const o = rs(t, r & a, 4);
-    let s = rs(t, (r & i) >> 4, 3);
+    const o = as(t, r & a, 4);
+    let s = as(t, (r & i) >> 4, 3);
     return s === 0 && (s = 65536), e.slice(o, o + s);
   } else
     return t.slice(r);
 }
-function Uw(t) {
+function zw(t) {
   let e = [t];
   return {
     next() {
@@ -4717,14 +4721,14 @@ function Uw(t) {
     }
   };
 }
-function Cc(t) {
-  return t[Symbol.asyncIterator] ? t[Symbol.asyncIterator]() : t[Symbol.iterator] ? t[Symbol.iterator]() : t.next ? t : Uw(t);
+function Nc(t) {
+  return t[Symbol.asyncIterator] ? t[Symbol.asyncIterator]() : t[Symbol.iterator] ? t[Symbol.iterator]() : t.next ? t : zw(t);
 }
-class Dc {
+class Fc {
   constructor(e) {
     if (typeof Buffer > "u")
       throw new Error("Missing Buffer dependency");
-    this.stream = Cc(e), this.buffer = null, this.cursor = 0, this.undoCursor = 0, this.started = !1, this._ended = !1, this._discardedBytes = 0;
+    this.stream = Nc(e), this.buffer = null, this.cursor = 0, this.undoCursor = 0, this.started = !1, this._ended = !1, this._discardedBytes = 0;
   }
   eof() {
     return this._ended && this.cursor === this.buffer.length;
@@ -4764,7 +4768,7 @@ class Dc {
   async _accumulate(e) {
     if (this._ended) return;
     const r = [this.buffer];
-    for (; this.cursor + e > Mw(r); ) {
+    for (; this.cursor + e > Lw(r); ) {
       const n = await this._next();
       if (this._ended) break;
       r.push(n);
@@ -4778,11 +4782,11 @@ class Dc {
     this.buffer = await this._next();
   }
 }
-function Mw(t) {
+function Lw(t) {
   return t.reduce((e, r) => e + r.length, 0);
 }
-async function zw(t, e) {
-  const r = new Dc(t);
+async function Hw(t, e) {
+  const r = new Fc(t);
   let n = await r.read(4);
   if (n = n.toString("utf8"), n !== "PACK")
     throw new F(`Invalid PACK header '${n}'`);
@@ -4792,7 +4796,7 @@ async function zw(t, e) {
   let i = await r.read(4);
   if (i = i.readUInt32BE(0), !(i < 1))
     for (; !r.eof() && i--; ) {
-      const o = r.tell(), { type: s, length: l, ofs: c, reference: f } = await Lw(r), u = new _i.Inflate();
+      const o = r.tell(), { type: s, length: l, ofs: c, reference: f } = await Gw(r), u = new bi.Inflate();
       for (; !u.result; ) {
         const d = await r.chunk();
         if (!d) break;
@@ -4818,7 +4822,7 @@ async function zw(t, e) {
       }
     }
 }
-async function Lw(t) {
+async function Gw(t) {
   let e = await t.byte();
   const r = e >> 4 & 7;
   let n = e & 15;
@@ -4840,10 +4844,10 @@ async function Lw(t) {
   }
   return r === 7 && (i = await t.read(20)), { type: r, length: n, ofs: a, reference: i };
 }
-async function Nc(t) {
-  return _i.inflate(t);
+async function jc(t) {
+  return bi.inflate(t);
 }
-function Hw(t) {
+function Ww(t) {
   const e = [];
   let r = 0, n = 0;
   do {
@@ -4853,7 +4857,7 @@ function Hw(t) {
   } while (n);
   return e.reduce((a, i) => a + 1 << 7 | i, -1);
 }
-function Gw(t, e) {
+function qw(t, e) {
   let r = e, n = 4, a = null;
   do
     a = t.readUInt8(), r |= (a & 127) << n, n += 7;
@@ -4906,7 +4910,7 @@ class ze {
       7: "ref-delta"
     }, i = {}, o = e.slice(-20).toString("hex"), s = [], l = {}, c = /* @__PURE__ */ new Map();
     let f = null, u = null;
-    await zw([e], async ({ data: m, type: y, reference: _, offset: v, num: S }) => {
+    await Hw([e], async ({ data: m, type: y, reference: _, offset: v, num: S }) => {
       f === null && (f = S);
       const k = Math.floor(
         (f - S) * 100 / f
@@ -4928,7 +4932,7 @@ class ze {
     });
     const d = Object.keys(i).map(Number);
     for (const [m, y] of d.entries()) {
-      const _ = m + 1 === d.length ? e.byteLength - 20 : d[m + 1], v = i[y], S = iw.buf(e.slice(y, _)) >>> 0;
+      const _ = m + 1 === d.length ? e.byteLength - 20 : d[m + 1], v = i[y], S = sw.buf(e.slice(y, _)) >>> 0;
       v.end = _, v.crc = S;
     }
     const h = new ze({
@@ -5027,10 +5031,10 @@ class ze {
       throw new F("Unrecognized type: 0b" + s.toString(2));
     const c = o & 15;
     let f = c;
-    o & 128 && (f = Gw(i, c));
+    o & 128 && (f = qw(i, c));
     let d = null, h = null;
     if (l === "ofs_delta") {
-      const p = Hw(i), m = e - p;
+      const p = Ww(i), m = e - p;
       ({ object: d, type: l } = await this.readSlice({ start: m }));
     }
     if (l === "ref_delta") {
@@ -5038,15 +5042,15 @@ class ze {
       ({ object: d, type: l } = await this.read({ oid: p }));
     }
     const w = a.slice(i.tell());
-    if (h = Buffer.from(await Nc(w)), h.byteLength !== f)
+    if (h = Buffer.from(await jc(w)), h.byteLength !== f)
       throw new F(
         `Packfile told us object would have length ${f} but it had length ${h.byteLength}`
       );
-    return d && (h = Buffer.from(jw(h, d))), this.readDepth > 3 && (this.offsetCache[e] = { type: l, object: h }), { type: l, format: "content", object: h };
+    return d && (h = Buffer.from(Mw(h, d))), this.readDepth > 3 && (this.offsetCache[e] = { type: l, object: h }), { type: l, format: "content", object: h };
   }
 }
 const dn = Symbol("PackfileCache");
-async function Ww({
+async function Zw({
   fs: t,
   filename: e,
   getExternalRefDelta: r,
@@ -5056,7 +5060,7 @@ async function Ww({
   const i = await t.read(e);
   return ze.fromIdx({ idx: i, getExternalRefDelta: r });
 }
-function xi({
+function Ei({
   fs: t,
   cache: e,
   filename: r,
@@ -5066,7 +5070,7 @@ function xi({
 }) {
   e[dn] || (e[dn] = /* @__PURE__ */ new Map());
   let o = e[dn].get(r);
-  return o || (o = Ww({
+  return o || (o = Zw({
     fs: t,
     filename: r,
     getExternalRefDelta: n,
@@ -5074,14 +5078,14 @@ function xi({
     emitterPrefix: i
   }), e[dn].set(r, o)), o;
 }
-const as = 8 * 1024 * 1024;
-async function qw(t, { start: e = 0, end: r = t.length } = {}) {
-  const n = ow.createHash("sha1");
-  for (let a = e; a < r; a += as)
-    n.update(t.subarray(a, Math.min(a + as, r)));
+const os = 8 * 1024 * 1024;
+async function Vw(t, { start: e = 0, end: r = t.length } = {}) {
+  const n = cw.createHash("sha1");
+  for (let a = e; a < r; a += os)
+    n.update(t.subarray(a, Math.min(a + os, r)));
   return n.digest("hex");
 }
-async function Zw({
+async function Xw({
   fs: t,
   cache: e,
   gitdir: r,
@@ -5092,7 +5096,7 @@ async function Zw({
   let o = await t.readdir(R(r, "objects/pack"));
   o = o.filter((s) => s.endsWith(".idx"));
   for (const s of o) {
-    const l = `${r}/objects/pack/${s}`, c = await xi({
+    const l = `${r}/objects/pack/${s}`, c = await Ei({
       fs: t,
       cache: e,
       filename: l,
@@ -5113,7 +5117,7 @@ async function Zw({
           throw new F(
             `Packfile trailer mismatch: expected ${h}, got ${p}. The packfile may be corrupted.`
           );
-        const m = await qw(u, {
+        const m = await Vw(u, {
           start: 0,
           end: u.length - 20
         });
@@ -5138,8 +5142,8 @@ async function G({
 }) {
   const i = (f) => G({ fs: t, cache: e, gitdir: r, oid: f });
   let o;
-  if (n === "4b825dc642cb6eb9a060e54bf8d69288fbee4904" && (o = { format: "wrapped", object: Buffer.from("tree 0\0") }), o || (o = await Bc({ fs: t, gitdir: r, oid: n })), !o) {
-    if (o = await Zw({
+  if (n === "4b825dc642cb6eb9a060e54bf8d69288fbee4904" && (o = { format: "wrapped", object: Buffer.from("tree 0\0") }), o || (o = await Dc({ fs: t, gitdir: r, oid: n })), !o) {
+    if (o = await Xw({
       fs: t,
       cache: e,
       gitdir: r,
@@ -5149,7 +5153,7 @@ async function G({
       throw new H(n);
     return o;
   }
-  if (a === "deflated" || (o.format === "deflated" && (o.object = Buffer.from(await Nc(o.object)), o.format = "wrapped"), a === "wrapped"))
+  if (a === "deflated" || (o.format === "deflated" && (o.object = Buffer.from(await jc(o.object)), o.format = "wrapped"), a === "wrapped"))
     return o;
   const s = await Vt(o.object);
   if (s !== n)
@@ -5450,7 +5454,7 @@ class Yr extends U {
   }
 }
 Yr.code = "NoCommitError";
-var Fc = /* @__PURE__ */ Object.freeze({
+var Uc = /* @__PURE__ */ Object.freeze({
   __proto__: null,
   AlreadyExistsError: Ot,
   AmbiguousError: Fr,
@@ -5487,28 +5491,28 @@ var Fc = /* @__PURE__ */ Object.freeze({
   IndexResetError: Kr,
   NoCommitError: Yr
 });
-function ni({ name: t, email: e, timestamp: r, timezoneOffset: n }) {
-  return n = Vw(n), `${t} <${e}> ${r} ${n}`;
+function ai({ name: t, email: e, timestamp: r, timezoneOffset: n }) {
+  return n = Kw(n), `${t} <${e}> ${r} ${n}`;
 }
-function Vw(t) {
-  const e = Xw(Kw(t));
+function Kw(t) {
+  const e = Yw(Jw(t));
   t = Math.abs(t);
   const r = Math.floor(t / 60);
   t -= r * 60;
   let n = String(r), a = String(t);
   return n.length < 2 && (n = "0" + n), a.length < 2 && (a = "0" + a), (e === -1 ? "-" : "+") + n + a;
 }
-function Xw(t) {
+function Yw(t) {
   return Math.sign(t) || (Object.is(t, -0) ? -1 : 1);
 }
-function Kw(t) {
+function Jw(t) {
   return t === 0 ? t : -t;
 }
 function Wt(t) {
   return t = t.replace(/\r/g, ""), t = t.replace(/^\n+/, ""), t = t.replace(/\n+$/, "") + `
 `, t;
 }
-function In(t) {
+function Pn(t) {
   const [, e, r, n, a] = t.match(
     /^(.*) <(.*)> (.*) (.*)$/
   );
@@ -5516,14 +5520,14 @@ function In(t) {
     name: e,
     email: r,
     timestamp: Number(n),
-    timezoneOffset: Yw(a)
+    timezoneOffset: Qw(a)
   };
 }
-function Yw(t) {
+function Qw(t) {
   let [, e, r, n] = t.match(/(\+|-)(\d\d)(\d\d)/);
-  return n = (e === "+" ? 1 : -1) * (Number(r) * 60 + Number(n)), Jw(n);
+  return n = (e === "+" ? 1 : -1) * (Number(r) * 60 + Number(n)), tp(n);
 }
-function Jw(t) {
+function tp(t) {
   return t === 0 ? t : -t;
 }
 class st {
@@ -5546,7 +5550,7 @@ class st {
     return `object ${e.object}
 type ${e.type}
 tag ${e.tag}
-tagger ${ni(e.tagger)}
+tagger ${ai(e.tagger)}
 
 ${e.message}
 ${e.gpgsig ? e.gpgsig : ""}`;
@@ -5582,7 +5586,7 @@ ${e.gpgsig ? e.gpgsig : ""}`;
       const i = a.slice(0, a.indexOf(" ")), o = a.slice(a.indexOf(" ") + 1);
       Array.isArray(n[i]) ? n[i].push(o) : n[i] = o;
     }
-    return n.tagger && (n.tagger = In(n.tagger)), n.committer && (n.committer = In(n.committer)), n;
+    return n.tagger && (n.tagger = Pn(n.tagger)), n.committer && (n.committer = Pn(n.committer)), n;
   }
   withoutSignature() {
     const e = Wt(this._tag);
@@ -5614,13 +5618,13 @@ ${e.gpgsig ? e.gpgsig : ""}`;
     return st.from(o);
   }
 }
-function ja(t) {
+function Ua(t) {
   return t.trim().split(`
 `).map((e) => " " + e).join(`
 `) + `
 `;
 }
-function Qw(t) {
+function ep(t) {
   return t.split(`
 `).map((e) => e.replace(/^ /, "")).join(`
 `);
@@ -5639,7 +5643,7 @@ class q {
   static fromPayloadSignature({ payload: e, signature: r }) {
     const n = q.justHeaders(e), a = q.justMessage(e), i = Wt(
       n + `
-gpgsig` + ja(r) + `
+gpgsig` + Ua(r) + `
 ` + a
     );
     return new q(i);
@@ -5684,7 +5688,7 @@ gpgsig` + ja(r) + `
       const i = a.slice(0, a.indexOf(" ")), o = a.slice(a.indexOf(" ") + 1);
       Array.isArray(n[i]) ? n[i].push(o) : n[i] = o;
     }
-    return n.author && (n.author = In(n.author)), n.committer && (n.committer = In(n.committer)), n;
+    return n.author && (n.author = Pn(n.author)), n.committer && (n.committer = Pn(n.committer)), n;
   }
   static renderHeaders(e) {
     let r = "";
@@ -5698,11 +5702,11 @@ gpgsig` + ja(r) + `
 `;
     }
     const n = e.author;
-    r += `author ${ni(n)}
+    r += `author ${ai(n)}
 `;
     const a = e.committer || e.author;
-    return r += `committer ${ni(a)}
-`, e.gpgsig && (r += "gpgsig" + ja(e.gpgsig)), r;
+    return r += `committer ${ai(a)}
+`, e.gpgsig && (r += "gpgsig" + Ua(e.gpgsig)), r;
   }
   static render(e) {
     return q.renderHeaders(e) + `
@@ -5728,14 +5732,14 @@ gpgsig`)), n = e.slice(
       this._commit.indexOf("-----BEGIN PGP SIGNATURE-----"),
       this._commit.indexOf("-----END PGP SIGNATURE-----") + 27
     );
-    return Qw(e);
+    return ep(e);
   }
   static async sign(e, r, n) {
     const a = e.withoutSignature(), i = q.justMessage(e._commit);
     let { signature: o } = await r({ payload: a, secretKey: n });
     o = Wt(o);
     const l = q.justHeaders(e._commit) + `
-gpgsig` + ja(o) + `
+gpgsig` + Ua(o) + `
 ` + i;
     return q.from(l);
   }
@@ -5752,7 +5756,7 @@ async function Ge({ fs: t, cache: e, gitdir: r, oid: n }) {
     throw new ct(n, a, "tree");
   return { tree: ut.from(i), oid: n };
 }
-class tp {
+class rp {
   constructor({ fs: e, gitdir: r, ref: n, cache: a }) {
     this.fs = e, this.cache = a, this.gitdir = r, this.mapPromise = (async () => {
       const o = /* @__PURE__ */ new Map();
@@ -5812,7 +5816,7 @@ class tp {
   async mode(e) {
     if (e._mode === !1) {
       const r = await this.mapPromise, { mode: n } = r.get(e._fullpath);
-      e._mode = Oc(parseInt(n, 8));
+      e._mode = Ic(parseInt(n, 8));
     }
     return e._mode;
   }
@@ -5835,13 +5839,13 @@ class tp {
 }
 function mt({ ref: t = "HEAD" } = {}) {
   const e = /* @__PURE__ */ Object.create(null);
-  return Object.defineProperty(e, Hn, {
+  return Object.defineProperty(e, Gn, {
     value: function({ fs: r, gitdir: n, cache: a }) {
-      return new tp({ fs: r, gitdir: n, ref: t, cache: a });
+      return new rp({ fs: r, gitdir: n, ref: t, cache: a });
     }
   }), Object.freeze(e), e;
 }
-class ep {
+class np {
   constructor({ fs: e, dir: r, gitdir: n, cache: a }) {
     this.fs = e, this.cache = a, this.dir = r, this.gitdir = n, this.config = null;
     const i = this;
@@ -5915,11 +5919,11 @@ class ep {
         { fs: n, gitdir: a, cache: i },
         async function(s) {
           const l = s.entriesMap.get(e._fullpath), c = await e.stat(), u = await (await r._getGitConfig(n, a)).get("core.filemode"), d = typeof process < "u" ? process.platform !== "win32" : !0;
-          if (!l || $n(c, l, u, d)) {
+          if (!l || Rn(c, l, u, d)) {
             const h = await e.content();
             h === void 0 ? o = void 0 : (o = await Vt(
               Ke.wrap({ type: "blob", object: h })
-            ), l && o === l.oid && (!u || c.mode === l.mode) && $n(c, l, u, d) && s.insert({
+            ), l && o === l.oid && (!u || c.mode === l.mode) && Rn(c, l, u, d) && s.insert({
               filepath: e._fullpath,
               stats: c,
               oid: o
@@ -5937,18 +5941,18 @@ class ep {
 }
 function Qe() {
   const t = /* @__PURE__ */ Object.create(null);
-  return Object.defineProperty(t, Hn, {
+  return Object.defineProperty(t, Gn, {
     value: function({ fs: e, dir: r, gitdir: n, cache: a }) {
-      return new ep({ fs: e, dir: r, gitdir: n, cache: a });
+      return new np({ fs: e, dir: r, gitdir: n, cache: a });
     }
   }), Object.freeze(t), t;
 }
-function rp(t, e) {
+function ap(t, e) {
   const r = e - t;
   return Array.from({ length: r }, (n, a) => t + a);
 }
-const jc = typeof Array.prototype.flat > "u" ? (t) => t.reduce((e, r) => e.concat(r), []) : (t) => t.flat();
-class np {
+const Mc = typeof Array.prototype.flat > "u" ? (t) => t.reduce((e, r) => e.concat(r), []) : (t) => t.flat();
+class ip {
   constructor() {
     this.value = null;
   }
@@ -5959,8 +5963,8 @@ class np {
     this.value = null;
   }
 }
-function* ap(t) {
-  const e = new np();
+function* op(t) {
+  const e = new ip();
   let r;
   const n = [], a = t.length;
   for (let i = 0; i < a; i++)
@@ -5984,15 +5988,15 @@ async function se({
   map: i = async (l, c) => c,
   // The default reducer is a flatmap that filters out undefineds.
   reduce: o = async (l, c) => {
-    const f = jc(c);
+    const f = Mc(c);
     return l !== void 0 && f.unshift(l), f;
   },
   // The default iterate function walks all children concurrently
   iterate: s = (l, c) => Promise.all([...c].map(l))
 }) {
   const l = a.map(
-    (h) => h[Hn]({ fs: t, dir: r, gitdir: n, cache: e })
-  ), c = new Array(l.length).fill("."), f = rp(0, l.length), u = async (h) => {
+    (h) => h[Gn]({ fs: t, dir: r, gitdir: n, cache: e })
+  ), c = new Array(l.length).fill("."), f = ap(0, l.length), u = async (h) => {
     f.forEach((m) => {
       const y = h[m];
       h[m] = y && new l[m].ConstructEntry(y);
@@ -6005,7 +6009,7 @@ async function se({
     )).map((m) => (m === null ? [] : m)[Symbol.iterator]());
     return {
       entries: h,
-      children: ap(p)
+      children: op(p)
     };
   }, d = async (h) => {
     const { entries: w, children: p } = await u(h), m = w.find((_) => _ && _._fullpath)._fullpath, y = await i(m, w);
@@ -6016,29 +6020,29 @@ async function se({
   };
   return d(c);
 }
-async function ai(t, e) {
+async function ii(t, e) {
   const r = await t.readdir(e);
   r == null ? await t.rm(e) : r.length ? await Promise.all(
     r.map((n) => {
       const a = R(e, n);
       return t.lstat(a).then((i) => {
         if (i)
-          return i.isDirectory() ? ai(t, a) : t.rm(a);
+          return i.isDirectory() ? ii(t, a) : t.rm(a);
       });
     })
   ).then(() => t.rmdir(e)) : await t.rmdir(e);
 }
-function ip(t) {
-  return op(t) && is(t.then) && is(t.catch);
+function sp(t) {
+  return cp(t) && ss(t.then) && ss(t.catch);
 }
-function op(t) {
+function cp(t) {
   return t && typeof t == "object";
 }
-function is(t) {
+function ss(t) {
   return typeof t == "function";
 }
-function os(t) {
-  return ip(((r) => {
+function cs(t) {
+  return sp(((r) => {
     try {
       return r.readFile().catch((n) => n);
     } catch (n) {
@@ -6046,7 +6050,7 @@ function os(t) {
     }
   })(t));
 }
-const ss = [
+const fs = [
   "readFile",
   "writeFile",
   "mkdir",
@@ -6058,14 +6062,14 @@ const ss = [
   "readlink",
   "symlink"
 ];
-function cs(t, e) {
-  if (os(e))
-    for (const r of ss)
+function ls(t, e) {
+  if (cs(e))
+    for (const r of fs)
       t[`_${r}`] = e[r].bind(e);
   else
-    for (const r of ss)
+    for (const r of fs)
       t[`_${r}`] = ln(e[r].bind(e));
-  os(e) ? (e.cp && (t._cp = e.cp.bind(e)), e.rm ? t._rm = e.rm.bind(e) : e.rmdir.length > 1 ? t._rm = e.rmdir.bind(e) : t._rm = ai.bind(null, t)) : (e.cp && (t._cp = ln(e.cp.bind(e))), e.rm ? t._rm = ln(e.rm.bind(e)) : e.rmdir.length > 2 ? t._rm = ln(e.rmdir.bind(e)) : t._rm = ai.bind(null, t));
+  cs(e) ? (e.cp && (t._cp = e.cp.bind(e)), e.rm ? t._rm = e.rm.bind(e) : e.rmdir.length > 1 ? t._rm = e.rmdir.bind(e) : t._rm = ii.bind(null, t)) : (e.cp && (t._cp = ln(e.cp.bind(e))), e.rm ? t._rm = ln(e.rm.bind(e)) : e.rmdir.length > 2 ? t._rm = ln(e.rmdir.bind(e)) : t._rm = ii.bind(null, t));
 }
 class C {
   /**
@@ -6076,7 +6080,7 @@ class C {
   constructor(e) {
     if (typeof e._original_unwrapped_fs < "u") return e;
     const r = Object.getOwnPropertyDescriptor(e, "promises");
-    r && r.enumerable ? cs(this, e.promises) : cs(this, e), this._original_unwrapped_fs = e;
+    r && r.enumerable ? ls(this, e.promises) : ls(this, e), this._original_unwrapped_fs = e;
   }
   /**
    * Return true if a file exists, false if it doesn't exist.
@@ -6187,7 +6191,7 @@ class C {
   async readdir(e) {
     try {
       const r = await this._readdir(e);
-      return r.sort(Ln), r;
+      return r.sort(Hn), r;
     } catch (r) {
       return r.code === "ENOTDIR" ? null : [];
     }
@@ -6259,18 +6263,18 @@ function b(t, e) {
   if (e === void 0)
     throw new lt(t);
 }
-function sp(t) {
+function fp(t) {
   return t.startsWith("/") || /^[a-zA-Z]:[\\/]/.test(t);
 }
 async function D({ fsp: t, dotgit: e }) {
   b("fsp", t), b("dotgit", e);
   const r = await t._stat(e).catch(() => ({ isFile: () => !1, isDirectory: () => !1 }));
-  return r.isDirectory() ? e : r.isFile() ? t._readFile(e, "utf8").then((n) => n.trimRight().substr(8)).then((n) => sp(n) ? n : R(Ee(e), n)) : e;
+  return r.isDirectory() ? e : r.isFile() ? t._readFile(e, "utf8").then((n) => n.trimRight().substr(8)).then((n) => fp(n) ? n : R(Ee(e), n)) : e;
 }
-async function Pn(t, e) {
+async function Bn(t, e) {
   return !t && !e ? !1 : t && !e || !t && e ? !0 : !(await t.type() === "tree" && await e.type() === "tree" || await t.type() === await e.type() && await t.mode() === await e.mode() && await t.oid() === await e.oid());
 }
-async function Uc({
+async function zc({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -6295,7 +6299,7 @@ async function Uc({
       gitdir: l,
       trees: o,
       map: async function(f, [u, d, h]) {
-        const w = !await Pn(d, h), p = s.includes(f), m = !await Pn(h, u);
+        const w = !await Bn(d, h), p = s.includes(f), m = !await Bn(h, u);
         if (w || p)
           return u ? {
             path: f,
@@ -6346,7 +6350,7 @@ class tr {
    * @returns {Promise<boolean>} - `true` if the file is ignored, `false` otherwise.
    */
   static async isIgnored({ fs: e, dir: r, gitdir: n = R(r, ".git"), filepath: a }) {
-    if (Rn(a) === ".git") return !0;
+    if (On(a) === ".git") return !0;
     if (a === ".") return !1;
     let i = "";
     const o = R(n, "info", "exclude");
@@ -6372,7 +6376,7 @@ class tr {
       } catch (w) {
         if (w.code === "NOENT") continue;
       }
-      const d = sw().add(i);
+      const d = fw().add(i);
       d.add(u);
       const h = Ee(f.filepath);
       if (h !== "." && d.ignores(h)) return !0;
@@ -6381,19 +6385,19 @@ class tr {
     return c;
   }
 }
-async function cp({ fs: t, gitdir: e, object: r, format: n, oid: a }) {
+async function lp({ fs: t, gitdir: e, object: r, format: n, oid: a }) {
   const i = `objects/${a.slice(0, 2)}/${a.slice(2)}`, o = `${e}/${i}`;
   await t.exists(o) || await t.write(o, r);
 }
-let Ua = null;
-async function Mc(t) {
-  return Ua === null && (Ua = lp()), Ua ? fp(t) : _i.deflate(t);
+let Ma = null;
+async function Lc(t) {
+  return Ma === null && (Ma = dp()), Ma ? up(t) : bi.deflate(t);
 }
-async function fp(t) {
+async function up(t) {
   const e = new CompressionStream("deflate"), r = new Blob([t]).stream().pipeThrough(e);
   return new Uint8Array(await new Response(r).arrayBuffer());
 }
-function lp() {
+function dp() {
   try {
     return new CompressionStream("deflate").writable.close(), new Blob([]).stream().cancel(), !0;
   } catch {
@@ -6409,14 +6413,14 @@ async function dt({
   oid: i = void 0,
   dryRun: o = !1
 }) {
-  return a !== "deflated" && (a !== "wrapped" && (n = Ke.wrap({ type: r, object: n })), i = await Vt(n), n = Buffer.from(await Mc(n))), o || await cp({ fs: t, gitdir: e, object: n, format: "deflated", oid: i }), i;
+  return a !== "deflated" && (a !== "wrapped" && (n = Ke.wrap({ type: r, object: n })), i = await Vt(n), n = Buffer.from(await Lc(n))), o || await lp({ fs: t, gitdir: e, object: n, format: "deflated", oid: i }), i;
 }
-function zc(t) {
+function Hc(t) {
   let e;
   for (; ~(e = t.indexOf(92)); ) t[e] = 47;
   return t;
 }
-async function Lc({
+async function Gc({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -6432,7 +6436,7 @@ async function Lc({
       { fs: s, gitdir: l, cache: a },
       async (c) => {
         const u = await (await J.get({ fs: s, gitdir: l })).get("core.autocrlf");
-        return ii({
+        return oi({
           dir: e,
           gitdir: l,
           fs: s,
@@ -6448,7 +6452,7 @@ async function Lc({
     throw s.caller = "git.add", s;
   }
 }
-async function ii({
+async function oi({
   dir: t,
   gitdir: e,
   fs: r,
@@ -6473,7 +6477,7 @@ async function ii({
       const w = await r.readdir(R(t, d));
       if (o) {
         const p = w.map(
-          (m) => ii({
+          (m) => oi({
             dir: t,
             gitdir: e,
             fs: r,
@@ -6487,7 +6491,7 @@ async function ii({
         await Promise.all(p);
       } else
         for (const p of w)
-          await ii({
+          await oi({
             dir: t,
             gitdir: e,
             fs: r,
@@ -6498,7 +6502,7 @@ async function ii({
             autocrlf: s
           });
     } else {
-      const w = h.isSymbolicLink() ? await r.readlink(R(t, d)).then(zc) : await r.read(R(t, d), { autocrlf: s });
+      const w = h.isSymbolicLink() ? await r.readlink(R(t, d)).then(Hc) : await r.read(R(t, d), { autocrlf: s });
       if (w === null) throw new H(d);
       const p = await dt({ fs: r, gitdir: e, type: "blob", object: w });
       a.insert({ filepath: d, stats: h, oid: p });
@@ -6513,7 +6517,7 @@ async function ii({
 async function xr({ fs: t, gitdir: e, path: r }) {
   return (await J.get({ fs: t, gitdir: e })).get(r);
 }
-function Hc(t, ...e) {
+function Wc(t, ...e) {
   for (const r of e)
     if (r)
       for (const n of Object.keys(r)) {
@@ -6529,7 +6533,7 @@ async function ce({ fs: t, gitdir: e, author: r, commit: n }) {
     // author.email is allowed to be empty string
     timestamp: a,
     timezoneOffset: new Date(a * 1e3).getTimezoneOffset()
-  }, o = Hc(
+  }, o = Wc(
     {},
     i,
     n ? n.author : void 0,
@@ -6551,7 +6555,7 @@ async function Se({
     // committer.email is allowed to be empty string
     timestamp: i,
     timezoneOffset: new Date(i * 1e3).getTimezoneOffset()
-  }, s = Hc(
+  }, s = Wc(
     {},
     o,
     a ? a.committer : void 0,
@@ -6561,16 +6565,16 @@ async function Se({
   if (s.name !== void 0)
     return s;
 }
-async function Gc({ fs: t, cache: e, gitdir: r, oid: n }) {
+async function qc({ fs: t, cache: e, gitdir: r, oid: n }) {
   const { type: a, object: i } = await G({ fs: t, cache: e, gitdir: r, oid: n });
   if (a === "tag")
-    return n = st.from(i).parse().object, Gc({ fs: t, cache: e, gitdir: r, oid: n });
+    return n = st.from(i).parse().object, qc({ fs: t, cache: e, gitdir: r, oid: n });
   if (a !== "commit")
     throw new ct(n, a, "commit");
   return { commit: q.from(i), oid: n };
 }
 async function zt({ fs: t, cache: e, gitdir: r, oid: n }) {
-  const { commit: a, oid: i } = await Gc({
+  const { commit: a, oid: i } = await qc({
     fs: t,
     cache: e,
     gitdir: r,
@@ -6640,8 +6644,8 @@ async function Jr({
   return Y.acquire(
     { fs: t, gitdir: n, cache: e, allowUnmerged: !1 },
     async function(S) {
-      const O = Ic(S.entries).get(".");
-      if (h || (h = await Wc({ fs: t, gitdir: n, inode: O, dryRun: c })), d ? d = await Promise.all(
+      const O = Bc(S.entries).get(".");
+      if (h || (h = await Zc({ fs: t, gitdir: n, inode: O, dryRun: c })), d ? d = await Promise.all(
         d.map((E) => T.resolve({ fs: t, gitdir: n, ref: E }))
       ) : l ? d = y.commit.parent : d = m ? [m] : [], !a)
         if (l)
@@ -6672,10 +6676,10 @@ async function Jr({
     }
   );
 }
-async function Wc({ fs: t, gitdir: e, inode: r, dryRun: n }) {
+async function Zc({ fs: t, gitdir: e, inode: r, dryRun: n }) {
   const a = r.children;
   for (const l of a)
-    l.type === "tree" && (l.metadata.mode = "040000", l.metadata.oid = await Wc({ fs: t, gitdir: e, inode: l, dryRun: n }));
+    l.type === "tree" && (l.metadata.mode = "040000", l.metadata.oid = await Zc({ fs: t, gitdir: e, inode: l, dryRun: n }));
   const i = a.map((l) => ({
     mode: l.metadata.mode,
     path: l.basename,
@@ -6700,7 +6704,7 @@ async function Qr({ fs: t, cache: e, gitdir: r, oid: n, filepath: a }) {
     n = o.oid;
   else {
     const l = a.split("/");
-    n = await qc({
+    n = await Vc({
       fs: t,
       cache: e,
       gitdir: r,
@@ -6712,7 +6716,7 @@ async function Qr({ fs: t, cache: e, gitdir: r, oid: n, filepath: a }) {
   }
   return n;
 }
-async function qc({
+async function Vc({
   fs: t,
   cache: e,
   gitdir: r,
@@ -6735,7 +6739,7 @@ async function qc({
         });
         if (c !== "tree")
           throw new ct(i, c, "tree", o);
-        return n = ut.from(f), qc({
+        return n = ut.from(f), Vc({
           fs: t,
           cache: e,
           gitdir: r,
@@ -6772,7 +6776,7 @@ async function tn({ fs: t, gitdir: e, tree: r }) {
     format: "content"
   });
 }
-async function up({
+async function hp({
   fs: t,
   cache: e,
   onSign: r,
@@ -6833,7 +6837,7 @@ async function up({
     signingKey: f
   });
 }
-async function Zc({
+async function Xc({
   fs: t,
   onSign: e,
   dir: r,
@@ -6859,7 +6863,7 @@ async function Zc({
     });
     if (!w) throw new at("committer");
     const p = await D({ fsp: d, dotgit: n });
-    return await up({
+    return await hp({
       fs: d,
       cache: u,
       onSign: e,
@@ -6876,13 +6880,13 @@ async function Zc({
     throw d.caller = "git.addNote", d;
   }
 }
-const dp = /(^|[/.])([/.]|$)|^@$|@{|[\x00-\x20\x7f~^:?*[\\]|\.lock(\/|$)/;
+const wp = /(^|[/.])([/.]|$)|^@$|@{|[\x00-\x20\x7f~^:?*[\\]|\.lock(\/|$)/;
 function Er(t, e) {
   if (typeof t != "string")
     throw new TypeError("Reference name must be a string");
-  return !dp.test(t) && !0;
+  return !wp.test(t) && !0;
 }
-async function Vc({ fs: t, gitdir: e, remote: r, url: n, force: a }) {
+async function Kc({ fs: t, gitdir: e, remote: r, url: n, force: a }) {
   if (!Er(r))
     throw new $t(r, vr.clean(r));
   const i = await J.get({ fs: t, gitdir: e });
@@ -6893,7 +6897,7 @@ async function Vc({ fs: t, gitdir: e, remote: r, url: n, force: a }) {
     `+refs/heads/*:refs/remotes/${r}/*`
   ), await J.save({ fs: t, gitdir: e, config: i });
 }
-async function Xc({
+async function Yc({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -6904,7 +6908,7 @@ async function Xc({
   try {
     b("fs", t), b("gitdir", r), b("remote", n), b("url", a);
     const o = new C(t), s = await D({ fsp: o, dotgit: r });
-    return await Vc({
+    return await Kc({
       fs: o,
       gitdir: s,
       remote: n,
@@ -6915,7 +6919,7 @@ async function Xc({
     throw o.caller = "git.addRemote", o;
   }
 }
-async function hp({
+async function pp({
   fs: t,
   cache: e,
   onSign: r,
@@ -6952,7 +6956,7 @@ async function hp({
   });
   await T.writeRef({ fs: t, gitdir: n, ref: a, value: w });
 }
-async function Kc({
+async function Jc({
   fs: t,
   onSign: e,
   dir: r,
@@ -6974,7 +6978,7 @@ async function Kc({
       author: i
     });
     if (!w) throw new at("tagger");
-    return await hp({
+    return await pp({
       fs: d,
       cache: u,
       onSign: e,
@@ -6991,7 +6995,7 @@ async function Kc({
     throw d.caller = "git.annotatedTag", d;
   }
 }
-async function wp({
+async function mp({
   fs: t,
   gitdir: e,
   ref: r,
@@ -7016,7 +7020,7 @@ async function wp({
     value: o
   });
 }
-async function Yc({
+async function Qc({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -7028,7 +7032,7 @@ async function Yc({
   try {
     b("fs", t), b("gitdir", r), b("ref", n);
     const s = new C(t), l = await D({ fsp: s, dotgit: r });
-    return await wp({
+    return await mp({
       fs: s,
       gitdir: l,
       ref: n,
@@ -7040,8 +7044,8 @@ async function Yc({
     throw s.caller = "git.branch", s;
   }
 }
-const Jc = (t, e) => t === "." || e == null || e.length === 0 || e === "." ? !0 : e.length >= t.length ? e.startsWith(t) : t.startsWith(e);
-async function Ei({
+const tf = (t, e) => t === "." || e == null || e.length === 0 || e === "." ? !0 : e.length >= t.length ? e.startsWith(t) : t.startsWith(e);
+async function Si({
   fs: t,
   cache: e,
   onProgress: r,
@@ -7090,7 +7094,7 @@ async function Ei({
   if (!c) {
     let _;
     try {
-      _ = await pp({
+      _ = await gp({
         fs: t,
         cache: e,
         onProgress: r,
@@ -7169,10 +7173,10 @@ async function Ei({
     ), w) {
       const x = _.filter(
         ([E]) => E === "create" || E === "create-index" || E === "update" || E === "mkdir-index"
-      ), g = await fs(
+      ), g = await us(
         "Update Working Dir",
         x.map(
-          ([E, A, $, I, B]) => () => gp({ fs: t, cache: e, gitdir: i, dir: a }, [
+          ([E, A, $, I, B]) => () => _p({ fs: t, cache: e, gitdir: i, dir: a }, [
             E,
             A,
             $,
@@ -7186,10 +7190,10 @@ async function Ei({
       await Y.acquire(
         { fs: t, gitdir: i, cache: e, allowUnmerged: !0 },
         async function(E) {
-          await fs(
+          await us(
             "Update Index",
             g.map(
-              ([A, $, I]) => () => mp({ index: E, fullpath: A, oid: $, stats: I })
+              ([A, $, I]) => () => yp({ index: E, fullpath: A, oid: $, stats: I })
             ),
             r,
             p
@@ -7259,7 +7263,7 @@ async function Ei({
     }) : await T.writeRef({ fs: t, gitdir: i, ref: "HEAD", value: y });
   }
 }
-async function pp({
+async function gp({
   fs: t,
   cache: e,
   onProgress: r,
@@ -7278,7 +7282,7 @@ async function pp({
     trees: [mt({ ref: i }), Qe(), $e()],
     map: async function(c, [f, u, d]) {
       if (c === ".") return;
-      if (s && !s.some((w) => Jc(c, w)))
+      if (s && !s.some((w) => tf(c, w)))
         return null;
       switch (r && await r({ phase: "Analyzing workdir", loaded: ++l }), [!!d, !!f, !!u].map(Number).join("")) {
         case "000":
@@ -7418,11 +7422,11 @@ async function pp({
     },
     // Modify the default flat mapping
     reduce: async function(c, f) {
-      return f = jc(f), c ? c && c[0] === "rmdir" ? (f.push(c), f) : (f.unshift(c), f) : f;
+      return f = Mc(f), c ? c && c[0] === "rmdir" ? (f.push(c), f) : (f.unshift(c), f) : f;
     }
   });
 }
-async function mp({ index: t, fullpath: e, stats: r, oid: n }) {
+async function yp({ index: t, fullpath: e, stats: r, oid: n }) {
   try {
     t.insert({
       filepath: e,
@@ -7433,7 +7437,7 @@ async function mp({ index: t, fullpath: e, stats: r, oid: n }) {
     console.warn(`Error inserting ${e} into index:`, a);
   }
 }
-async function gp({ fs: t, cache: e, gitdir: r, dir: n }, [a, i, o, s, l]) {
+async function _p({ fs: t, cache: e, gitdir: r, dir: n }, [a, i, o, s, l]) {
   const c = `${n}/${i}`;
   if (a !== "create-index" && a !== "mkdir-index") {
     const { object: u } = await G({ fs: t, cache: e, gitdir: r, oid: o });
@@ -7451,7 +7455,7 @@ async function gp({ fs: t, cache: e, gitdir: r, dir: n }, [a, i, o, s, l]) {
   const f = await t.lstat(c);
   return s === 33261 && (f.mode = 493), a === "mkdir-index" && (f.mode = 57344), [i, o, f];
 }
-async function fs(t, e, r, n) {
+async function us(t, e, r, n) {
   const a = [];
   try {
     for (let i = 0; i < e.length; i += n) {
@@ -7470,7 +7474,7 @@ async function fs(t, e, r, n) {
   }
   return a;
 }
-async function Si({
+async function ki({
   fs: t,
   onProgress: e,
   onPostCheckout: r,
@@ -7491,7 +7495,7 @@ async function Si({
   try {
     b("fs", t), b("dir", n), b("gitdir", a);
     const m = o || "HEAD", y = new C(t), _ = await D({ fsp: y, dotgit: a });
-    return await Ei({
+    return await Si({
       fs: y,
       cache: h,
       onProgress: e,
@@ -7513,9 +7517,9 @@ async function Si({
     throw m.caller = "git.checkout", m;
   }
 }
-const Ma = /^.*(\r?\n|$)/gm;
-function yp({ branches: t, contents: e }) {
-  const r = t[1], n = t[2], a = e[0], i = e[1], o = e[2], s = i.match(Ma), l = a.match(Ma), c = o.match(Ma), f = cw(s, l, c), u = 7;
+const za = /^.*(\r?\n|$)/gm;
+function bp({ branches: t, contents: e }) {
+  const r = t[1], n = t[2], a = e[0], i = e[1], o = e[2], s = i.match(za), l = a.match(za), c = o.match(za), f = lw(s, l, c), u = 7;
   let d = "", h = !0;
   for (const w of f)
     w.ok && (d += w.ok.join("")), w.conflict && (h = !1, d += `${"<".repeat(u)} ${r}
@@ -7524,7 +7528,7 @@ function yp({ branches: t, contents: e }) {
 `);
   return { cleanMerge: h, mergedText: d };
 }
-async function Qc({
+async function ef({
   fs: t,
   cache: e,
   dir: r,
@@ -7547,7 +7551,7 @@ async function Qc({
     gitdir: n,
     trees: [w, p, m],
     map: async function(O, [x, g, E]) {
-      const A = Rn(O), $ = await Pn(x, g), I = await Pn(E, g);
+      const A = On(O), $ = await Bn(x, g), I = await Bn(E, g);
       switch (`${$}-${I}`) {
         case "false-false":
           return {
@@ -7589,7 +7593,7 @@ async function Qc({
               type: "tree"
             };
           if (x && E && await x.type() === "blob" && await E.type() === "blob")
-            return _p({
+            return vp({
               fs: t,
               gitdir: n,
               path: A,
@@ -7683,7 +7687,7 @@ async function Qc({
     S
   )) : k.oid;
 }
-async function _p({
+async function vp({
   fs: t,
   gitdir: e,
   path: r,
@@ -7694,7 +7698,7 @@ async function _p({
   theirName: s,
   baseName: l,
   dryRun: c,
-  mergeDriver: f = yp
+  mergeDriver: f = bp
 }) {
   const u = "blob";
   let d = "100755", h = "", w = "";
@@ -7728,30 +7732,30 @@ async function _p({
   });
   return { cleanMerge: v, mergeResult: { mode: p, path: r, oid: S, type: u } };
 }
-const bp = {
+const xp = {
   stage: $e,
   workdir: Qe
 };
-let za;
+let La;
 async function We(t, e) {
-  return za === void 0 && (za = new br()), za.acquire(t, e);
+  return La === void 0 && (La = new br()), La.acquire(t, e);
 }
-async function vp(t, e, r, n, a = null) {
+async function Ep(t, e, r, n, a = null) {
   const i = R(r, n), o = await t.lstat(i);
   if (!o) throw new H(i);
   if (o.isDirectory())
     throw new F(
       `${i}: file expected, but found directory`
     );
-  const s = a ? await Bc({ fs: t, gitdir: e, oid: a }) : void 0;
+  const s = a ? await Dc({ fs: t, gitdir: e, oid: a }) : void 0;
   let l = s ? a : void 0;
   return s || await We({ fs: t, gitdir: e, currentFilepath: i }, async () => {
-    const c = o.isSymbolicLink() ? await t.readlink(i).then(zc) : await t.read(i);
+    const c = o.isSymbolicLink() ? await t.readlink(i).then(Hc) : await t.read(i);
     if (c === null) throw new H(i);
     l = await dt({ fs: t, gitdir: e, type: "blob", object: c });
   }), l;
 }
-async function xp({ fs: t, dir: e, gitdir: r, entries: n }) {
+async function Sp({ fs: t, dir: e, gitdir: r, entries: n }) {
   async function a(i) {
     if (i.type === "tree") {
       if (!i.oid) {
@@ -7762,7 +7766,7 @@ async function xp({ fs: t, dir: e, gitdir: r, entries: n }) {
           tree: o
         }), i.mode = 16384;
       }
-    } else i.type === "blob" && (i.oid = await vp(
+    } else i.type === "blob" && (i.oid = await Ep(
       t,
       r,
       e,
@@ -7773,14 +7777,14 @@ async function xp({ fs: t, dir: e, gitdir: r, entries: n }) {
   }
   return Promise.all(n.map(a));
 }
-async function ls({
+async function ds({
   fs: t,
   dir: e,
   gitdir: r,
   treePair: n
   // [TREE({ ref: 'HEAD' }), 'STAGE'] would be the equivalent of `git write-tree`
 }) {
-  const a = n[1] === "stage", i = n.map((h) => typeof h == "string" ? bp[h]() : h), o = [], f = await se({
+  const a = n[1] === "stage", i = n.map((h) => typeof h == "string" ? xp[h]() : h), o = [], f = await se({
     fs: t,
     cache: {},
     dir: e,
@@ -7807,7 +7811,7 @@ async function ls({
   });
   if (o.length === 0 || f.length === 0)
     return null;
-  const d = (await xp({
+  const d = (await Sp({
     fs: t,
     dir: e,
     gitdir: r,
@@ -7820,7 +7824,7 @@ async function ls({
   }));
   return tn({ fs: t, gitdir: r, tree: d });
 }
-async function tf({
+async function rf({
   fs: t,
   dir: e,
   gitdir: r,
@@ -7891,7 +7895,7 @@ async function tf({
     });
   });
 }
-async function us({
+async function hs({
   fs: t,
   cache: e,
   dir: r,
@@ -7929,7 +7933,7 @@ async function us({
     oid: w
   }), m = await Y.acquire(
     { fs: t, gitdir: n, cache: e, allowUnmerged: !1 },
-    async (_) => Qc({
+    async (_) => ef({
       fs: t,
       cache: e,
       dir: r,
@@ -7963,7 +7967,7 @@ async function us({
     dryRun: i,
     noUpdateBranch: o
   });
-  return r && !i && !o && await tf({
+  return r && !i && !o && await rf({
     fs: t,
     dir: r,
     gitdir: n,
@@ -7972,7 +7976,7 @@ async function us({
     wasStaged: !0
   }), y;
 }
-async function ef({
+async function nf({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -7993,7 +7997,7 @@ async function ef({
       oid: n
     });
     if (d.parent && d.parent.length > 1)
-      return await us({
+      return await hs({
         fs: f,
         cache: a,
         dir: e,
@@ -8012,7 +8016,7 @@ async function ef({
     });
     if (!h)
       throw new at("committer");
-    return await us({
+    return await hs({
       fs: f,
       cache: a,
       dir: e,
@@ -8028,9 +8032,9 @@ async function ef({
     throw f.caller = "git.cherryPick", f;
   }
 }
-const Ep = /^refs\/(heads\/|tags\/|remotes\/)?(.*)/;
+const kp = /^refs\/(heads\/|tags\/|remotes\/)?(.*)/;
 function me(t) {
-  const e = Ep.exec(t);
+  const e = kp.exec(t);
   return e ? e[1] === "remotes/" && t.endsWith("/HEAD") ? e[2].slice(0, -5) : e[2] : t;
 }
 async function le({
@@ -8054,21 +8058,21 @@ async function le({
   if (a.startsWith("refs/"))
     return r ? a : me(a);
 }
-function Sp(t) {
+function Ap(t) {
   return t = t.replace(/^git@([^:]+):/, "https://$1/"), t = t.replace(/^ssh:\/\//, "https://"), t;
 }
-function rf({ username: t = "", password: e = "" }) {
+function af({ username: t = "", password: e = "" }) {
   return `Basic ${Buffer.from(`${t}:${e}`).toString("base64")}`;
 }
 async function en(t, e) {
-  const r = Cc(t);
+  const r = Nc(t);
   for (; ; ) {
     const { value: n, done: a } = await r.next();
     if (n && await e(n), a) break;
   }
   r.return && r.return();
 }
-async function Bn(t) {
+async function Cn(t) {
   let e = 0;
   const r = [];
   await en(t, (i) => {
@@ -8080,14 +8084,14 @@ async function Bn(t) {
     n.set(i, a), a += i.byteLength;
   return n;
 }
-function ds(t) {
+function ws(t) {
   let e = t.match(/^https?:\/\/([^/]+)@/);
   if (e == null) return { url: t, auth: {} };
   e = e[1];
   const [r, n] = e.split(":");
   return t = t.replace(`${e}@`, ""), { url: t, auth: { username: r, password: n } };
 }
-function oi(t, e) {
+function si(t, e) {
   const r = e.toString(16);
   return "0".repeat(t - r.length) + r;
 }
@@ -8100,11 +8104,11 @@ class X {
   }
   static encode(e) {
     typeof e == "string" && (e = Buffer.from(e));
-    const r = e.length + 4, n = oi(4, r);
+    const r = e.length + 4, n = si(4, r);
     return Buffer.concat([Buffer.from(n, "utf8"), e]);
   }
   static streamReader(e) {
-    const r = new Dc(e);
+    const r = new Fc(e);
     return async function() {
       try {
         let a = await r.read(4);
@@ -8118,7 +8122,7 @@ class X {
     };
   }
 }
-async function hs(t) {
+async function ps(t) {
   const e = {};
   let r;
   for (; r = await t(), r !== !0; ) {
@@ -8133,28 +8137,28 @@ async function hs(t) {
   }
   return { protocolVersion: 2, capabilities2: e };
 }
-async function ws(t, { service: e }) {
+async function ms(t, { service: e }) {
   const r = /* @__PURE__ */ new Set(), n = /* @__PURE__ */ new Map(), a = /* @__PURE__ */ new Map(), i = X.streamReader(t);
   let o = await i();
   for (; o === null; ) o = await i();
   if (o === !0) throw new Lr();
   if (o.includes("version 2"))
-    return hs(i);
+    return ps(i);
   if (o.toString("utf8").replace(/\n$/, "") !== `# service=${e}`)
     throw new Oe(`# service=${e}\\n`, o.toString("utf8"));
   let s = await i();
   for (; s === null; ) s = await i();
   if (s === !0) return { capabilities: r, refs: n, symrefs: a };
   if (s = s.toString("utf8"), s.includes("version 2"))
-    return hs(i);
-  const [l, c] = La(s, "\0", "\\x00");
+    return ps(i);
+  const [l, c] = Ha(s, "\0", "\\x00");
   if (c.split(" ").map((f) => r.add(f)), l !== "0000000000000000000000000000000000000000 capabilities^{}") {
-    const [f, u] = La(l, " ", " ");
+    const [f, u] = Ha(l, " ", " ");
     for (n.set(u, f); ; ) {
       const d = await i();
       if (d === !0) break;
       if (d !== null) {
-        const [h, w] = La(d.toString("utf8"), " ", " ");
+        const [h, w] = Ha(d.toString("utf8"), " ", " ");
         n.set(w, h);
       }
     }
@@ -8166,7 +8170,7 @@ async function ws(t, { service: e }) {
     }
   return { protocolVersion: 1, capabilities: r, refs: n, symrefs: a };
 }
-function La(t, e, r) {
+function Ha(t, e, r) {
   const n = t.trim().split(e);
   if (n.length !== 2)
     throw new Oe(
@@ -8175,17 +8179,17 @@ function La(t, e, r) {
     );
   return n;
 }
-const ps = (t, e) => t.endsWith("?") ? `${t}${e}` : `${t}/${e.replace(/^https?:\/\//, "")}`, ms = (t, e) => {
-  (e.username || e.password) && (t.Authorization = rf(e)), e.headers && Object.assign(t, e.headers);
-}, Ha = async (t) => {
+const gs = (t, e) => t.endsWith("?") ? `${t}${e}` : `${t}/${e.replace(/^https?:\/\//, "")}`, ys = (t, e) => {
+  (e.username || e.password) && (t.Authorization = af(e)), e.headers && Object.assign(t, e.headers);
+}, Ga = async (t) => {
   try {
-    const e = Buffer.from(await Bn(t.body)), r = e.toString("utf8");
+    const e = Buffer.from(await Cn(t.body)), r = e.toString("utf8");
     return { preview: r.length < 256 ? r : r.slice(0, 256) + "...", response: r, data: e };
   } catch {
     return {};
   }
 };
-class Cn {
+class Dn {
   /**
    * Returns the capabilities of the GitRemoteHTTP class.
    *
@@ -8225,9 +8229,9 @@ class Cn {
     headers: c,
     protocolVersion: f
   }) {
-    let { url: u, auth: d } = ds(l);
-    const h = o ? ps(o, u) : u;
-    (d.username || d.password) && (c.Authorization = rf(d)), f === 2 && (c["Git-Protocol"] = "version=2");
+    let { url: u, auth: d } = ws(l);
+    const h = o ? gs(o, u) : u;
+    (d.username || d.password) && (c.Authorization = af(d)), f === 2 && (c["Git-Protocol"] = "version=2");
     let w, p, m = !1;
     do
       if (w = await e.request({
@@ -8243,21 +8247,21 @@ class Cn {
             headers: { ...c }
           }), d && d.cancel)
             throw new Je();
-          d && (ms(c, d), m = !0, p = !0);
+          d && (ys(c, d), m = !0, p = !0);
         }
       } else w.statusCode === 200 && m && a && await a(u, d);
     while (p);
     if (w.statusCode !== 200) {
-      const { response: y } = await Ha(w);
+      const { response: y } = await Ga(w);
       throw new Le(w.statusCode, w.statusMessage, y);
     }
     if (w.headers["content-type"] === `application/x-${s}-advertisement`) {
-      const y = await ws(w.body, { service: s });
+      const y = await ms(w.body, { service: s });
       return y.auth = d, y;
     } else {
-      const { preview: y, response: _, data: v } = await Ha(w);
+      const { preview: y, response: _, data: v } = await Ga(w);
       try {
-        const S = await ws([v], { service: s });
+        const S = await ms([v], { service: s });
         return S.auth = d, S;
       } catch {
         throw new Zr(y, _);
@@ -8289,8 +8293,8 @@ class Cn {
     body: s,
     headers: l
   }) {
-    const c = ds(i);
-    c && (i = c.url), n && (i = ps(n, i)), l["content-type"] = `application/x-${a}-request`, l.accept = `application/x-${a}-result`, ms(l, o);
+    const c = ws(i);
+    c && (i = c.url), n && (i = gs(n, i)), l["content-type"] = `application/x-${a}-request`, l.accept = `application/x-${a}-result`, ys(l, o);
     const f = await e.request({
       onProgress: r,
       method: "POST",
@@ -8299,13 +8303,13 @@ class Cn {
       headers: l
     });
     if (f.statusCode !== 200) {
-      const { response: u } = Ha(f);
+      const { response: u } = Ga(f);
       throw new Le(f.statusCode, f.statusMessage, u);
     }
     return f;
   }
 }
-class Gn {
+class Wn {
   /**
    * Determines the appropriate remote helper for the given URL.
    *
@@ -8317,8 +8321,8 @@ class Gn {
    */
   static getRemoteHelperFor({ url: e }) {
     const r = /* @__PURE__ */ new Map();
-    r.set("http", Cn), r.set("https", Cn);
-    const n = kp({ url: e });
+    r.set("http", Dn), r.set("https", Dn);
+    const n = $p({ url: e });
     if (!n)
       throw new Xr(e);
     if (r.has(n.transport))
@@ -8326,11 +8330,11 @@ class Gn {
     throw new Vr(
       e,
       n.transport,
-      n.transport === "ssh" ? Sp(e) : void 0
+      n.transport === "ssh" ? Ap(e) : void 0
     );
   }
 }
-function kp({ url: t }) {
+function $p({ url: t }) {
   if (t.startsWith("git@"))
     return {
       transport: "ssh",
@@ -8398,11 +8402,11 @@ class Sr {
       });
   }
 }
-async function Ap({ fs: t, gitdir: e, oid: r }) {
+async function Rp({ fs: t, gitdir: e, oid: r }) {
   const n = `objects/${r.slice(0, 2)}/${r.slice(2)}`;
   return t.exists(`${e}/${n}`);
 }
-async function $p({
+async function Op({
   fs: t,
   cache: e,
   gitdir: r,
@@ -8412,7 +8416,7 @@ async function $p({
   let i = await t.readdir(R(r, "objects/pack"));
   i = i.filter((o) => o.endsWith(".idx"));
   for (const o of i) {
-    const s = `${r}/objects/pack/${o}`, l = await xi({
+    const s = `${r}/objects/pack/${o}`, l = await Ei({
       fs: t,
       cache: e,
       filename: s,
@@ -8424,7 +8428,7 @@ async function $p({
   }
   return !1;
 }
-async function gs({
+async function _s({
   fs: t,
   cache: e,
   gitdir: r,
@@ -8432,8 +8436,8 @@ async function gs({
   format: a = "content"
 }) {
   const i = (s) => G({ fs: t, cache: e, gitdir: r, oid: s });
-  let o = await Ap({ fs: t, gitdir: r, oid: n });
-  return o || (o = await $p({
+  let o = await Rp({ fs: t, gitdir: r, oid: n });
+  return o || (o = await Op({
     fs: t,
     cache: e,
     gitdir: r,
@@ -8441,23 +8445,23 @@ async function gs({
     getExternalRefDelta: i
   })), o;
 }
-function Rp(t) {
+function Tp(t) {
   const a = "5041434b" + "00000002" + "00000000";
   return t.slice(0, 12).toString("hex") === a;
 }
-function nf(t, e) {
+function of(t, e) {
   const r = t.map((n) => n.split("=", 1)[0]);
   return e.filter((n) => {
     const a = n.split("=", 1)[0];
     return r.includes(a);
   });
 }
-const Wn = {
+const qn = {
   name: "isomorphic-git",
   version: "1.37.5",
   agent: "git/isomorphic-git@1.37.5"
 };
-class bn {
+class vn {
   constructor() {
     this._queue = [];
   }
@@ -8493,25 +8497,25 @@ class bn {
     });
   }
 }
-function Op(t) {
+function Ip(t) {
   const e = t.indexOf("\r"), r = t.indexOf(`
 `);
   return e === -1 && r === -1 ? -1 : e === -1 ? r + 1 : r === -1 ? e + 1 : r === e + 1 ? r + 1 : Math.min(e, r) + 1;
 }
-function af(t) {
-  const e = new bn();
+function sf(t) {
+  const e = new vn();
   let r = "";
   return (async () => (await en(t, (n) => {
     for (n = n.toString("utf8"), r += n; ; ) {
-      const a = Op(r);
+      const a = Ip(r);
       if (a === -1) break;
       e.write(r.slice(0, a)), r = r.slice(a);
     }
   }), r.length > 0 && e.write(r), e.end()))(), e;
 }
-class of {
+class cf {
   static demux(e) {
-    const r = X.streamReader(e), n = new bn(), a = new bn(), i = new bn(), o = async function() {
+    const r = X.streamReader(e), n = new vn(), a = new vn(), i = new vn(), o = async function() {
       const s = await r();
       if (s === null) return o();
       if (s === !0) {
@@ -8611,8 +8615,8 @@ class of {
   //   return output
   // }
 }
-async function Tp(t) {
-  const { packetlines: e, packfile: r, progress: n } = of.demux(t), a = [], i = [], o = [];
+async function Pp(t) {
+  const { packetlines: e, packfile: r, progress: n } = cf.demux(t), a = [], i = [], o = [];
   let s = !1, l = !1;
   return new Promise((c, f) => {
     en(e, (u) => {
@@ -8633,7 +8637,7 @@ async function Tp(t) {
     });
   });
 }
-function Ip({
+function Bp({
   capabilities: t = [],
   wants: e = [],
   haves: r = [],
@@ -8666,7 +8670,7 @@ function Ip({
   return s.push(X.encode(`done
 `)), s;
 }
-async function ki({
+async function Ai({
   fs: t,
   cache: e,
   http: r,
@@ -8696,7 +8700,7 @@ async function ki({
     throw new lt("remote OR url");
   const $ = f || x && await g.get(`branch.${x}.merge`) || c || "HEAD";
   h === void 0 && (h = await g.get("http.corsProxy"));
-  const I = Gn.getRemoteHelperFor({ url: A }), B = await I.discover({
+  const I = Wn.getRemoteHelperFor({ url: A }), B = await I.discover({
     http: r,
     onAuth: i,
     onAuthSuccess: o,
@@ -8727,7 +8731,7 @@ async function ki({
   });
   for (const L of K.keys())
     L === yt || L === "HEAD" || L.startsWith("refs/heads/") || _ && L.startsWith("refs/tags/") || K.delete(L);
-  const Et = nf(
+  const Et = of(
     [...B.capabilities],
     [
       "multi_ack_detailed",
@@ -8739,33 +8743,33 @@ async function ki({
       // isomorphic-git is perfectly happy with thin packfiles in .git/objects/pack but
       // canonical git it turns out is NOT.
       "ofs-delta",
-      `agent=${Wn.agent}`
+      `agent=${qn.agent}`
     ]
   );
   y && Et.push("deepen-relative");
-  const qn = v ? [Tt] : K.values(), Zn = v ? [x] : await T.listRefs({
+  const Zn = v ? [Tt] : K.values(), Vn = v ? [x] : await T.listRefs({
     fs: t,
     gitdir: l,
     filepath: "refs"
   });
   let ht = [];
-  for (let L of Zn)
+  for (let L of Vn)
     try {
       L = await T.expand({ fs: t, gitdir: l, ref: L });
       const rt = await T.resolve({ fs: t, gitdir: l, ref: L });
-      await gs({ fs: t, cache: e, gitdir: l, oid: rt }) && ht.push(rt);
+      await _s({ fs: t, cache: e, gitdir: l, oid: rt }) && ht.push(rt);
     } catch {
     }
   ht = [...new Set(ht)];
-  const Z = await Sr.read({ fs: t, gitdir: l }), It = B.capabilities.has("shallow") ? [...Z] : [], it = Ip({
+  const Z = await Sr.read({ fs: t, gitdir: l }), It = B.capabilities.has("shallow") ? [...Z] : [], it = Bp({
     capabilities: Et,
-    wants: qn,
+    wants: Zn,
     haves: ht,
     shallows: It,
     depth: w,
     since: p,
     exclude: m
-  }), rr = Buffer.from(await Bn(it)), ue = await I.connect({
+  }), rr = Buffer.from(await Cn(it)), ue = await I.connect({
     http: r,
     onProgress: n,
     corsProxy: h,
@@ -8774,13 +8778,13 @@ async function ki({
     auth: N,
     body: [rr],
     headers: S
-  }), Q = await Tp(ue.body);
+  }), Q = await Pp(ue.body);
   ue.headers && (Q.headers = ue.headers);
   for (const L of Q.shallows)
     if (!Z.has(L))
       try {
         const { object: rt } = await G({ fs: t, cache: e, gitdir: l, oid: L }), _t = new q(rt), Pt = await Promise.all(
-          _t.headers().parent.map((ar) => gs({ fs: t, cache: e, gitdir: l, oid: ar }))
+          _t.headers().parent.map((ar) => _s({ fs: t, cache: e, gitdir: l, oid: ar }))
         );
         Pt.length === 0 || Pt.every((ar) => ar) || Z.add(L);
       } catch {
@@ -8792,12 +8796,12 @@ async function ki({
     const L = /* @__PURE__ */ new Map([[yt, Tt]]), rt = /* @__PURE__ */ new Map();
     let _t = 10, Pt = yt;
     for (; _t--; ) {
-      const Xn = B.symrefs.get(Pt);
-      if (Xn === void 0) break;
-      rt.set(Pt, Xn), Pt = Xn;
+      const Kn = B.symrefs.get(Pt);
+      if (Kn === void 0) break;
+      rt.set(Pt, Kn), Pt = Kn;
     }
-    const Vn = K.get(Pt);
-    Vn && L.set(Pt, Vn);
+    const Xn = K.get(Pt);
+    Xn && L.set(Pt, Xn);
     const { pruned: ar } = await T.updateRemoteRefs({
       fs: t,
       gitdir: l,
@@ -8832,12 +8836,12 @@ async function ki({
         break;
       }
   }
-  const Il = yt.startsWith("refs/tags") ? "tag" : "branch";
+  const Bl = yt.startsWith("refs/tags") ? "tag" : "branch";
   if (Q.FETCH_HEAD = {
     oid: Tt,
-    description: `${Il} '${me(yt)}' of ${A}`
+    description: `${Bl} '${me(yt)}' of ${A}`
   }, n || a) {
-    const L = af(Q.progress);
+    const L = sf(Q.progress);
     en(L, async (rt) => {
       if (a && await a(rt), n) {
         const _t = rt.match(/([^:]*).*\((\d+?)\/(\d+?)\)/);
@@ -8849,15 +8853,15 @@ async function ki({
       }
     });
   }
-  const rn = Buffer.from(await Bn(Q.packfile));
+  const rn = Buffer.from(await Cn(Q.packfile));
   if (ue.body.error) throw ue.body.error;
-  const Ri = rn.slice(-20).toString("hex"), nr = {
+  const Oi = rn.slice(-20).toString("hex"), nr = {
     defaultBranch: Q.HEAD,
     fetchHead: Q.FETCH_HEAD.oid,
     fetchHeadDescription: Q.FETCH_HEAD.description
   };
-  if (Q.headers && (nr.headers = Q.headers), k && (nr.pruned = Q.pruned), Ri !== "" && !Rp(rn)) {
-    nr.packfile = `objects/pack/pack-${Ri}.pack`;
+  if (Q.headers && (nr.headers = Q.headers), k && (nr.pruned = Q.pruned), Oi !== "" && !Tp(rn)) {
+    nr.packfile = `objects/pack/pack-${Oi}.pack`;
     const L = R(l, nr.packfile);
     await t.write(L, rn);
     const rt = (Pt) => G({ fs: t, cache: e, gitdir: l, oid: Pt }), _t = await ze.fromPack({
@@ -8869,7 +8873,7 @@ async function ki({
   }
   return nr;
 }
-async function sf({
+async function ff({
   fs: t,
   bare: e = !1,
   dir: r,
@@ -8901,7 +8905,7 @@ async function sf({
   ), await t.write(n + "/HEAD", `ref: refs/heads/${a}
 `);
 }
-async function Pp({
+async function Cp({
   fs: t,
   cache: e,
   http: r,
@@ -8929,11 +8933,11 @@ async function Pp({
   batchSize: g = 100
 }) {
   try {
-    if (await sf({ fs: t, gitdir: f }), await Vc({ fs: t, gitdir: f, remote: w, url: u, force: !1 }), d) {
+    if (await ff({ fs: t, gitdir: f }), await Kc({ fs: t, gitdir: f, remote: w, url: u, force: !1 }), d) {
       const $ = await J.get({ fs: t, gitdir: f });
       await $.set("http.corsProxy", d), await J.save({ fs: t, gitdir: f, config: $ });
     }
-    const { defaultBranch: E, fetchHead: A } = await ki({
+    const { defaultBranch: E, fetchHead: A } = await Ai({
       fs: t,
       cache: e,
       http: r,
@@ -8955,7 +8959,7 @@ async function Pp({
       tags: !k
     });
     if (A === null) return;
-    h = h || E, h = h.replace("refs/heads/", ""), await Ei({
+    h = h || E, h = h.replace("refs/heads/", ""), await Si({
       fs: t,
       cache: e,
       onProgress: n,
@@ -8973,7 +8977,7 @@ async function Pp({
     }), E;
   }
 }
-async function cf({
+async function lf({
   fs: t,
   http: e,
   onProgress: r,
@@ -9003,7 +9007,7 @@ async function cf({
   try {
     b("fs", t), b("http", e), b("gitdir", c), v || b("dir", l), b("url", f);
     const E = new C(t), A = await D({ fsp: E, dotgit: c });
-    return await Pp({
+    return await Cp({
       fs: E,
       cache: O,
       http: e,
@@ -9034,7 +9038,7 @@ async function cf({
     throw E.caller = "git.clone", E;
   }
 }
-async function ff({
+async function uf({
   fs: t,
   onSign: e,
   dir: r,
@@ -9074,7 +9078,7 @@ async function ff({
     throw p.caller = "git.commit", p;
   }
 }
-async function lf({
+async function df({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -9094,7 +9098,7 @@ async function lf({
     throw i.caller = "git.currentBranch", i;
   }
 }
-async function Bp({ fs: t, gitdir: e, ref: r }) {
+async function Dp({ fs: t, gitdir: e, ref: r }) {
   if (r = r.startsWith("refs/heads/") ? r : `refs/heads/${r}`, !await T.exists({ fs: t, gitdir: e, ref: r }))
     throw new H(r);
   const a = await T.expand({ fs: t, gitdir: e, ref: r }), i = await le({ fs: t, gitdir: e, fullname: !0 });
@@ -9106,59 +9110,12 @@ async function Bp({ fs: t, gitdir: e, ref: r }) {
   const o = me(r), s = await J.get({ fs: t, gitdir: e });
   await s.deleteSection("branch", o), await J.save({ fs: t, gitdir: e, config: s });
 }
-async function uf({
+async function hf({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
   ref: n
 }) {
-  try {
-    b("fs", t), b("ref", n);
-    const a = new C(t), i = await D({ fsp: a, dotgit: r });
-    return await Bp({
-      fs: a,
-      gitdir: i,
-      ref: n
-    });
-  } catch (a) {
-    throw a.caller = "git.deleteBranch", a;
-  }
-}
-async function df({ fs: t, dir: e, gitdir: r = R(e, ".git"), ref: n }) {
-  try {
-    b("fs", t), b("ref", n);
-    const a = new C(t), i = await D({ fsp: a, dotgit: r });
-    await T.deleteRef({ fs: a, gitdir: i, ref: n });
-  } catch (a) {
-    throw a.caller = "git.deleteRef", a;
-  }
-}
-async function Cp({ fs: t, gitdir: e, remote: r }) {
-  const n = await J.get({ fs: t, gitdir: e });
-  await n.deleteSection("remote", r), await J.save({ fs: t, gitdir: e, config: n });
-}
-async function hf({
-  fs: t,
-  dir: e,
-  gitdir: r = R(e, ".git"),
-  remote: n
-}) {
-  try {
-    b("fs", t), b("remote", n);
-    const a = new C(t), i = await D({ fsp: a, dotgit: r });
-    return await Cp({
-      fs: a,
-      gitdir: i,
-      remote: n
-    });
-  } catch (a) {
-    throw a.caller = "git.deleteRemote", a;
-  }
-}
-async function Dp({ fs: t, gitdir: e, ref: r }) {
-  r = r.startsWith("refs/tags/") ? r : `refs/tags/${r}`, await T.deleteRef({ fs: t, gitdir: e, ref: r });
-}
-async function wf({ fs: t, dir: e, gitdir: r = R(e, ".git"), ref: n }) {
   try {
     b("fs", t), b("ref", n);
     const a = new C(t), i = await D({ fsp: a, dotgit: r });
@@ -9168,14 +9125,61 @@ async function wf({ fs: t, dir: e, gitdir: r = R(e, ".git"), ref: n }) {
       ref: n
     });
   } catch (a) {
+    throw a.caller = "git.deleteBranch", a;
+  }
+}
+async function wf({ fs: t, dir: e, gitdir: r = R(e, ".git"), ref: n }) {
+  try {
+    b("fs", t), b("ref", n);
+    const a = new C(t), i = await D({ fsp: a, dotgit: r });
+    await T.deleteRef({ fs: a, gitdir: i, ref: n });
+  } catch (a) {
+    throw a.caller = "git.deleteRef", a;
+  }
+}
+async function Np({ fs: t, gitdir: e, remote: r }) {
+  const n = await J.get({ fs: t, gitdir: e });
+  await n.deleteSection("remote", r), await J.save({ fs: t, gitdir: e, config: n });
+}
+async function pf({
+  fs: t,
+  dir: e,
+  gitdir: r = R(e, ".git"),
+  remote: n
+}) {
+  try {
+    b("fs", t), b("remote", n);
+    const a = new C(t), i = await D({ fsp: a, dotgit: r });
+    return await Np({
+      fs: a,
+      gitdir: i,
+      remote: n
+    });
+  } catch (a) {
+    throw a.caller = "git.deleteRemote", a;
+  }
+}
+async function Fp({ fs: t, gitdir: e, ref: r }) {
+  r = r.startsWith("refs/tags/") ? r : `refs/tags/${r}`, await T.deleteRef({ fs: t, gitdir: e, ref: r });
+}
+async function mf({ fs: t, dir: e, gitdir: r = R(e, ".git"), ref: n }) {
+  try {
+    b("fs", t), b("ref", n);
+    const a = new C(t), i = await D({ fsp: a, dotgit: r });
+    return await Fp({
+      fs: a,
+      gitdir: i,
+      ref: n
+    });
+  } catch (a) {
     throw a.caller = "git.deleteTag", a;
   }
 }
-async function Np({ fs: t, gitdir: e, oid: r }) {
+async function jp({ fs: t, gitdir: e, oid: r }) {
   const n = r.slice(0, 2);
   return (await t.readdir(`${e}/objects/${n}`)).map((i) => `${n}${i}`).filter((i) => i.startsWith(r));
 }
-async function Fp({
+async function Up({
   fs: t,
   cache: e,
   gitdir: r,
@@ -9186,7 +9190,7 @@ async function Fp({
   let o = await t.readdir(R(r, "objects/pack"));
   o = o.filter((s) => s.endsWith(".idx"));
   for (const s of o) {
-    const l = `${r}/objects/pack/${s}`, c = await xi({
+    const l = `${r}/objects/pack/${s}`, c = await Ei({
       fs: t,
       cache: e,
       filename: l,
@@ -9198,8 +9202,8 @@ async function Fp({
   }
   return i;
 }
-async function jp({ fs: t, cache: e, gitdir: r, oid: n }) {
-  const a = (s) => G({ fs: t, cache: e, gitdir: r, oid: s }), i = await Np({ fs: t, gitdir: r, oid: n }), o = await Fp({
+async function Mp({ fs: t, cache: e, gitdir: r, oid: n }) {
+  const a = (s) => G({ fs: t, cache: e, gitdir: r, oid: s }), i = await jp({ fs: t, gitdir: r, oid: n }), o = await Up({
     fs: t,
     cache: e,
     gitdir: r,
@@ -9212,7 +9216,7 @@ async function jp({ fs: t, cache: e, gitdir: r, oid: n }) {
     return i[0];
   throw i.length > 1 ? new Fr("oids", n, i) : new H(`an object matching "${n}"`);
 }
-async function pf({
+async function gf({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -9222,7 +9226,7 @@ async function pf({
   try {
     b("fs", t), b("gitdir", r), b("oid", n);
     const i = new C(t), o = await D({ fsp: i, dotgit: r });
-    return await jp({
+    return await Mp({
       fs: i,
       cache: a,
       gitdir: o,
@@ -9232,7 +9236,7 @@ async function pf({
     throw i.caller = "git.expandOid", i;
   }
 }
-async function mf({ fs: t, dir: e, gitdir: r = R(e, ".git"), ref: n }) {
+async function yf({ fs: t, dir: e, gitdir: r = R(e, ".git"), ref: n }) {
   try {
     b("fs", t), b("gitdir", r), b("ref", n);
     const a = new C(t), i = await D({ fsp: a, dotgit: r });
@@ -9245,7 +9249,7 @@ async function mf({ fs: t, dir: e, gitdir: r = R(e, ".git"), ref: n }) {
     throw a.caller = "git.expandRef", a;
   }
 }
-async function Ai({ fs: t, cache: e, gitdir: r, oids: n }) {
+async function $i({ fs: t, cache: e, gitdir: r, oids: n }) {
   const a = {}, i = n.length;
   let o = n.map((s, l) => ({ index: l, oid: s }));
   for (; o.length; ) {
@@ -9266,7 +9270,7 @@ async function Ai({ fs: t, cache: e, gitdir: r, oids: n }) {
   }
   return [];
 }
-async function gf({
+async function _f({
   fs: t,
   cache: e,
   dir: r,
@@ -9303,7 +9307,7 @@ async function gf({
     fs: t,
     gitdir: n,
     ref: i
-  }), S = await Ai({
+  }), S = await $i({
     fs: t,
     cache: e,
     gitdir: n,
@@ -9330,7 +9334,7 @@ async function gf({
       throw new Hr();
     const O = await Y.acquire(
       { fs: t, gitdir: n, cache: e, allowUnmerged: !1 },
-      async (g) => Qc({
+      async (g) => ef({
         fs: t,
         cache: e,
         dir: r,
@@ -9371,7 +9375,7 @@ async function gf({
     };
   }
 }
-async function yf({
+async function bf({
   fs: t,
   cache: e,
   http: r,
@@ -9404,7 +9408,7 @@ async function yf({
         throw new lt("ref");
       f = A;
     }
-    const { fetchHead: g, fetchHeadDescription: E } = await ki({
+    const { fetchHead: g, fetchHeadDescription: E } = await Ai({
       fs: t,
       cache: e,
       http: r,
@@ -9424,7 +9428,7 @@ async function yf({
       prune: w,
       pruneTags: p
     });
-    await gf({
+    await _f({
       fs: t,
       cache: e,
       gitdir: c,
@@ -9438,7 +9442,7 @@ async function yf({
       signingKey: x,
       dryRun: !1,
       noUpdateBranch: !1
-    }), await Ei({
+    }), await Si({
       fs: t,
       cache: e,
       onProgress: n,
@@ -9452,7 +9456,7 @@ async function yf({
     throw g.caller = "git.pull", g;
   }
 }
-async function _f({
+async function vf({
   fs: t,
   http: e,
   onProgress: r,
@@ -9479,7 +9483,7 @@ async function _f({
       timestamp: Date.now(),
       timezoneOffset: 0
     }, _ = new C(t), v = await D({ fsp: _, dotgit: l });
-    return await yf({
+    return await bf({
       fs: _,
       cache: m,
       http: e,
@@ -9505,7 +9509,7 @@ async function _f({
     throw y.caller = "git.fastForward", y;
   }
 }
-async function bf({
+async function xf({
   fs: t,
   http: e,
   onProgress: r,
@@ -9534,7 +9538,7 @@ async function bf({
   try {
     b("fs", t), b("http", e), b("gitdir", l);
     const g = new C(t), E = await D({ fsp: g, dotgit: l });
-    return await ki({
+    return await Ai({
       fs: g,
       cache: x,
       http: e,
@@ -9563,7 +9567,7 @@ async function bf({
     throw g.caller = "git.fetch", g;
   }
 }
-async function vf({
+async function Ef({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -9573,7 +9577,7 @@ async function vf({
   try {
     b("fs", t), b("gitdir", r), b("oids", n);
     const i = new C(t), o = await D({ fsp: i, dotgit: r });
-    return await Ai({
+    return await $i({
       fs: i,
       cache: a,
       gitdir: o,
@@ -9583,24 +9587,24 @@ async function vf({
     throw i.caller = "git.findMergeBase", i;
   }
 }
-async function xf({ fs: t, filepath: e }) {
+async function Sf({ fs: t, filepath: e }) {
   if (await t.exists(R(e, ".git")))
     return e;
   {
     const r = Ee(e);
     if (r === e)
       throw new H(`git root for ${e}`);
-    return xf({ fs: t, filepath: r });
+    return Sf({ fs: t, filepath: r });
   }
 }
-async function Ef({ fs: t, filepath: e }) {
+async function kf({ fs: t, filepath: e }) {
   try {
-    return b("fs", t), b("filepath", e), await xf({ fs: new C(t), filepath: e });
+    return b("fs", t), b("filepath", e), await Sf({ fs: new C(t), filepath: e });
   } catch (r) {
     throw r.caller = "git.findRoot", r;
   }
 }
-async function Sf({ fs: t, dir: e, gitdir: r = R(e, ".git"), path: n }) {
+async function Af({ fs: t, dir: e, gitdir: r = R(e, ".git"), path: n }) {
   try {
     b("fs", t), b("gitdir", r), b("path", n);
     const a = new C(t), i = await D({ fsp: a, dotgit: r });
@@ -9613,10 +9617,10 @@ async function Sf({ fs: t, dir: e, gitdir: r = R(e, ".git"), path: n }) {
     throw a.caller = "git.getConfig", a;
   }
 }
-async function Up({ fs: t, gitdir: e, path: r }) {
+async function zp({ fs: t, gitdir: e, path: r }) {
   return (await J.get({ fs: t, gitdir: e })).getall(r);
 }
-async function kf({
+async function $f({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -9625,7 +9629,7 @@ async function kf({
   try {
     b("fs", t), b("gitdir", r), b("path", n);
     const a = new C(t), i = await D({ fsp: a, dotgit: r });
-    return await Up({
+    return await zp({
       fs: a,
       gitdir: i,
       path: n
@@ -9634,7 +9638,7 @@ async function kf({
     throw a.caller = "git.getConfigAll", a;
   }
 }
-async function Af({
+async function Rf({
   http: t,
   onAuth: e,
   onAuthSuccess: r,
@@ -9646,7 +9650,7 @@ async function Af({
 }) {
   try {
     b("http", t), b("url", i);
-    const c = await Gn.getRemoteHelperFor({ url: i }).discover({
+    const c = await Wn.getRemoteHelperFor({ url: i }).discover({
       http: t,
       onAuth: e,
       onAuthSuccess: r,
@@ -9678,7 +9682,7 @@ async function Af({
     throw l.caller = "git.getRemoteInfo", l;
   }
 }
-function $f(t, e, r, n) {
+function Of(t, e, r, n) {
   const a = [];
   for (const [i, o] of t.refs) {
     if (e && !i.startsWith(e)) continue;
@@ -9696,7 +9700,7 @@ function $f(t, e, r, n) {
   }
   return a;
 }
-async function Rf({
+async function Tf({
   http: t,
   onAuth: e,
   onAuthSuccess: r,
@@ -9709,7 +9713,7 @@ async function Rf({
 }) {
   try {
     b("http", t), b("url", i);
-    const f = await Gn.getRemoteHelperFor({ url: i }).discover({
+    const f = await Wn.getRemoteHelperFor({ url: i }).discover({
       http: t,
       onAuth: e,
       onAuthSuccess: r,
@@ -9733,13 +9737,13 @@ async function Rf({
     return {
       protocolVersion: 1,
       capabilities: u,
-      refs: $f(f, void 0, !0, !0)
+      refs: Of(f, void 0, !0, !0)
     };
   } catch (c) {
     throw c.caller = "git.getRemoteInfo2", c;
   }
 }
-async function Mp({
+async function Lp({
   type: t,
   object: e,
   format: r = "content",
@@ -9747,10 +9751,10 @@ async function Mp({
 }) {
   return r !== "deflated" && (r !== "wrapped" && (e = Ke.wrap({ type: t, object: e })), n = await Vt(e)), { oid: n, object: e };
 }
-async function Of({ object: t }) {
+async function If({ object: t }) {
   try {
     b("object", t), typeof t == "string" ? t = Buffer.from(t, "utf8") : t instanceof Uint8Array || (t = new Uint8Array(t));
-    const e = "blob", { oid: r, object: n } = await Mp({
+    const e = "blob", { oid: r, object: n } = await Lp({
       type: e,
       format: "content",
       object: t
@@ -9760,7 +9764,7 @@ async function Of({ object: t }) {
     throw e.caller = "git.hashBlob", e;
   }
 }
-async function zp({
+async function Hp({
   fs: t,
   cache: e,
   onProgress: r,
@@ -9782,7 +9786,7 @@ async function zp({
     throw o.caller = "git.indexPack", o;
   }
 }
-async function Tf({
+async function Pf({
   fs: t,
   onProgress: e,
   dir: r,
@@ -9793,7 +9797,7 @@ async function Tf({
   try {
     b("fs", t), b("dir", r), b("gitdir", r), b("filepath", a);
     const o = new C(t), s = await D({ fsp: o, dotgit: n });
-    return await zp({
+    return await Hp({
       fs: o,
       cache: i,
       onProgress: e,
@@ -9805,7 +9809,7 @@ async function Tf({
     throw o.caller = "git.indexPack", o;
   }
 }
-async function If({
+async function Bf({
   fs: t,
   bare: e = !1,
   dir: r,
@@ -9815,7 +9819,7 @@ async function If({
   try {
     b("fs", t), b("gitdir", n), e || b("dir", r);
     const i = new C(t), o = await D({ fsp: i, dotgit: n });
-    return await sf({
+    return await ff({
       fs: i,
       bare: e,
       dir: r,
@@ -9826,7 +9830,7 @@ async function If({
     throw i.caller = "git.init", i;
   }
 }
-async function Pf({
+async function Cf({
   fs: t,
   cache: e,
   gitdir: r,
@@ -9862,7 +9866,7 @@ async function Pf({
   }
   return !1;
 }
-async function Bf({
+async function Df({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -9874,7 +9878,7 @@ async function Bf({
   try {
     b("fs", t), b("gitdir", r), b("oid", n), b("ancestor", a);
     const s = new C(t), l = await D({ fsp: s, dotgit: r });
-    return await Pf({
+    return await Cf({
       fs: s,
       cache: o,
       gitdir: l,
@@ -9886,7 +9890,7 @@ async function Bf({
     throw s.caller = "git.isDescendent", s;
   }
 }
-async function Cf({
+async function Nf({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -9905,7 +9909,7 @@ async function Cf({
     throw a.caller = "git.isIgnored", a;
   }
 }
-async function Df({
+async function Ff({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -9923,10 +9927,10 @@ async function Df({
     throw a.caller = "git.listBranches", a;
   }
 }
-async function Lp({ fs: t, gitdir: e, ref: r, cache: n }) {
+async function Gp({ fs: t, gitdir: e, ref: r, cache: n }) {
   if (r) {
     const a = await T.resolve({ gitdir: e, fs: t, ref: r }), i = [];
-    return await Nf({
+    return await jf({
       fs: t,
       cache: n,
       gitdir: e,
@@ -9942,7 +9946,7 @@ async function Lp({ fs: t, gitdir: e, ref: r, cache: n }) {
       }
     );
 }
-async function Nf({
+async function jf({
   fs: t,
   cache: e,
   gitdir: r,
@@ -9952,7 +9956,7 @@ async function Nf({
 }) {
   const { tree: o } = await er({ fs: t, cache: e, gitdir: r, oid: n });
   for (const s of o)
-    s.type === "tree" ? await Nf({
+    s.type === "tree" ? await jf({
       fs: t,
       cache: e,
       gitdir: r,
@@ -9961,7 +9965,7 @@ async function Nf({
       prefix: R(i, s.path)
     }) : a.push(R(i, s.path));
 }
-async function Ff({
+async function Uf({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -9971,7 +9975,7 @@ async function Ff({
   try {
     b("fs", t), b("gitdir", r);
     const i = new C(t), o = await D({ fsp: i, dotgit: r });
-    return await Lp({
+    return await Gp({
       fs: i,
       cache: a,
       gitdir: o,
@@ -9981,7 +9985,7 @@ async function Ff({
     throw i.caller = "git.listFiles", i;
   }
 }
-async function Hp({ fs: t, cache: e, gitdir: r, ref: n }) {
+async function Wp({ fs: t, cache: e, gitdir: r, ref: n }) {
   let a;
   try {
     a = await T.resolve({ gitdir: r, fs: t, ref: n });
@@ -9999,7 +10003,7 @@ async function Hp({ fs: t, cache: e, gitdir: r, ref: n }) {
     note: s.oid
   }));
 }
-async function jf({
+async function Mf({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -10009,7 +10013,7 @@ async function jf({
   try {
     b("fs", t), b("gitdir", r), b("ref", n);
     const i = new C(t), o = await D({ fsp: i, dotgit: r });
-    return await Hp({
+    return await Wp({
       fs: i,
       cache: a,
       gitdir: o,
@@ -10019,7 +10023,7 @@ async function jf({
     throw i.caller = "git.listNotes", i;
   }
 }
-async function Uf({
+async function zf({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -10033,7 +10037,7 @@ async function Uf({
     throw a.caller = "git.listRefs", a;
   }
 }
-async function Gp({ fs: t, gitdir: e }) {
+async function qp({ fs: t, gitdir: e }) {
   const r = await J.get({ fs: t, gitdir: e }), n = await r.getSubsections("remote");
   return Promise.all(
     n.map(async (i) => {
@@ -10042,11 +10046,11 @@ async function Gp({ fs: t, gitdir: e }) {
     })
   );
 }
-async function Mf({ fs: t, dir: e, gitdir: r = R(e, ".git") }) {
+async function Lf({ fs: t, dir: e, gitdir: r = R(e, ".git") }) {
   try {
     b("fs", t), b("gitdir", r);
     const n = new C(t), a = await D({ fsp: n, dotgit: r });
-    return await Gp({
+    return await qp({
       fs: n,
       gitdir: a
     });
@@ -10054,7 +10058,7 @@ async function Mf({ fs: t, dir: e, gitdir: r = R(e, ".git") }) {
     throw n.caller = "git.listRemotes", n;
   }
 }
-async function Wp(t) {
+async function Zp(t) {
   const e = X.streamReader(t), r = [];
   let n;
   for (; n = await e(), n !== !0; ) {
@@ -10069,13 +10073,13 @@ async function Wp(t) {
   }
   return r;
 }
-async function qp({ prefix: t, symrefs: e, peelTags: r }) {
+async function Vp({ prefix: t, symrefs: e, peelTags: r }) {
   const n = [];
   return n.push(X.encode(`command=ls-refs
-`)), n.push(X.encode(`agent=${Wn.agent}
+`)), n.push(X.encode(`agent=${qn.agent}
 `)), (r || e || t) && n.push(X.delim()), r && n.push(X.encode("peel")), e && n.push(X.encode("symrefs")), t && n.push(X.encode(`ref-prefix ${t}`)), n.push(X.flush()), n;
 }
-async function zf({
+async function Hf({
   http: t,
   onAuth: e,
   onAuthSuccess: r,
@@ -10091,7 +10095,7 @@ async function zf({
 }) {
   try {
     b("http", t), b("url", i);
-    const d = await Cn.discover({
+    const d = await Dn.discover({
       http: t,
       onAuth: e,
       onAuthSuccess: r,
@@ -10103,8 +10107,8 @@ async function zf({
       protocolVersion: l
     });
     if (d.protocolVersion === 1)
-      return $f(d, c, f, u);
-    const h = await qp({ prefix: c, symrefs: f, peelTags: u }), w = await Cn.connect({
+      return Of(d, c, f, u);
+    const h = await Vp({ prefix: c, symrefs: f, peelTags: u }), w = await Dn.connect({
       http: t,
       auth: d.auth,
       headers: o,
@@ -10113,12 +10117,12 @@ async function zf({
       url: i,
       body: h
     });
-    return Wp(w.body);
+    return Zp(w.body);
   } catch (d) {
     throw d.caller = "git.listServerRefs", d;
   }
 }
-async function Lf({ fs: t, dir: e, gitdir: r = R(e, ".git") }) {
+async function Gf({ fs: t, dir: e, gitdir: r = R(e, ".git") }) {
   try {
     b("fs", t), b("gitdir", r);
     const n = new C(t), a = await D({ fsp: n, dotgit: r });
@@ -10127,16 +10131,16 @@ async function Lf({ fs: t, dir: e, gitdir: r = R(e, ".git") }) {
     throw n.caller = "git.listTags", n;
   }
 }
-function Zp(t, e) {
+function Xp(t, e) {
   return t.committer.timestamp - e.committer.timestamp;
 }
-const Vp = "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391";
-async function ys({ fs: t, cache: e, gitdir: r, oid: n, fileId: a }) {
-  if (a === Vp) return;
+const Kp = "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391";
+async function bs({ fs: t, cache: e, gitdir: r, oid: n, fileId: a }) {
+  if (a === Kp) return;
   const i = n;
   let o;
   const s = await Ge({ fs: t, cache: e, gitdir: r, oid: n }), l = s.tree;
-  return a === s.oid ? o = s.path : (o = await Hf({
+  return a === s.oid ? o = s.path : (o = await Wf({
     fs: t,
     cache: e,
     gitdir: r,
@@ -10145,7 +10149,7 @@ async function ys({ fs: t, cache: e, gitdir: r, oid: n, fileId: a }) {
     oid: i
   }), Array.isArray(o) && (o.length === 0 ? o = void 0 : o.length === 1 && (o = o[0]))), o;
 }
-async function Hf({
+async function Wf({
   fs: t,
   cache: e,
   gitdir: r,
@@ -10163,7 +10167,7 @@ async function Hf({
       gitdir: r,
       oid: c.oid
     }).then(function({ object: u }) {
-      return Hf({
+      return Wf({
         fs: t,
         cache: e,
         gitdir: r,
@@ -10177,7 +10181,7 @@ async function Hf({
   });
   return await Promise.all(l), o;
 }
-async function Xp({
+async function Yp({
   fs: t,
   cache: e,
   gitdir: r,
@@ -10210,7 +10214,7 @@ async function Xp({
       } catch (S) {
         if (S instanceof H) {
           let k = l && w;
-          if (k && (k = await ys({
+          if (k && (k = await bs({
             fs: t,
             cache: e,
             gitdir: r,
@@ -10219,7 +10223,7 @@ async function Xp({
           }), k))
             if (Array.isArray(k)) {
               if (p) {
-                const O = await ys({
+                const O = await bs({
                   fs: t,
                   cache: e,
                   gitdir: r,
@@ -10255,11 +10259,11 @@ async function Xp({
         const S = await zt({ fs: t, cache: e, gitdir: r, oid: v });
         h.map((k) => k.oid).includes(S.oid) || h.push(S);
       }
-    h.length === 0 && y(_), h.sort((v, S) => Zp(v.commit, S.commit));
+    h.length === 0 && y(_), h.sort((v, S) => Xp(v.commit, S.commit));
   }
   return f;
 }
-async function Gf({
+async function qf({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -10275,7 +10279,7 @@ async function Gf({
   try {
     b("fs", t), b("gitdir", r), b("ref", a);
     const f = new C(t), u = await D({ fsp: f, dotgit: r });
-    return await Xp({
+    return await Yp({
       fs: f,
       cache: c,
       gitdir: u,
@@ -10290,7 +10294,7 @@ async function Gf({
     throw f.caller = "git.log", f;
   }
 }
-async function Wf({
+async function Zf({
   fs: t,
   onSign: e,
   dir: r,
@@ -10327,7 +10331,7 @@ async function Wf({
     });
     if (!k && (!s || !o))
       throw new at("committer");
-    return await gf({
+    return await _f({
       fs: _,
       cache: p,
       dir: r,
@@ -10351,7 +10355,7 @@ async function Wf({
     throw _.caller = "git.merge", _;
   }
 }
-const Kp = {
+const Jp = {
   commit: 16,
   tree: 32,
   blob: 48,
@@ -10359,29 +10363,29 @@ const Kp = {
   ofs_delta: 96,
   ref_delta: 112
 };
-async function qf({
+async function Vf({
   fs: t,
   cache: e,
   dir: r,
   gitdir: n = R(r, ".git"),
   oids: a
 }) {
-  const i = new $c(), o = [];
+  const i = new Oc(), o = [];
   function s(f, u) {
     const d = Buffer.from(f, u);
     o.push(d), i.update(d);
   }
   async function l({ stype: f, object: u }) {
-    const d = Kp[f];
+    const d = Jp[f];
     let h = u.length, w = h > 15 ? 128 : 0;
     const p = h & 15;
     h = h >>> 4;
     let m = (w | d | p).toString(16);
     for (s(m, "hex"); w; )
-      w = h > 127 ? 128 : 0, m = w | h & 127, s(oi(2, m), "hex"), h = h >>> 7;
-    s(Buffer.from(await Mc(u)));
+      w = h > 127 ? 128 : 0, m = w | h & 127, s(si(2, m), "hex"), h = h >>> 7;
+    s(Buffer.from(await Lc(u)));
   }
-  s("PACK"), s("00000002", "hex"), s(oi(8, a.length), "hex");
+  s("PACK"), s("00000002", "hex"), s(si(8, a.length), "hex");
   for (const f of a) {
     const { type: u, object: d } = await G({ fs: t, cache: e, gitdir: n, oid: f });
     await l({ object: d, stype: u });
@@ -10389,14 +10393,14 @@ async function qf({
   const c = i.digest();
   return o.push(c), o;
 }
-async function Yp({ fs: t, cache: e, gitdir: r, oids: n, write: a }) {
-  const i = await qf({ fs: t, cache: e, gitdir: r, oids: n }), o = Buffer.from(await Bn(i)), l = `pack-${o.slice(-20).toString("hex")}.pack`;
+async function Qp({ fs: t, cache: e, gitdir: r, oids: n, write: a }) {
+  const i = await Vf({ fs: t, cache: e, gitdir: r, oids: n }), o = Buffer.from(await Cn(i)), l = `pack-${o.slice(-20).toString("hex")}.pack`;
   return a ? (await t.write(R(r, `objects/pack/${l}`), o), { filename: l }) : {
     filename: l,
     packfile: new Uint8Array(o)
   };
 }
-async function Zf({
+async function Xf({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -10407,7 +10411,7 @@ async function Zf({
   try {
     b("fs", t), b("gitdir", r), b("oids", n);
     const o = new C(t), s = await D({ fsp: o, dotgit: r });
-    return await Yp({
+    return await Qp({
       fs: o,
       cache: i,
       gitdir: s,
@@ -10418,7 +10422,7 @@ async function Zf({
     throw o.caller = "git.packObjects", o;
   }
 }
-async function Vf({
+async function Kf({
   fs: t,
   http: e,
   onProgress: r,
@@ -10459,7 +10463,7 @@ async function Vf({
       committer: k
     });
     if (!$) throw new at("committer");
-    return await yf({
+    return await bf({
       fs: g,
       cache: x,
       http: e,
@@ -10489,7 +10493,7 @@ async function Vf({
     throw g.caller = "git.pull", g;
   }
 }
-async function Jp({
+async function tm({
   fs: t,
   cache: e,
   dir: r,
@@ -10526,7 +10530,7 @@ async function Jp({
     await f(u);
   return c;
 }
-async function Ga({
+async function Wa({
   fs: t,
   cache: e,
   dir: r,
@@ -10554,7 +10558,7 @@ async function Ga({
     await o(s);
   return i;
 }
-async function Qp(t) {
+async function em(t) {
   const e = {};
   let r = "";
   const n = X.streamReader(t);
@@ -10580,7 +10584,7 @@ async function Qp(t) {
   }
   return e;
 }
-async function tm({
+async function rm({
   capabilities: t = [],
   triplets: e = []
 }) {
@@ -10595,7 +10599,7 @@ async function tm({
     ), n = "";
   return r.push(X.flush()), r;
 }
-async function em({
+async function nm({
   fs: t,
   cache: e,
   http: r,
@@ -10627,7 +10631,7 @@ async function em({
   if (typeof S > "u")
     throw new lt("remoteRef");
   m === void 0 && (m = await v.get("http.corsProxy"));
-  const O = await T.expand({ fs: t, gitdir: c, ref: _ }), x = p ? "0000000000000000000000000000000000000000" : await T.resolve({ fs: t, gitdir: c, ref: O }), g = Gn.getRemoteHelperFor({ url: S }), E = await g.discover({
+  const O = await T.expand({ fs: t, gitdir: c, ref: _ }), x = p ? "0000000000000000000000000000000000000000" : await T.resolve({ fs: t, gitdir: c, ref: O }), g = Wn.getRemoteHelperFor({ url: S }), E = await g.discover({
     http: r,
     onAuth: i,
     onAuthSuccess: o,
@@ -10667,24 +10671,24 @@ async function em({
     const Z = [...E.refs.values()];
     let It = /* @__PURE__ */ new Set();
     if (I !== "0000000000000000000000000000000000000000") {
-      const it = await Ai({
+      const it = await $i({
         fs: t,
         cache: e,
         gitdir: c,
         oids: [x, I]
       });
       for (const rr of it) Z.push(rr);
-      B && (It = await Ga({ fs: t, cache: e, gitdir: c, oids: it }));
+      B && (It = await Wa({ fs: t, cache: e, gitdir: c, oids: it }));
     }
     if (!Z.includes(x)) {
-      const it = await Jp({
+      const it = await tm({
         fs: t,
         cache: e,
         gitdir: c,
         start: [x],
         finish: Z
       });
-      N = await Ga({ fs: t, cache: e, gitdir: c, oids: it });
+      N = await Wa({ fs: t, cache: e, gitdir: c, oids: it });
     }
     if (B) {
       try {
@@ -10698,7 +10702,7 @@ async function em({
           fullref: it,
           map: E.refs
         }), ue = [rr];
-        for (const Q of await Ga({ fs: t, cache: e, gitdir: c, oids: ue }))
+        for (const Q of await Wa({ fs: t, cache: e, gitdir: c, oids: ue }))
           It.add(Q);
       } catch {
       }
@@ -10708,7 +10712,7 @@ async function em({
     if (x === I && (w = !0), !w) {
       if (O.startsWith("refs/tags") && I !== "0000000000000000000000000000000000000000")
         throw new He("tag-exists");
-      if (x !== "0000000000000000000000000000000000000000" && I !== "0000000000000000000000000000000000000000" && !await Pf({
+      if (x !== "0000000000000000000000000000000000000000" && I !== "0000000000000000000000000000000000000000" && !await Cf({
         fs: t,
         cache: e,
         gitdir: c,
@@ -10719,13 +10723,13 @@ async function em({
         throw new He("not-fast-forward");
     }
   }
-  const K = nf(
+  const K = of(
     [...E.capabilities],
-    ["report-status", "side-band-64k", `agent=${Wn.agent}`]
-  ), Tt = await tm({
+    ["report-status", "side-band-64k", `agent=${qn.agent}`]
+  ), Tt = await rm({
     capabilities: K,
     triplets: [{ oldoid: I, oid: x, fullRef: $ }]
-  }), yt = p ? [] : await qf({
+  }), yt = p ? [] : await Vf({
     fs: t,
     cache: e,
     gitdir: c,
@@ -10739,14 +10743,14 @@ async function em({
     auth: A,
     headers: y,
     body: [...Tt, ...yt]
-  }), { packfile: qn, progress: Zn } = await of.demux(Et.body);
+  }), { packfile: Zn, progress: Vn } = await cf.demux(Et.body);
   if (a) {
-    const Z = af(Zn);
+    const Z = sf(Vn);
     en(Z, async (It) => {
       await a(It);
     });
   }
-  const ht = await Qp(qn);
+  const ht = await em(Zn);
   if (Et.headers && (ht.headers = Et.headers), d && ht.ok && ht.refs[$].ok && !O.startsWith("refs/tags")) {
     const Z = `refs/remotes/${d}/${$.replace(
       "refs/heads",
@@ -10762,7 +10766,7 @@ async function em({
     throw new Gr(Z, ht);
   }
 }
-async function Xf({
+async function Yf({
   fs: t,
   http: e,
   onProgress: r,
@@ -10786,7 +10790,7 @@ async function Xf({
   try {
     b("fs", t), b("http", e), b("gitdir", c);
     const v = new C(t), S = await D({ fsp: v, dotgit: c });
-    return await em({
+    return await nm({
       fs: v,
       cache: _,
       http: e,
@@ -10810,29 +10814,29 @@ async function Xf({
     throw v.caller = "git.push", v;
   }
 }
-async function Kf({ fs: t, cache: e, gitdir: r, oid: n }) {
+async function Jf({ fs: t, cache: e, gitdir: r, oid: n }) {
   const { type: a, object: i } = await G({ fs: t, cache: e, gitdir: r, oid: n });
   if (a === "tag")
-    return n = st.from(i).parse().object, Kf({ fs: t, cache: e, gitdir: r, oid: n });
+    return n = st.from(i).parse().object, Jf({ fs: t, cache: e, gitdir: r, oid: n });
   if (a !== "blob")
     throw new ct(n, a, "blob");
   return { oid: n, blob: new Uint8Array(i) };
 }
-async function Yf({
+async function Qf({
   fs: t,
   cache: e,
   gitdir: r,
   oid: n,
   filepath: a = void 0
 }) {
-  return a !== void 0 && (n = await Qr({ fs: t, cache: e, gitdir: r, oid: n, filepath: a })), await Kf({
+  return a !== void 0 && (n = await Qr({ fs: t, cache: e, gitdir: r, oid: n, filepath: a })), await Jf({
     fs: t,
     cache: e,
     gitdir: r,
     oid: n
   });
 }
-async function Jf({
+async function tl({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -10843,7 +10847,7 @@ async function Jf({
   try {
     b("fs", t), b("gitdir", r), b("oid", n);
     const o = new C(t), s = await D({ fsp: o, dotgit: r });
-    return await Yf({
+    return await Qf({
       fs: o,
       cache: i,
       gitdir: s,
@@ -10854,7 +10858,7 @@ async function Jf({
     throw o.caller = "git.readBlob", o;
   }
 }
-async function $i({
+async function Ri({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -10874,14 +10878,14 @@ async function $i({
     throw i.caller = "git.readCommit", i;
   }
 }
-async function rm({
+async function am({
   fs: t,
   cache: e,
   gitdir: r,
   ref: n = "refs/notes/commits",
   oid: a
 }) {
-  const i = await T.resolve({ gitdir: r, fs: t, ref: n }), { blob: o } = await Yf({
+  const i = await T.resolve({ gitdir: r, fs: t, ref: n }), { blob: o } = await Qf({
     fs: t,
     cache: e,
     gitdir: r,
@@ -10890,7 +10894,7 @@ async function rm({
   });
   return o;
 }
-async function Qf({
+async function el({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -10901,7 +10905,7 @@ async function Qf({
   try {
     b("fs", t), b("gitdir", r), b("ref", n), b("oid", a);
     const o = new C(t), s = await D({ fsp: o, dotgit: r });
-    return await rm({
+    return await am({
       fs: o,
       cache: i,
       gitdir: s,
@@ -10912,7 +10916,7 @@ async function Qf({
     throw o.caller = "git.readNote", o;
   }
 }
-async function tl({
+async function rl({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -10966,7 +10970,7 @@ async function tl({
     throw l.caller = "git.readObject", l;
   }
 }
-async function nm({ fs: t, cache: e, gitdir: r, oid: n }) {
+async function im({ fs: t, cache: e, gitdir: r, oid: n }) {
   const { type: a, object: i } = await G({
     fs: t,
     cache: e,
@@ -10983,7 +10987,7 @@ async function nm({ fs: t, cache: e, gitdir: r, oid: n }) {
     payload: o.payload()
   };
 }
-async function el({
+async function nl({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -10993,7 +10997,7 @@ async function el({
   try {
     b("fs", t), b("gitdir", r), b("oid", n);
     const i = new C(t), o = await D({ fsp: i, dotgit: r });
-    return await nm({
+    return await im({
       fs: i,
       cache: a,
       gitdir: o,
@@ -11003,7 +11007,7 @@ async function el({
     throw i.caller = "git.readTag", i;
   }
 }
-async function rl({
+async function al({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -11025,7 +11029,7 @@ async function rl({
     throw o.caller = "git.readTree", o;
   }
 }
-async function nl({
+async function il({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -11045,7 +11049,7 @@ async function nl({
     throw i.caller = "git.remove", i;
   }
 }
-async function am({
+async function om({
   fs: t,
   cache: e,
   onSign: r,
@@ -11090,7 +11094,7 @@ async function am({
     signingKey: l
   });
 }
-async function al({
+async function ol({
   fs: t,
   onSign: e,
   dir: r,
@@ -11117,7 +11121,7 @@ async function al({
       committer: s
     });
     if (!h) throw new at("committer");
-    return await am({
+    return await om({
       fs: f,
       cache: c,
       onSign: e,
@@ -11132,7 +11136,7 @@ async function al({
     throw f.caller = "git.removeNote", f;
   }
 }
-async function im({
+async function sm({
   fs: t,
   gitdir: e,
   oldref: r,
@@ -11165,7 +11169,7 @@ async function im({
     value: o
   });
 }
-async function il({
+async function sl({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -11176,7 +11180,7 @@ async function il({
   try {
     b("fs", t), b("gitdir", r), b("ref", n), b("oldref", a);
     const o = new C(t), s = await D({ fsp: o, dotgit: r });
-    return await im({
+    return await sm({
       fs: o,
       gitdir: s,
       ref: n,
@@ -11187,10 +11191,10 @@ async function il({
     throw o.caller = "git.renameBranch", o;
   }
 }
-async function ol({ gitdir: t, type: e, object: r }) {
+async function cl({ gitdir: t, type: e, object: r }) {
   return Vt(Ke.wrap({ type: e, object: r }));
 }
-async function sl({
+async function fl({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -11235,7 +11239,7 @@ async function sl({
       size: 0
     };
     const u = e && await o.read(R(e, n));
-    u && (c = await ol({
+    u && (c = await cl({
       gitdir: s,
       type: "blob",
       object: u
@@ -11249,7 +11253,7 @@ async function sl({
     throw o.caller = "git.reset", o;
   }
 }
-async function cl({
+async function ll({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -11269,7 +11273,7 @@ async function cl({
     throw i.caller = "git.resolveRef", i;
   }
 }
-async function fl({
+async function ul({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -11285,7 +11289,7 @@ async function fl({
     throw o.caller = "git.setConfig", o;
   }
 }
-async function ll({ fs: t, gitdir: e, commit: r }) {
+async function dl({ fs: t, gitdir: e, commit: r }) {
   const n = q.from(r).toObject();
   return await dt({
     fs: t,
@@ -11295,14 +11299,14 @@ async function ll({ fs: t, gitdir: e, commit: r }) {
     format: "content"
   });
 }
-class Dn {
+class Nn {
   // constructor removed
   static get timezoneOffsetForRefLogEntry() {
     const e = (/* @__PURE__ */ new Date()).getTimezoneOffset(), r = Math.abs(Math.floor(e / 60)), n = Math.abs(e % 60).toString().padStart(2, "0");
     return `${e > 0 ? "-" : "+"}${r.toString().padStart(2, "0")}${n}`;
   }
   static createStashReflogEntry(e, r, n) {
-    const a = e.name.replace(/\s/g, ""), i = "0000000000000000000000000000000000000000", o = Math.floor(Date.now() / 1e3), s = Dn.timezoneOffsetForRefLogEntry;
+    const a = e.name.replace(/\s/g, ""), i = "0000000000000000000000000000000000000000", o = Math.floor(Date.now() / 1e3), s = Nn.timezoneOffsetForRefLogEntry;
     return `${i} ${r} ${a} ${e.email} ${o} ${s}	${n}
 `;
   }
@@ -11397,7 +11401,7 @@ class qt {
    * @returns {Promise<string>} - The object ID of the written commit.
    */
   async writeStashCommit({ message: e, tree: r, parent: n }) {
-    return ll({
+    return dl({
       fs: this.fs,
       gitdir: this.gitdir,
       commit: {
@@ -11454,7 +11458,7 @@ class qt {
    * @returns {Promise<void>}
    */
   async writeStashReflogEntry({ stashCommit: e, message: r }) {
-    const n = await this.getAuthor(), a = Dn.createStashReflogEntry(
+    const n = await this.getAuthor(), a = Nn.createStashReflogEntry(
       n,
       e,
       r
@@ -11475,10 +11479,10 @@ class qt {
     if (!await this.fs.exists(this.refLogsStashPath))
       return [];
     const r = await this.fs.read(this.refLogsStashPath, "utf8");
-    return Dn.getStashReflogEntry(r, e);
+    return Nn.getStashReflogEntry(r, e);
   }
 }
-async function ul({ fs: t, dir: e, gitdir: r, message: n = "" }) {
+async function hl({ fs: t, dir: e, gitdir: r, message: n = "" }) {
   const a = new qt({ fs: t, dir: e, gitdir: r });
   await a.getAuthor();
   const i = await le({
@@ -11489,9 +11493,9 @@ async function ul({ fs: t, dir: e, gitdir: r, message: n = "" }) {
     fs: t,
     gitdir: r,
     ref: "HEAD"
-  }), l = (await $i({ fs: t, dir: e, gitdir: r, oid: o })).commit.message, c = [o];
+  }), l = (await Ri({ fs: t, dir: e, gitdir: r, oid: o })).commit.message, c = [o];
   let f = null, u = mt({ ref: "HEAD" });
-  const d = await ls({
+  const d = await ds({
     fs: t,
     dir: e,
     gitdir: r,
@@ -11505,7 +11509,7 @@ async function ul({ fs: t, dir: e, gitdir: r, message: n = "" }) {
     });
     c.push(m), f = d, u = $e();
   }
-  const h = await ls({
+  const h = await ds({
     fs: t,
     dir: e,
     gitdir: r,
@@ -11528,8 +11532,8 @@ async function ul({ fs: t, dir: e, gitdir: r, message: n = "" }) {
     parent: c
   }), stashMsg: w, branch: i, stashMgr: a };
 }
-async function om({ fs: t, dir: e, gitdir: r, message: n = "" }) {
-  const { stashCommit: a, stashMsg: i, branch: o, stashMgr: s } = await ul({
+async function cm({ fs: t, dir: e, gitdir: r, message: n = "" }) {
+  const { stashCommit: a, stashMsg: i, branch: o, stashMgr: s } = await hl({
     fs: t,
     dir: e,
     gitdir: r,
@@ -11538,7 +11542,7 @@ async function om({ fs: t, dir: e, gitdir: r, message: n = "" }) {
   return await s.writeStashRef(a), await s.writeStashReflogEntry({
     stashCommit: a,
     message: i
-  }), await Si({
+  }), await ki({
     fs: t,
     dir: e,
     gitdir: r,
@@ -11548,8 +11552,8 @@ async function om({ fs: t, dir: e, gitdir: r, message: n = "" }) {
     // force checkout to discard changes
   }), a;
 }
-async function sm({ fs: t, dir: e, gitdir: r, message: n = "" }) {
-  const { stashCommit: a } = await ul({
+async function fm({ fs: t, dir: e, gitdir: r, message: n = "" }) {
+  const { stashCommit: a } = await hl({
     fs: t,
     dir: e,
     gitdir: r,
@@ -11557,7 +11561,7 @@ async function sm({ fs: t, dir: e, gitdir: r, message: n = "" }) {
   });
   return a;
 }
-async function dl({ fs: t, dir: e, gitdir: r, refIdx: n = 0 }) {
+async function wl({ fs: t, dir: e, gitdir: r, refIdx: n = 0 }) {
   const i = await new qt({ fs: t, dir: e, gitdir: r }).readStashCommit(n), { parent: o = null } = i.commit ? i.commit : {};
   if (!(!o || !Array.isArray(o)))
     for (let s = 0; s < o.length - 1; s++) {
@@ -11567,7 +11571,7 @@ async function dl({ fs: t, dir: e, gitdir: r, refIdx: n = 0 }) {
         gitdir: r,
         oid: o[s + 1]
       })).commit.message.startsWith("stash-Index");
-      await tf({
+      await rf({
         fs: t,
         dir: e,
         gitdir: r,
@@ -11577,7 +11581,7 @@ async function dl({ fs: t, dir: e, gitdir: r, refIdx: n = 0 }) {
       });
     }
 }
-async function hl({ fs: t, dir: e, gitdir: r, refIdx: n = 0 }) {
+async function pl({ fs: t, dir: e, gitdir: r, refIdx: n = 0 }) {
   const a = new qt({ fs: t, dir: e, gitdir: r });
   if (!(await a.readStashCommit(n)).commit)
     return;
@@ -11605,10 +11609,10 @@ async function hl({ fs: t, dir: e, gitdir: r, refIdx: n = 0 }) {
       await t.rm(l);
   });
 }
-async function cm({ fs: t, dir: e, gitdir: r }) {
+async function lm({ fs: t, dir: e, gitdir: r }) {
   return new qt({ fs: t, dir: e, gitdir: r }).readStashReflogs({ parsed: !0 });
 }
-async function fm({ fs: t, dir: e, gitdir: r }) {
+async function um({ fs: t, dir: e, gitdir: r }) {
   const n = new qt({ fs: t, dir: e, gitdir: r }), a = [n.refStashPath, n.refLogsStashPath];
   await We(a, async () => {
     await Promise.all(
@@ -11619,10 +11623,10 @@ async function fm({ fs: t, dir: e, gitdir: r }) {
     );
   });
 }
-async function lm({ fs: t, dir: e, gitdir: r, refIdx: n = 0 }) {
-  await dl({ fs: t, dir: e, gitdir: r, refIdx: n }), await hl({ fs: t, dir: e, gitdir: r, refIdx: n });
+async function dm({ fs: t, dir: e, gitdir: r, refIdx: n = 0 }) {
+  await wl({ fs: t, dir: e, gitdir: r, refIdx: n }), await pl({ fs: t, dir: e, gitdir: r, refIdx: n });
 }
-async function wl({
+async function ml({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -11632,13 +11636,13 @@ async function wl({
 }) {
   b("fs", t), b("dir", e), b("gitdir", r), b("op", n);
   const o = {
-    push: om,
-    apply: dl,
-    drop: hl,
-    list: cm,
-    clear: fm,
-    pop: lm,
-    create: sm
+    push: cm,
+    apply: wl,
+    drop: pl,
+    list: lm,
+    clear: um,
+    pop: dm,
+    create: fm
   }, s = ["apply", "drop", "pop"];
   try {
     const l = new C(t), c = await D({ fsp: l, dotgit: r });
@@ -11665,7 +11669,7 @@ async function wl({
     throw l.caller = "git.stash", l;
   }
 }
-async function pl({
+async function gl({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -11682,7 +11686,7 @@ async function pl({
       filepath: n
     }))
       return "ignored";
-    const l = await um({ fs: i, cache: a, gitdir: o }), c = await ml({
+    const l = await hm({ fs: i, cache: a, gitdir: o }), c = await yl({
       fs: i,
       cache: a,
       gitdir: o,
@@ -11696,10 +11700,10 @@ async function pl({
         return null;
       }
     ), u = await i.lstat(R(e, n)), d = c !== null, h = f !== null, w = u !== null, p = async () => {
-      if (h && !$n(f, u))
+      if (h && !Rn(f, u))
         return f.oid;
       {
-        const m = await i.read(R(e, n)), y = await ol({
+        const m = await i.read(R(e, n)), y = await cl({
           gitdir: o,
           type: "blob",
           object: m
@@ -11730,7 +11734,7 @@ async function pl({
     throw i.caller = "git.status", i;
   }
 }
-async function ml({ fs: t, cache: e, gitdir: r, tree: n, path: a }) {
+async function yl({ fs: t, cache: e, gitdir: r, tree: n, path: a }) {
   typeof a == "string" && (a = a.split("/"));
   const i = a.shift();
   for (const o of n)
@@ -11745,14 +11749,14 @@ async function ml({ fs: t, cache: e, gitdir: r, tree: n, path: a }) {
       });
       if (s === "tree") {
         const c = ut.from(l);
-        return ml({ fs: t, cache: e, gitdir: r, tree: c, path: a });
+        return yl({ fs: t, cache: e, gitdir: r, tree: c, path: a });
       }
       if (s === "blob")
         throw new ct(o.oid, s, "blob", a.join("/"));
     }
   return null;
 }
-async function um({ fs: t, cache: e, gitdir: r }) {
+async function hm({ fs: t, cache: e, gitdir: r }) {
   let n;
   try {
     n = await T.resolve({
@@ -11767,7 +11771,7 @@ async function um({ fs: t, cache: e, gitdir: r }) {
   const { tree: a } = await er({ fs: t, cache: e, gitdir: r, oid: n });
   return a;
 }
-async function gl({
+async function _l({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -11791,7 +11795,7 @@ async function gl({
           fs: l,
           dir: e,
           filepath: f
-        }) || !a.some((x) => Jc(f, x)))
+        }) || !a.some((x) => tf(f, x)))
           return null;
         if (i && !i(f))
           return;
@@ -11817,7 +11821,7 @@ async function gl({
     throw l.caller = "git.statusMatrix", l;
   }
 }
-async function yl({
+async function bl({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -11843,7 +11847,7 @@ async function yl({
     throw o.caller = "git.tag", o;
   }
 }
-async function _l({
+async function vl({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -11925,14 +11929,14 @@ async function _l({
     throw f.caller = "git.updateIndex", f;
   }
 }
-function bl() {
+function xl() {
   try {
-    return Wn.version;
+    return qn.version;
   } catch (t) {
     throw t.caller = "git.version", t;
   }
 }
-async function vl({
+async function El({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -11959,7 +11963,7 @@ async function vl({
     throw l.caller = "git.walk", l;
   }
 }
-async function xl({ fs: t, dir: e, gitdir: r = R(e, ".git"), blob: n }) {
+async function Sl({ fs: t, dir: e, gitdir: r = R(e, ".git"), blob: n }) {
   try {
     b("fs", t), b("gitdir", r), b("blob", n);
     const a = new C(t), i = await D({ fsp: a, dotgit: r });
@@ -11974,7 +11978,7 @@ async function xl({ fs: t, dir: e, gitdir: r = R(e, ".git"), blob: n }) {
     throw a.caller = "git.writeBlob", a;
   }
 }
-async function El({
+async function kl({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -11983,7 +11987,7 @@ async function El({
   try {
     b("fs", t), b("gitdir", r), b("commit", n);
     const a = new C(t), i = await D({ fsp: a, dotgit: r });
-    return await ll({
+    return await dl({
       fs: a,
       gitdir: i,
       commit: n
@@ -11992,7 +11996,7 @@ async function El({
     throw a.caller = "git.writeCommit", a;
   }
 }
-async function Sl({
+async function Al({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -12035,7 +12039,7 @@ async function Sl({
     throw l.caller = "git.writeObject", l;
   }
 }
-async function kl({
+async function $l({
   fs: t,
   dir: e,
   gitdir: r = R(e, ".git"),
@@ -12071,7 +12075,7 @@ async function kl({
     throw s.caller = "git.writeRef", s;
   }
 }
-async function dm({ fs: t, gitdir: e, tag: r }) {
+async function wm({ fs: t, gitdir: e, tag: r }) {
   const n = st.from(r).toObject();
   return await dt({
     fs: t,
@@ -12081,11 +12085,11 @@ async function dm({ fs: t, gitdir: e, tag: r }) {
     format: "content"
   });
 }
-async function Al({ fs: t, dir: e, gitdir: r = R(e, ".git"), tag: n }) {
+async function Rl({ fs: t, dir: e, gitdir: r = R(e, ".git"), tag: n }) {
   try {
     b("fs", t), b("gitdir", r), b("tag", n);
     const a = new C(t), i = await D({ fsp: a, dotgit: r });
-    return await dm({
+    return await wm({
       fs: a,
       gitdir: i,
       tag: n
@@ -12094,7 +12098,7 @@ async function Al({ fs: t, dir: e, gitdir: r = R(e, ".git"), tag: n }) {
     throw a.caller = "git.writeTag", a;
   }
 }
-async function $l({ fs: t, dir: e, gitdir: r = R(e, ".git"), tree: n }) {
+async function Ol({ fs: t, dir: e, gitdir: r = R(e, ".git"), tree: n }) {
   try {
     b("fs", t), b("gitdir", r), b("tree", n);
     const a = new C(t), i = await D({ fsp: a, dotgit: r });
@@ -12107,155 +12111,155 @@ async function $l({ fs: t, dir: e, gitdir: r = R(e, ".git"), tree: n }) {
     throw a.caller = "git.writeTree", a;
   }
 }
-var hm = {
-  Errors: Fc,
+var pm = {
+  Errors: Uc,
   STAGE: $e,
   TREE: mt,
   WORKDIR: Qe,
-  add: Lc,
-  abortMerge: Uc,
-  addNote: Zc,
-  addRemote: Xc,
-  annotatedTag: Kc,
-  branch: Yc,
-  cherryPick: ef,
-  checkout: Si,
-  clone: cf,
-  commit: ff,
-  getConfig: Sf,
-  getConfigAll: kf,
-  setConfig: fl,
-  currentBranch: lf,
-  deleteBranch: uf,
-  deleteRef: df,
-  deleteRemote: hf,
-  deleteTag: wf,
-  expandOid: pf,
-  expandRef: mf,
-  fastForward: _f,
-  fetch: bf,
-  findMergeBase: vf,
-  findRoot: Ef,
-  getRemoteInfo: Af,
-  getRemoteInfo2: Rf,
-  hashBlob: Of,
-  indexPack: Tf,
-  init: If,
-  isDescendent: Bf,
-  isIgnored: Cf,
-  listBranches: Df,
-  listFiles: Ff,
-  listNotes: jf,
-  listRefs: Uf,
-  listRemotes: Mf,
-  listServerRefs: zf,
-  listTags: Lf,
-  log: Gf,
-  merge: Wf,
-  packObjects: Zf,
-  pull: Vf,
-  push: Xf,
-  readBlob: Jf,
-  readCommit: $i,
-  readNote: Qf,
-  readObject: tl,
-  readTag: el,
-  readTree: rl,
-  remove: nl,
-  removeNote: al,
-  renameBranch: il,
-  resetIndex: sl,
-  updateIndex: _l,
-  resolveRef: cl,
-  status: pl,
-  statusMatrix: gl,
-  tag: yl,
-  version: bl,
-  walk: vl,
-  writeBlob: xl,
-  writeCommit: El,
-  writeObject: Sl,
-  writeRef: kl,
-  writeTag: Al,
-  writeTree: $l,
-  stash: wl
+  add: Gc,
+  abortMerge: zc,
+  addNote: Xc,
+  addRemote: Yc,
+  annotatedTag: Jc,
+  branch: Qc,
+  cherryPick: nf,
+  checkout: ki,
+  clone: lf,
+  commit: uf,
+  getConfig: Af,
+  getConfigAll: $f,
+  setConfig: ul,
+  currentBranch: df,
+  deleteBranch: hf,
+  deleteRef: wf,
+  deleteRemote: pf,
+  deleteTag: mf,
+  expandOid: gf,
+  expandRef: yf,
+  fastForward: vf,
+  fetch: xf,
+  findMergeBase: Ef,
+  findRoot: kf,
+  getRemoteInfo: Rf,
+  getRemoteInfo2: Tf,
+  hashBlob: If,
+  indexPack: Pf,
+  init: Bf,
+  isDescendent: Df,
+  isIgnored: Nf,
+  listBranches: Ff,
+  listFiles: Uf,
+  listNotes: Mf,
+  listRefs: zf,
+  listRemotes: Lf,
+  listServerRefs: Hf,
+  listTags: Gf,
+  log: qf,
+  merge: Zf,
+  packObjects: Xf,
+  pull: Kf,
+  push: Yf,
+  readBlob: tl,
+  readCommit: Ri,
+  readNote: el,
+  readObject: rl,
+  readTag: nl,
+  readTree: al,
+  remove: il,
+  removeNote: ol,
+  renameBranch: sl,
+  resetIndex: fl,
+  updateIndex: vl,
+  resolveRef: ll,
+  status: gl,
+  statusMatrix: _l,
+  tag: bl,
+  version: xl,
+  walk: El,
+  writeBlob: Sl,
+  writeCommit: kl,
+  writeObject: Al,
+  writeRef: $l,
+  writeTag: Rl,
+  writeTree: Ol,
+  stash: ml
 };
-P.Errors = Fc;
+P.Errors = Uc;
 P.STAGE = $e;
 P.TREE = mt;
 P.WORKDIR = Qe;
-P.abortMerge = Uc;
-P.add = Lc;
-P.addNote = Zc;
-P.addRemote = Xc;
-P.annotatedTag = Kc;
-P.branch = Yc;
-P.checkout = Si;
-P.cherryPick = ef;
-P.clone = cf;
-P.commit = ff;
-P.currentBranch = lf;
-var wm = P.default = hm;
-P.deleteBranch = uf;
-P.deleteRef = df;
-P.deleteRemote = hf;
-P.deleteTag = wf;
-P.expandOid = pf;
-P.expandRef = mf;
-P.fastForward = _f;
-P.fetch = bf;
-P.findMergeBase = vf;
-P.findRoot = Ef;
-P.getConfig = Sf;
-P.getConfigAll = kf;
-P.getRemoteInfo = Af;
-P.getRemoteInfo2 = Rf;
-P.hashBlob = Of;
-P.indexPack = Tf;
-P.init = If;
-P.isDescendent = Bf;
-P.isIgnored = Cf;
-P.listBranches = Df;
-P.listFiles = Ff;
-P.listNotes = jf;
-P.listRefs = Uf;
-P.listRemotes = Mf;
-P.listServerRefs = zf;
-P.listTags = Lf;
-P.log = Gf;
-P.merge = Wf;
-P.packObjects = Zf;
-P.pull = Vf;
-P.push = Xf;
-P.readBlob = Jf;
-P.readCommit = $i;
-P.readNote = Qf;
-P.readObject = tl;
-P.readTag = el;
-P.readTree = rl;
-P.remove = nl;
-P.removeNote = al;
-P.renameBranch = il;
-P.resetIndex = sl;
-P.resolveRef = cl;
-P.setConfig = fl;
-P.stash = wl;
-P.status = pl;
-P.statusMatrix = gl;
-P.tag = yl;
-P.updateIndex = _l;
-P.version = bl;
-P.walk = vl;
-P.writeBlob = xl;
-P.writeCommit = El;
-P.writeObject = Sl;
-P.writeRef = kl;
-P.writeTag = Al;
-P.writeTree = $l;
-class pm {
+P.abortMerge = zc;
+P.add = Gc;
+P.addNote = Xc;
+P.addRemote = Yc;
+P.annotatedTag = Jc;
+P.branch = Qc;
+P.checkout = ki;
+P.cherryPick = nf;
+P.clone = lf;
+P.commit = uf;
+P.currentBranch = df;
+var mm = P.default = pm;
+P.deleteBranch = hf;
+P.deleteRef = wf;
+P.deleteRemote = pf;
+P.deleteTag = mf;
+P.expandOid = gf;
+P.expandRef = yf;
+P.fastForward = vf;
+P.fetch = xf;
+P.findMergeBase = Ef;
+P.findRoot = kf;
+P.getConfig = Af;
+P.getConfigAll = $f;
+P.getRemoteInfo = Rf;
+P.getRemoteInfo2 = Tf;
+P.hashBlob = If;
+P.indexPack = Pf;
+P.init = Bf;
+P.isDescendent = Df;
+P.isIgnored = Nf;
+P.listBranches = Ff;
+P.listFiles = Uf;
+P.listNotes = Mf;
+P.listRefs = zf;
+P.listRemotes = Lf;
+P.listServerRefs = Hf;
+P.listTags = Gf;
+P.log = qf;
+P.merge = Zf;
+P.packObjects = Xf;
+P.pull = Kf;
+P.push = Yf;
+P.readBlob = tl;
+P.readCommit = Ri;
+P.readNote = el;
+P.readObject = rl;
+P.readTag = nl;
+P.readTree = al;
+P.remove = il;
+P.removeNote = ol;
+P.renameBranch = sl;
+P.resetIndex = fl;
+P.resolveRef = ll;
+P.setConfig = ul;
+P.stash = ml;
+P.status = gl;
+P.statusMatrix = _l;
+P.tag = bl;
+P.updateIndex = vl;
+P.version = xl;
+P.walk = El;
+P.writeBlob = Sl;
+P.writeCommit = kl;
+P.writeObject = Al;
+P.writeRef = $l;
+P.writeTag = Rl;
+P.writeTree = Ol;
+class gm {
   async getStatus(e) {
     try {
-      const r = await wm.currentBranch({ fs: kt, dir: e, gitdir: e + "/.git" }), a = Yn("git status --porcelain", { cwd: e, encoding: "utf-8" }).trim().split(`
+      const r = await mm.currentBranch({ fs: kt, dir: e, gitdir: e + "/.git" }), a = hn("git status --porcelain", { cwd: e, encoding: "utf-8" }).trim().split(`
 `).filter((o) => o.trim()), i = {};
       for (const o of a) {
         const s = o.trim();
@@ -12283,7 +12287,7 @@ class pm {
       let i = a.split(`
 `);
       if (a.endsWith(`
-`) && (i = i.slice(0, -1)), Yn(`git ls-files --others --exclude-standard "${r}"`, {
+`) && (i = i.slice(0, -1)), hn(`git ls-files --others --exclude-standard "${r}"`, {
         cwd: e,
         encoding: "utf-8",
         stdio: ["ignore", "pipe", "ignore"]
@@ -12294,7 +12298,7 @@ class pm {
         }));
       let s;
       try {
-        s = Yn(`git diff HEAD -- "${r}"`, {
+        s = hn(`git diff HEAD -- "${r}"`, {
           cwd: e,
           encoding: "utf-8",
           stdio: ["ignore", "pipe", "ignore"]
@@ -12344,8 +12348,8 @@ class pm {
     }
   }
 }
-const Rl = new pm();
-class mm {
+const Tl = new gm();
+class ym {
   async listFiles(e, r) {
     return this.readDirectory(e, "", r);
   }
@@ -12354,8 +12358,8 @@ class mm {
     for (const o of a) {
       if (o === "node_modules" || o === ".git" || o === ".gitignore" && !n || !n && o.startsWith("."))
         continue;
-      const s = vn.join(e, o), l = kt.statSync(s);
-      let c = r ? vn.join(r, o) : o;
+      const s = xn.join(e, o), l = kt.statSync(s);
+      let c = r ? xn.join(r, o) : o;
       if (c = c.replace(/\\/g, "/"), l.isDirectory()) {
         const f = this.readDirectory(s, c, n);
         i.push({
@@ -12379,12 +12383,12 @@ class mm {
     return kt.readFileSync(e, "utf-8");
   }
 }
-const Ol = new mm();
+const Il = new ym();
 let Ft;
-const gm = process.cwd();
-function Tl() {
-  const t = process.platform === "win32", { width: e, height: r } = Cl.getPrimaryDisplay().workAreaSize, n = Math.round(e * 0.8), a = Math.round(r * 0.85);
-  if (Ft = new _s({
+const _m = process.cwd();
+function Pl() {
+  const t = process.platform === "win32", { width: e, height: r } = Nl.getPrimaryDisplay().workAreaSize, n = Math.round(e * 0.8), a = Math.round(r * 0.85);
+  if (Ft = new vs({
     width: n,
     height: a,
     minWidth: 800,
@@ -12398,31 +12402,45 @@ function Tl() {
   }), process.env.NODE_ENV === "development")
     Ft.loadURL("http://localhost:5173"), Ft.webContents.openDevTools();
   else {
-    const i = Dl.join(hr.getAppPath(), "dist/index.html");
+    const i = Fl.join(hr.getAppPath(), "dist/index.html");
     Ft.loadFile(i);
   }
   Ft.on("closed", () => {
     Ft = null;
   });
 }
-hr.whenReady().then(Tl);
+hr.whenReady().then(Pl);
 hr.on("window-all-closed", () => {
   process.platform !== "darwin" && hr.quit();
 });
 hr.on("activate", () => {
-  _s.getAllWindows().length === 0 && Tl();
+  vs.getAllWindows().length === 0 && Pl();
 });
-gt.handle("get-settings", () => Nn.getSettings());
-gt.handle("save-settings", (t, e) => (Nn.setSettings(e), !0));
-gt.handle("read-file", async (t, e) => Ol.readFile(e));
-gt.handle("list-files", async (t, e, r) => Ol.listFiles(e, r));
-gt.handle("get-git-status", async (t, e) => Rl.getStatus(e));
-gt.handle("execute-git-command", async (t, e, r) => ({
-  success: !0,
-  output: `Command received: ${r}`
-}));
-gt.handle("get-file-diff", async (t, e, r) => Rl.getFileDiff(e, r));
-gt.handle("get-current-repo-path", () => gm);
+gt.handle("get-settings", () => Fn.getSettings());
+gt.handle("save-settings", (t, e) => (Fn.setSettings(e), !0));
+gt.handle("read-file", async (t, e) => Il.readFile(e));
+gt.handle("list-files", async (t, e, r) => Il.listFiles(e, r));
+gt.handle("get-git-status", async (t, e) => Tl.getStatus(e));
+gt.handle("execute-git-command", async (t, e, r) => {
+  try {
+    return {
+      success: !0,
+      output: hn(r, {
+        cwd: e,
+        encoding: "utf-8",
+        stdio: [null, "pipe", "pipe"]
+      }).trim()
+    };
+  } catch (n) {
+    return {
+      success: !1,
+      output: (n.stdout || n.stderr || n.message || String(n)).trim(),
+      error: String(n)
+    };
+  }
+});
+gt.handle("get-file-diff", async (t, e, r) => Tl.getFileDiff(e, r));
+gt.handle("get-current-repo-path", () => _m);
 gt.handle("get-platform", () => process.platform);
 gt.handle("minimize-window", () => {
   Ft && Ft.minimize();
@@ -12430,5 +12448,5 @@ gt.handle("minimize-window", () => {
 gt.handle("close-window", () => {
   Ft && Ft.close();
 });
-gt.handle("get-recent-files", () => Nn.getRecentFiles());
-gt.handle("add-recent-file", (t, e, r) => (Nn.addRecentFile(e, r), !0));
+gt.handle("get-recent-files", () => Fn.getRecentFiles());
+gt.handle("add-recent-file", (t, e, r) => (Fn.addRecentFile(e, r), !0));

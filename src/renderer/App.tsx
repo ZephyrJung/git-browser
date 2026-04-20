@@ -149,7 +149,7 @@ const App: React.FC = () => {
         />
       </div>
       {workMode === 'command' ? (
-        <CommandBar />
+        <CommandBar selectedFile={selectedFile} />
       ) : (
         <ButtonBar />
       )}

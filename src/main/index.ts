@@ -1,5 +1,6 @@
 import { app, BrowserWindow, ipcMain, screen } from 'electron'
 import path from 'node:path'
+import { execSync } from 'child_process'
 import { storageService } from './storage-service'
 import { gitService } from './git-service'
 import { fileService } from './file-service'
@@ -78,11 +79,26 @@ ipcMain.handle('get-git-status', async (_event, repoPath) => {
   return gitService.getStatus(repoPath)
 })
 
-ipcMain.handle('execute-git-command', async (_event, _repoPath, command): Promise<CommandResult> => {
-  // TODO: 实现命令执行
-  return {
-    success: true,
-    output: `Command received: ${command}`,
+ipcMain.handle('execute-git-command', async (_event, repoPath, command): Promise<CommandResult> => {
+  try {
+    const output = execSync(command, {
+      cwd: repoPath,
+      encoding: 'utf-8',
+      stdio: [null, 'pipe', 'pipe'],
+    });
+    return {
+      success: true,
+      output: output.trim(),
+    };
+  } catch (e: any) {
+    // Some git commands exit with non-zero but still have useful output (e.g. git diff)
+    // Still return the output we have
+    const output = e.stdout || e.stderr || e.message || String(e);
+    return {
+      success: false,
+      output: output.trim(),
+      error: String(e),
+    };
   }
 })
 
