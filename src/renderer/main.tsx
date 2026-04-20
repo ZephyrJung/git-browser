@@ -6,24 +6,6 @@ import './index.css'
 // Expose electron API to window - electron is available globally due to nodeIntegration: true
 const { ipcRenderer } = window.require('electron')
 
-declare global {
-  interface Window {
-    electron: {
-      getSettings: () => Promise<any>;
-      saveSettings: (settings: any) => Promise<boolean>;
-      readFile: (filePath: string) => Promise<string>;
-      listFiles: (dirPath: string, showHidden: boolean) => Promise<any[]>;
-      getGitStatus: (repoPath: string) => Promise<any>;
-      getFileDiff: (repoPath: string, filePath: string) => Promise<any>;
-      executeGitCommand: (repoPath: string, command: string) => Promise<any>;
-      getCurrentRepoPath: () => Promise<string>;
-      getPlatform: () => Promise<string>;
-      minimizeWindow: () => void;
-      closeWindow: () => void;
-    };
-  }
-}
-
 window.electron = {
   getSettings: () => ipcRenderer.invoke('get-settings'),
   saveSettings: (settings: any) => ipcRenderer.invoke('save-settings', settings),
@@ -34,6 +16,8 @@ window.electron = {
   executeGitCommand: (repoPath: string, command: string) => ipcRenderer.invoke('execute-git-command', repoPath, command),
   getCurrentRepoPath: () => ipcRenderer.invoke('get-current-repo-path'),
   getPlatform: () => ipcRenderer.invoke('get-platform'),
+  getRecentFiles: () => ipcRenderer.invoke('get-recent-files'),
+  addRecentFile: (filePath: string, maxCount: number) => ipcRenderer.invoke('add-recent-file', filePath, maxCount),
   minimizeWindow: () => ipcRenderer.invoke('minimize-window'),
   closeWindow: () => ipcRenderer.invoke('close-window'),
 }

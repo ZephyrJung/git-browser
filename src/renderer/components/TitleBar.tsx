@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface TitleBarProps {
   branch: string;
@@ -12,6 +12,8 @@ const TitleBar: React.FC<TitleBarProps> = ({
   onSettingsClick,
 }) => {
   const [isWindows, setIsWindows] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const checkPlatform = async () => {
@@ -21,6 +23,20 @@ const TitleBar: React.FC<TitleBarProps> = ({
     checkPlatform();
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+    if (showMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showMenu]);
+
   const handleMinimize = () => {
     const { ipcRenderer } = window.require('electron');
     ipcRenderer.invoke('minimize-window');
@@ -29,6 +45,15 @@ const TitleBar: React.FC<TitleBarProps> = ({
   const handleClose = () => {
     const { ipcRenderer } = window.require('electron');
     ipcRenderer.invoke('close-window');
+  };
+
+  const handleMenuClick = () => {
+    setShowMenu(!showMenu);
+  };
+
+  const handleSettingsSelect = () => {
+    setShowMenu(false);
+    onSettingsClick();
   };
 
   return (
@@ -44,13 +69,25 @@ const TitleBar: React.FC<TitleBarProps> = ({
       {hasChanges && (
         <span className="w-3 h-3 mr-2 bg-yellow-500 rounded-full animate-pulse" title="有未提交变更" />
       )}
-      <button
-        className={`flex items-center justify-center w-8 h-8 rounded hover:bg-gray-200 dark:hover:bg-gray-700 ${isWindows ? 'no-drag-region' : ''}`}
-        onClick={onSettingsClick}
-        title="设置"
-      >
-        <span className="text-base">☰</span>
-      </button>
+      <div className="relative" ref={menuRef}>
+        <button
+          className={`flex items-center justify-center w-8 h-8 rounded hover:bg-gray-200 dark:hover:bg-gray-700 ${isWindows ? 'no-drag-region' : ''}`}
+          onClick={handleMenuClick}
+          title="菜单"
+        >
+          <span className="text-base">☰</span>
+        </button>
+        {showMenu && (
+          <div className="absolute top-full right-0 mt-1 w-48 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 shadow-lg rounded py-1 z-50 no-drag-region">
+            <div
+              className="px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+              onClick={handleSettingsSelect}
+            >
+              ⚙ 设置
+            </div>
+          </div>
+        )}
+      </div>
       {isWindows && (
         <>
           <button

@@ -22,6 +22,7 @@ const App: React.FC = () => {
   const [repoPath, setRepoPath] = useState<string>('');
   const [sidebarWidth, setSidebarWidth] = useState(280);
   const [activeTab, setActiveTab] = useState<TabType>('all');
+  const [recentFiles, setRecentFiles] = useState<string[]>([]);
   const isDragging = useRef(false);
 
   useEffect(() => {
@@ -39,6 +40,14 @@ const App: React.FC = () => {
       setWorkMode(loaded.defaultMode);
     };
     loadSettings();
+  }, []);
+
+  useEffect(() => {
+    const loadRecentFiles = async () => {
+      const files = await window.electron.getRecentFiles();
+      setRecentFiles(files);
+    };
+    loadRecentFiles();
   }, []);
 
   // Refresh git status whenever repoPath changes or tab changes (always get latest)
@@ -72,8 +81,25 @@ const App: React.FC = () => {
     return () => window.removeEventListener('mouseup', handleGlobalMouseUp);
   }, []);
 
-  const handleFileSelect = (file: FileNode) => {
+  const handleFileSelect = async (file: FileNode) => {
     setSelectedFile(file);
+    if (settings && file.path) {
+      await window.electron.addRecentFile(file.path, settings.maxRecentFiles);
+      const updated = await window.electron.getRecentFiles();
+      setRecentFiles(updated);
+    }
+  };
+
+  const handleRecentFileSelect = (filePath: string) => {
+    // Find the file in file tree and select it - for now just set selected file path
+    // FileTree will need to have this file already loaded to expand to it
+    // TODO: Navigate to file in tree
+    setSelectedFile({
+      name: filePath.split('/').pop() || filePath,
+      path: filePath,
+      isDirectory: false,
+      status: 'normal',
+    });
   };
 
   const handleToggleSettings = () => {
@@ -117,6 +143,9 @@ const App: React.FC = () => {
         <CodeViewer
           file={selectedFile}
           currentBranch={gitStatus.branch}
+          repoPath={repoPath}
+          recentFiles={recentFiles}
+          onRecentFileSelect={handleRecentFileSelect}
         />
       </div>
       {workMode === 'command' ? (

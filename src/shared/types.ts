@@ -15,6 +15,7 @@ export interface AppSettings {
   theme: 'light' | 'dark';
   defaultMode: WorkMode;
   requireConfirmation: boolean;
+  maxRecentFiles: number;
   credentials: {
     sshKeys: SshKey[];
     httpCredentials: HttpCredential[];

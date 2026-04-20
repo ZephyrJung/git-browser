@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, screen } from 'electron'
 import path from 'node:path'
 import { storageService } from './storage-service'
 import { gitService } from './git-service'
@@ -10,10 +10,16 @@ const currentRepoPath = process.cwd();
 
 function createWindow() {
   const isWindows = process.platform === 'win32';
-  
+  const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workAreaSize;
+
+  const width = Math.round(screenWidth * 0.8);
+  const height = Math.round(screenHeight * 0.85);
+
   mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
+    width,
+    height,
+    minWidth: 800,
+    minHeight: 600,
     titleBarStyle: isWindows ? 'hidden' : 'default',
     frame: !isWindows,
     webPreferences: {
@@ -102,4 +108,13 @@ ipcMain.handle('close-window', () => {
   if (mainWindow) {
     mainWindow.close();
   }
+})
+
+ipcMain.handle('get-recent-files', () => {
+  return storageService.getRecentFiles()
+})
+
+ipcMain.handle('add-recent-file', (_event, filePath, maxCount) => {
+  storageService.addRecentFile(filePath, maxCount)
+  return true
 })

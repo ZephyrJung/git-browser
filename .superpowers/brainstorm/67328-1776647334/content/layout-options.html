@@ -1,0 +1,57 @@
+<h2>文件树修改状态条 - 布局选项</h2>
+<p class="subtitle">在文件浏览区右侧添加一个状态条，用于快速定位到有修改的文件</p>
+
+<div class="options">
+  <div class="option" data-choice="minimal" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>极简滚动条标记</h3>
+      <p>在文件树滚动条内部显示颜色标记，不占用额外宽度</p>
+      <ul>
+        <li>优点：不占用额外空间，保持原有布局</li>
+        <li>缺点：点击区域小，不容易点击</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="option" data-choice="side-bar" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>独立侧边状态条</h3>
+      <p>在文件树最右侧增加一个窄条状区域，显示修改位置标记</p>
+      <ul>
+        <li>优点：点击区域大，清晰可见，交互方便</li>
+        <li>缺点：占用一点额外宽度（约12px）</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="option" data-choice="overview" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>完整文件概览图</h3>
+      <p>右侧显示整个文件树的缩小版缩略图，突出显示修改文件</p>
+      <ul>
+        <li>优点：提供完整上下文，直观看到整体分布</li>
+        <li>缺点：占用更多宽度（约30-40px），计算量更大</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="mockup">
+  <div class="mockup-header">当前布局结构参考</div>
+  <div class="mockup-body">
+    <div style="width: 280px; border: 1px solid #ccc; background: #f5f5f5;">
+      <div style="height: 40px; border-bottom: 1px solid #ccc; padding: 8px;">
+        标签页 + 搜索按钮
+      </div>
+      <div style="display: flex;">
+        <div style="flex: 1; height: 400px; padding: 4px;">
+          文件树内容（可滚动）
+        </div>
+        <!-- 这里就是新增状态条的位置 -->
+      </div>
+    </div>
+  </div>
+</div>

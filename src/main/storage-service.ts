@@ -10,6 +10,7 @@ const defaultSettings: AppSettings = {
   theme: 'light',
   defaultMode: 'command',
   requireConfirmation: true,
+  maxRecentFiles: 10,
   credentials: {
     sshKeys: [],
     httpCredentials: [],
@@ -19,6 +20,7 @@ const defaultSettings: AppSettings = {
 const defaultStore: StoreData = {
   settings: defaultSettings,
   recentRepos: [],
+  recentFiles: [],
 };
 
 export class StorageService {
@@ -72,6 +74,23 @@ export class StorageService {
     this.data.recentRepos = this.data.recentRepos.filter(r => r !== repoPath);
     this.data.recentRepos.unshift(repoPath);
     this.data.recentRepos = this.data.recentRepos.slice(0, 10);
+    this.save();
+  }
+
+  getRecentFiles(): string[] {
+    if (!this.data.recentFiles) {
+      this.data.recentFiles = [];
+    }
+    return this.data.recentFiles;
+  }
+
+  addRecentFile(filePath: string, maxCount: number): void {
+    if (!this.data.recentFiles) {
+      this.data.recentFiles = [];
+    }
+    this.data.recentFiles = this.data.recentFiles.filter(f => f !== filePath);
+    this.data.recentFiles.unshift(filePath);
+    this.data.recentFiles = this.data.recentFiles.slice(0, maxCount);
     this.save();
   }
 }

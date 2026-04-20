@@ -19,13 +19,13 @@ export function getStatusColorClass(status: FileNode['status']): string {
 export function getStatusBgClass(status: FileNode['status']): string {
   switch (status) {
     case 'new':
-      return 'bg-green-50 dark:bg-green-900/20';
+      return 'bg-green-600 dark:bg-green-600';
     case 'modified':
-      return 'bg-blue-50 dark:bg-blue-900/20';
+      return 'bg-blue-600 dark:bg-blue-600';
     case 'deleted':
-      return 'bg-red-50 dark:bg-red-900/20';
+      return 'bg-red-600 dark:bg-red-600';
     case 'conflict':
-      return 'bg-orange-50 dark:bg-orange-900/20';
+      return 'bg-orange-500 dark:bg-orange-500';
     case 'normal':
     default:
       return 'bg-transparent';

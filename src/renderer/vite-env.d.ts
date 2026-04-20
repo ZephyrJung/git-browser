@@ -8,6 +8,8 @@ interface ElectronAPI {
   executeGitCommand: (repoPath: string, command: string) => Promise<any>;
   getCurrentRepoPath: () => Promise<string>;
   getPlatform: () => Promise<string>;
+  getRecentFiles: () => Promise<string[]>;
+  addRecentFile: (filePath: string, maxCount: number) => Promise<boolean>;
   minimizeWindow: () => void;
   closeWindow: () => void;
 }

@@ -12,6 +12,7 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ onClose }) => {
     theme: 'light',
     defaultMode: 'command',
     requireConfirmation: true,
+    maxRecentFiles: 10,
     credentials: {
       sshKeys: [],
       httpCredentials: [],
@@ -316,6 +317,17 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ onClose }) => {
                   深色
                 </button>
               </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm">最近文件最大数量</span>
+              <input
+                type="number"
+                min="1"
+                max="50"
+                value={settings.maxRecentFiles}
+                className="w-20 px-2 py-1 text-sm border rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
+                onChange={e => setSettings({ ...settings, maxRecentFiles: parseInt(e.target.value) || 10 })}
+              />
             </div>
           </div>
         </div>
