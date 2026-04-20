@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { CommandResult } from '@/shared/types';
 
 import type { FileNode } from '@/shared/types';
@@ -8,6 +8,13 @@ interface CommitInfo {
   author: string;
   date: string;
   message: string;
+}
+
+interface BranchInfo {
+  name: string;        // display name (remote: stripped origin/ prefix)
+  fullName: string;    // full name (origin/main) for checkout
+  isCurrent: boolean;
+  isRemote: boolean;
 }
 
 interface CommandBarProps {
@@ -22,19 +29,43 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile }) => {
   const [dialogOutput, setDialogOutput] = useState('');
   const [showCommitHistory, setShowCommitHistory] = useState(false);
   const [commits, setCommits] = useState<CommitInfo[]>([]);
+  const [showSwitchBranch, setShowSwitchBranch] = useState(false);
+  const [branches, setBranches] = useState<BranchInfo[]>([]);
   const [loading, setLoading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [copyToast, setCopyToast] = useState<string | null>(null);
+
+  // Close any open dialog on ESC key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (showCommitHistory) setShowCommitHistory(false);
+        if (showOutputDialog) setShowOutputDialog(false);
+        if (showSwitchBranch) setShowSwitchBranch(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showCommitHistory, showOutputDialog, showSwitchBranch]);
 
   const isGitLogCommand = (cmd: string): boolean => {
     const trimmed = cmd.trim().toLowerCase();
     return trimmed === 'git log' || trimmed.startsWith('git log ');
   };
 
+  const isBranchCommand = (cmd: string): boolean => {
+    const trimmed = cmd.trim().toLowerCase();
+    // Only open selection dialog when user enters git branch without any arguments
+    // If user adds args (git branch -a, git branch -v), just output normally
+    return trimmed === 'git branch';
+  };
+
   const shouldShowDialog = (cmd: string): boolean => {
     const trimmed = cmd.trim().toLowerCase();
     // Common commands that produce multi-line output should open in dialog
-    const dialogCommands = ['git status', 'git branch', 'git branches', 'git diff'];
-    return dialogCommands.some(c => trimmed === c || trimmed.startsWith(c + ' '));
+    const dialogCommands = ['git status', 'git diff'];
+    return dialogCommands.some(c => trimmed === c || trimmed.startsWith(c + ' ')) ||
+           isBranchCommand(trimmed);
   };
 
   const processCommand = (cmd: string): string => {
@@ -51,6 +82,85 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile }) => {
     }
 
     return processed;
+  };
+
+  const loadAllBranches = async () => {
+    setLoading(true);
+    setStatusMessage(null);
+    try {
+      const repoPath = await window.electron.getCurrentRepoPath();
+      // Get all branches including both local and remote
+      // Format: %(refname:short)|%(HEAD)|%(refname:lstrip=2)
+      // For local: main| |main
+      // For remote: origin/main| |remotes/origin
+      const output: CommandResult = await window.electron.executeGitCommand(repoPath, 'git branch -a --format="%(refname:short)|%(HEAD)|%(refname:lstrip=2)"');
+      if (output.output && output.output.trim()) {
+        const lines = output.output.trim().split('\n').filter((line: string) => line.trim());
+        const parsedBranches = lines.map((line: string) => {
+          const [name, isHead, ref] = line.split('|');
+          let displayName = name.trim();
+          const isRemote = ref.startsWith('remotes/');
+          // For remote branches: strip the remote prefix from display name (origin/main -> main)
+          if (isRemote) {
+            const firstSlash = displayName.indexOf('/');
+            if (firstSlash !== -1) {
+              displayName = displayName.slice(firstSlash + 1);
+            }
+          }
+          return {
+            name: displayName,
+            fullName: name.trim(),
+            isCurrent: isHead.trim() === '*',
+            isRemote,
+          };
+        });
+        // Filter out empty lines
+        const filteredBranches = parsedBranches.filter(b => b.name);
+        // Deduplicate: if same display name exists in both local and remote, keep only local
+        const seenNames = new Set<string>();
+        // Add local branches first
+        const result: BranchInfo[] = [];
+        filteredBranches.filter(b => !b.isRemote).forEach(b => {
+          if (!seenNames.has(b.name)) {
+            seenNames.add(b.name);
+            result.push(b);
+          }
+        });
+        // Then add remote branches that don't have local duplicate
+        filteredBranches.filter(b => b.isRemote).forEach(b => {
+          if (!seenNames.has(b.name)) {
+            seenNames.add(b.name);
+            result.push(b);
+          }
+        });
+        // Sort: current first, then local, then remote
+        result.sort((a, b) => {
+          if (a.isCurrent !== b.isCurrent) return a.isCurrent ? -1 : 1;
+          if (a.isRemote !== b.isRemote) return a.isRemote ? 1 : -1;
+          return a.name.localeCompare(b.name);
+        });
+        setBranches(result);
+      } else {
+        setBranches([]);
+        setStatusMessage('获取分支列表失败');
+      }
+    } catch (e) {
+      console.error('Failed to load branches:', e);
+      setBranches([]);
+      setStatusMessage(String(e));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCloseSwitchBranch = () => {
+    setShowSwitchBranch(false);
+  };
+
+  const handleCopyBranch = (branchName: string) => {
+    navigator.clipboard.writeText(branchName);
+    setCopyToast(`已复制: ${branchName}`);
+    setTimeout(() => setCopyToast(null), 2000);
   };
 
   const parseCommitsFromOutput = (output: string): CommitInfo[] => {
@@ -125,10 +235,15 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile }) => {
   const executeCommand = async () => {
     if (!command.trim()) return;
     const processedCommand = processCommand(command);
+    const lower = processedCommand.toLowerCase();
 
     if (isGitLogCommand(processedCommand)) {
       // Special handling for git log - open formatted commit dialog
       await loadCommitHistory();
+    } else if (isBranchCommand(lower) && shouldShowDialog(processedCommand)) {
+      // git branch - show selection dialog with all branches
+      await loadAllBranches();
+      setShowSwitchBranch(true);
     } else if (shouldShowDialog(processedCommand)) {
       // Show raw output in a dialog for common multi-line commands
       const repoPath = await window.electron.getCurrentRepoPath();
@@ -306,6 +421,77 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile }) => {
                 关闭
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Switch Branch Dialog */}
+      {showSwitchBranch && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-900 rounded-lg p-6 w-[500px] max-h-[70vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">分支列表</h2>
+              <button
+                className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xl"
+                onClick={handleCloseSwitchBranch}
+              >
+                ✕
+              </button>
+            </div>
+
+            {loading ? (
+              <div className="text-center py-8 text-gray-500">加载中...</div>
+            ) : branches.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                {statusMessage || '暂无分支'}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {branches.map((branch) => (
+                  <div
+                    key={branch.fullName}
+                    className={`p-3 border rounded cursor-pointer ${
+                      branch.isCurrent
+                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 dark:border-blue-500'
+                        : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
+                    }`}
+                    onClick={() => handleCopyBranch(branch.name)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-sm ${branch.isCurrent ? 'font-semibold text-blue-600 dark:text-blue-400' : 'text-gray-800 dark:text-gray-200'}`}>
+                          {branch.name}
+                        </span>
+                        {branch.isRemote && (
+                          <span className="px-1.5 py-0.5 text-xs bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 rounded">
+                            远程
+                          </span>
+                        )}
+                      </div>
+                      {branch.isCurrent && (
+                        <span className="px-2 py-0.5 text-xs bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-200 rounded">
+                          当前
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {statusMessage && !loading && (
+              <div className={`mt-4 p-3 rounded text-sm ${
+                'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200'
+              }`}>
+                {statusMessage}
+              </div>
+            )}
+
+            {copyToast && (
+              <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-4 py-2 rounded text-sm z-50">
+                {copyToast}
+              </div>
+            )}
           </div>
         </div>
       )}
