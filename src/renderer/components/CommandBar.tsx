@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { CommandResult } from '@/shared/types';
 
 import type { FileNode } from '@/shared/types';
@@ -44,6 +44,36 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile }) => {
     originalCommand: '',
   });
   const [commitMessage, setCommitMessage] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Auto-focus command input whenever no dialog is open and not loading
+  useEffect(() => {
+    if (!loading && !showCommitHistory && !showOutputDialog && !showSwitchBranch && !commitMessageDialog.show) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 0);
+    }
+  }, [loading, showCommitHistory, showOutputDialog, showSwitchBranch, commitMessageDialog.show]);
+
+  // Global click handler - keep focus on command input when clicking outside dialogs
+  useEffect(() => {
+    const handleGlobalClick = (e: MouseEvent) => {
+      // Don't steal focus if any dialog is open
+      if (showCommitHistory || showOutputDialog || showSwitchBranch || commitMessageDialog.show) {
+        return;
+      }
+      // Don't steal focus if user clicked outside app or on another input/button
+      // Just keep focus on command input for better UX
+      setTimeout(() => {
+        if (document.activeElement !== inputRef.current && !loading) {
+          inputRef.current?.focus();
+        }
+      }, 0);
+    };
+
+    document.addEventListener('click', handleGlobalClick);
+    return () => document.removeEventListener('click', handleGlobalClick);
+  }, [showCommitHistory, showOutputDialog, showSwitchBranch, commitMessageDialog.show, loading]);
 
   // Close any open dialog on ESC key
   useEffect(() => {
@@ -346,6 +376,7 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile }) => {
     <div className="border-t border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2">
       <div className="flex gap-2">
         <input
+          ref={inputRef}
           type="text"
           className="flex-1 px-3 py-2 text-sm border rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed dark:disabled:bg-gray-800"
           placeholder="输入 Git 命令，按回车执行..."
@@ -462,40 +493,46 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile }) => {
             </div>
 
             <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded overflow-auto max-h-[50vh] text-xs">
-              <pre>
-                {dialogOutput.split('\n').map((line, index) => {
-                  let className = 'block';
-                  if (line.startsWith('+')) {
-                    className = 'block bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300';
-                  } else if (line.startsWith('-')) {
-                    className = 'block bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300';
-                  } else if (line.startsWith('@')) {
-                    className = 'block bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400';
-                  } else if (dialogTitle === 'git status' && (
-                    line.includes('Changes to be committed') ||
-                    line.includes('Changes not staged') ||
-                    line.includes('Untracked files') ||
-                    line.includes('Unmerged paths'))
-                  ) {
-                    className = 'block font-bold text-blue-700 dark:text-blue-300 mt-1';
-                  } else if (dialogTitle === 'git status' && line.trimLeft().startsWith('modified:')) {
-                    className = 'block text-blue-700 dark:text-blue-300';
-                  } else if (dialogTitle === 'git status' && (
-                    line.trimLeft().startsWith('new file:') ||
-                    line.trimLeft().startsWith('added:'))
-                  ) {
-                    className = 'block text-green-700 dark:text-green-300';
-                  } else if (dialogTitle === 'git status' && line.trimLeft().startsWith('deleted:')) {
-                    className = 'block text-red-700 dark:text-red-300';
-                  } else if (dialogTitle === 'git status' && line.trimLeft().startsWith('both modified:')) {
-                    className = 'block text-orange-700 dark:text-orange-300';
-                  }
-                  return (
-                    <div key={index} className={className}>
-                      <code>{line === '' ? '\u00A0' : line}</code>
-                    </div>
-                  );
-                })}
+                    <pre>
+                {!dialogOutput.trim() ? (
+                  <div className="block text-gray-500 italic">
+                    命令执行成功，无输出。
+                  </div>
+                ) : (
+                  dialogOutput.split('\n').map((line, index) => {
+                    let className = 'block';
+                    if (line.startsWith('+')) {
+                      className = 'block bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300';
+                    } else if (line.startsWith('-')) {
+                      className = 'block bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300';
+                    } else if (line.startsWith('@')) {
+                      className = 'block bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400';
+                    } else if (dialogTitle.toLowerCase().includes('git status') && (
+                      line.includes('Changes to be committed') ||
+                      line.includes('Changes not staged') ||
+                      line.includes('Untracked files') ||
+                      line.includes('Unmerged paths'))
+                    ) {
+                      className = 'block font-bold text-blue-700 dark:text-blue-300 mt-1';
+                    } else if (dialogTitle.toLowerCase().includes('git status') && line.trimLeft().startsWith('modified:')) {
+                      className = 'block text-blue-700 dark:text-blue-300';
+                    } else if (dialogTitle.toLowerCase().includes('git status') && (
+                      line.trimLeft().startsWith('new file:') ||
+                      line.trimLeft().startsWith('added:'))
+                    ) {
+                      className = 'block text-green-700 dark:text-green-300';
+                    } else if (dialogTitle.toLowerCase().includes('git status') && line.trimLeft().startsWith('deleted:')) {
+                      className = 'block text-red-700 dark:text-red-300';
+                    } else if (dialogTitle.toLowerCase().includes('git status') && line.trimLeft().startsWith('both modified:')) {
+                      className = 'block text-orange-700 dark:text-orange-300';
+                    }
+                    return (
+                      <div key={index} className={className}>
+                        <code>{line === '' ? '\u00A0' : line}</code>
+                      </div>
+                    );
+                  })
+                )}
               </pre>
             </div>
 
