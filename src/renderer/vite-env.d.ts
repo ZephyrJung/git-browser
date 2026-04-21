@@ -7,9 +7,11 @@ interface ElectronAPI {
   getFileDiff: (repoPath: string, filePath: string) => Promise<any>;
   executeGitCommand: (repoPath: string, command: string) => Promise<any>;
   getCurrentRepoPath: () => Promise<string>;
+  setCurrentRepoPath: (path: string) => Promise<void>;
   getPlatform: () => Promise<string>;
   getRecentFiles: () => Promise<string[]>;
   addRecentFile: (filePath: string, maxCount: number) => Promise<boolean>;
+  selectFolder: () => Promise<string>;
   minimizeWindow: () => void;
   closeWindow: () => void;
 }

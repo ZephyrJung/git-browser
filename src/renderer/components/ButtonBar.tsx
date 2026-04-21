@@ -17,10 +17,10 @@ interface BranchInfo {
 }
 
 interface ButtonBarProps {
-  // TODO: 实现各个按钮的点击处理
+  repoPath: string;
 }
 
-const ButtonBar: React.FC<ButtonBarProps> = () => {
+const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
   const [showCommitHistory, setShowCommitHistory] = useState(false);
   const [commits, setCommits] = useState<CommitInfo[]>([]);
   const [showBranchList, setShowBranchList] = useState(false);
@@ -55,7 +55,6 @@ const ButtonBar: React.FC<ButtonBarProps> = () => {
   const loadCommitHistory = async () => {
     setLoading(true);
     try {
-      const repoPath = await window.electron.getCurrentRepoPath();
       console.log('Loading commit history from:', repoPath);
       // Quote the format string because | is interpreted as pipe by shell
       // Use %ci instead of %ai to get date without timezone offset
@@ -139,7 +138,6 @@ const ButtonBar: React.FC<ButtonBarProps> = () => {
     setLoading(true);
     setStatusMessage(null);
     try {
-      const repoPath = await window.electron.getCurrentRepoPath();
       // Get all branches including both local and remote
       // Format: %(refname:short)|%(HEAD)|%(refname:lstrip=2)
       // For local: main| |main
@@ -224,7 +222,6 @@ const ButtonBar: React.FC<ButtonBarProps> = () => {
     setLoading(true);
     setStatusMessage(null);
     try {
-      const repoPath = await window.electron.getCurrentRepoPath();
       const output: CommandResult = await window.electron.executeGitCommand(repoPath, `git checkout ${branch.fullName}`);
       if (output.success) {
         setStatusMessage(`已切换到分支: ${branch.name}`);
@@ -271,7 +268,6 @@ const ButtonBar: React.FC<ButtonBarProps> = () => {
     setStatusMessage(null);
 
     try {
-      const repoPath = await window.electron.getCurrentRepoPath();
       let successCount = 0;
       let errorMessages: string[] = [];
 

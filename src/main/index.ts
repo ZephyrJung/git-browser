@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, screen } from 'electron'
+import { app, BrowserWindow, ipcMain, screen, dialog } from 'electron'
 import path from 'node:path'
 import { execSync } from 'child_process'
 import { spawn } from 'child_process'
@@ -8,7 +8,7 @@ import { fileService } from './file-service'
 import type { CommandResult } from '@/shared/types'
 
 let mainWindow: BrowserWindow | null
-const currentRepoPath = process.cwd();
+let currentRepoPath = process.cwd();
 
 function createWindow() {
   const isWindows = process.platform === 'win32';
@@ -176,4 +176,20 @@ ipcMain.handle('get-recent-files', () => {
 ipcMain.handle('add-recent-file', (_event, filePath, maxCount) => {
   storageService.addRecentFile(filePath, maxCount)
   return true
+})
+
+ipcMain.handle('select-folder', async () => {
+  if (!mainWindow) return '';
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openDirectory'],
+    title: '选择 Git 仓库文件夹',
+  });
+  if (result.canceled || result.filePaths.length === 0) {
+    return '';
+  }
+  return result.filePaths[0];
+})
+
+ipcMain.handle('set-current-repo-path', (_event, path) => {
+  currentRepoPath = path;
 })

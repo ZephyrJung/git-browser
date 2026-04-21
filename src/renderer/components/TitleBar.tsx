@@ -3,17 +3,28 @@ import React, { useState, useEffect, useRef } from 'react';
 interface TitleBarProps {
   branch: string;
   hasChanges: boolean;
+  repoPath: string;
+  onRepoChange: (newPath: string) => void;
   onSettingsClick: () => void;
 }
 
 const TitleBar: React.FC<TitleBarProps> = ({
   branch,
   hasChanges,
+  repoPath,
+  onRepoChange,
   onSettingsClick,
 }) => {
   const [isWindows, setIsWindows] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const handleOpenRepo = async () => {
+    const selectedPath = await window.electron.selectFolder();
+    if (selectedPath) {
+      onRepoChange(selectedPath);
+    }
+  };
 
   useEffect(() => {
     const checkPlatform = async () => {
@@ -58,8 +69,14 @@ const TitleBar: React.FC<TitleBarProps> = ({
 
   return (
     <div className={`flex items-center h-10 ${isWindows ? 'pl-14 pr-0' : 'px-4'} bg-gray-100 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700 ${isWindows ? 'drag-region' : ''}`}>
-      <div className="flex-1 px-4 text-center text-sm font-medium">
-        <span>{document.title || 'git-browser'}</span>
+      <div className="flex-1 px-4 text-left text-sm font-medium">
+        <span
+          className="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 underline-offset-2 hover:underline"
+          onClick={handleOpenRepo}
+          title="点击选择其他仓库"
+        >
+          {repoPath || 'git-browser'}
+        </span>
         {branch && (
           <span className="ml-2 text-gray-500 dark:text-gray-400">
             [{branch}]

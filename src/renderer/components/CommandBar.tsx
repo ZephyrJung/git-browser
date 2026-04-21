@@ -24,9 +24,10 @@ interface CommitMessageDialog {
 
 interface CommandBarProps {
   selectedFile: FileNode | null;
+  repoPath: string;
 }
 
-const CommandBar: React.FC<CommandBarProps> = ({ selectedFile }) => {
+const CommandBar: React.FC<CommandBarProps> = ({ selectedFile, repoPath }) => {
   const [command, setCommand] = useState('');
   const [result, setResult] = useState<CommandResult | null>(null);
   const [showOutputDialog, setShowOutputDialog] = useState(false);
@@ -142,7 +143,6 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile }) => {
     setLoading(true);
     setStatusMessage(null);
     try {
-      const repoPath = await window.electron.getCurrentRepoPath();
       // Get all branches including both local and remote
       // Format: %(refname:short)|%(HEAD)|%(refname:lstrip=2)
       // For local: main| |main
@@ -255,7 +255,6 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile }) => {
   const loadCommitHistory = async () => {
     setLoading(true);
     try {
-      const repoPath = await window.electron.getCurrentRepoPath();
       // Use the same format as button bar
       // Use double quotes for Windows compatibility (cmd doesn't like single quotes)
       const logOutput: CommandResult = await window.electron.executeGitCommand(repoPath, 'git log --pretty=format:"%h|%an|%ci|%s" -n 100');
@@ -312,7 +311,6 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile }) => {
         setCommand('');
       } else {
         // All other commands - show raw output in dialog
-        const repoPath = await window.electron.getCurrentRepoPath();
         const executionResult: CommandResult = await window.electron.executeGitCommand(repoPath, processedCommand);
         setDialogTitle(processedCommand);
         setDialogOutput(executionResult.output || executionResult.error || '');
@@ -331,7 +329,6 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile }) => {
     }
     setLoading(true);
     try {
-      const repoPath = await window.electron.getCurrentRepoPath();
       // Build the final command: git commit -m "message"
       // Add any extra arguments from original command
       let finalCommand = commitMessageDialog.originalCommand;
@@ -390,7 +387,7 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile }) => {
           onClick={executeCommand}
           disabled={loading}
         >
-          {loading ? '执行中...' : '发送'}
+          发送
         </button>
         {result && !loading && (
           <span
@@ -404,8 +401,8 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile }) => {
           </span>
         )}
         {loading && (
-          <span className="flex items-center px-3 py-2 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-            执行中...
+          <span className="flex items-center px-3 py-2 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 animate-pulse">
+            ⏳
           </span>
         )}
       </div>

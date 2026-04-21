@@ -25,6 +25,14 @@ const App: React.FC = () => {
   const [recentFiles, setRecentFiles] = useState<string[]>([]);
   const isDragging = useRef(false);
 
+  const handleRepoChange = async (newPath: string) => {
+    setRepoPath(newPath);
+    await window.electron.setCurrentRepoPath(newPath);
+    // Update recent files after repo change
+    const updated = await window.electron.getRecentFiles();
+    setRecentFiles(updated);
+  };
+
   useEffect(() => {
     const getRepoPath = async () => {
       const path = await window.electron.getCurrentRepoPath();
@@ -142,6 +150,8 @@ const App: React.FC = () => {
       <TitleBar
         branch={gitStatus.branch}
         hasChanges={gitStatus.hasUncommittedChanges}
+        repoPath={repoPath}
+        onRepoChange={handleRepoChange}
         onSettingsClick={handleToggleSettings}
       />
       <div className="flex flex-1 overflow-hidden">
@@ -168,9 +178,9 @@ const App: React.FC = () => {
         />
       </div>
       {workMode === 'command' ? (
-        <CommandBar selectedFile={selectedFile} />
+        <CommandBar selectedFile={selectedFile} repoPath={repoPath} />
       ) : (
-        <ButtonBar />
+        <ButtonBar repoPath={repoPath} />
       )}
       {settingsOpen && settings && (
         <SettingsDialog onClose={handleCloseSettings} />

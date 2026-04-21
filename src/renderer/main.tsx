@@ -15,9 +15,11 @@ window.electron = {
   getFileDiff: (repoPath: string, filePath: string) => ipcRenderer.invoke('get-file-diff', repoPath, filePath),
   executeGitCommand: (repoPath: string, command: string) => ipcRenderer.invoke('execute-git-command', repoPath, command),
   getCurrentRepoPath: () => ipcRenderer.invoke('get-current-repo-path'),
+  setCurrentRepoPath: (path: string) => ipcRenderer.invoke('set-current-repo-path', path),
   getPlatform: () => ipcRenderer.invoke('get-platform'),
   getRecentFiles: () => ipcRenderer.invoke('get-recent-files'),
   addRecentFile: (filePath: string, maxCount: number) => ipcRenderer.invoke('add-recent-file', filePath, maxCount),
+  selectFolder: () => ipcRenderer.invoke('select-folder'),
   minimizeWindow: () => ipcRenderer.invoke('minimize-window'),
   closeWindow: () => ipcRenderer.invoke('close-window'),
 }
