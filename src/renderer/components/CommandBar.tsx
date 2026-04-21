@@ -257,59 +257,69 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile }) => {
   };
 
   const executeCommand = async () => {
-    if (!command.trim()) return;
+    if (!command.trim() || loading) return;
     const processedCommand = processCommand(command);
     const lower = processedCommand.toLowerCase();
 
-    if (isGitLogCommand(processedCommand)) {
-      // Special handling for git log - open formatted commit dialog
-      await loadCommitHistory();
-      setCommand('');
-    } else if (isBranchCommand(lower)) {
-      // git branch - show selection dialog with all branches
-      await loadAllBranches();
-      setShowSwitchBranch(true);
-      setCommand('');
-    } else if (isGitCommitWithoutMessage(processedCommand)) {
-      // git commit without -m parameter - prompt for commit message
-      setCommitMessageDialog({
-        show: true,
-        originalCommand: processedCommand,
-      });
-      setCommitMessage('');
-      setCommand('');
-    } else {
-      // All other commands - show raw output in dialog
-      const repoPath = await window.electron.getCurrentRepoPath();
-      const executionResult: CommandResult = await window.electron.executeGitCommand(repoPath, processedCommand);
-      setDialogTitle(processedCommand);
-      setDialogOutput(executionResult.output || executionResult.error || '');
-      setShowOutputDialog(true);
-      setResult(executionResult);
-      setCommand('');
+    setLoading(true);
+    try {
+      if (isGitLogCommand(processedCommand)) {
+        // Special handling for git log - open formatted commit dialog
+        await loadCommitHistory();
+        setCommand('');
+      } else if (isBranchCommand(lower)) {
+        // git branch - show selection dialog with all branches
+        await loadAllBranches();
+        setShowSwitchBranch(true);
+        setCommand('');
+      } else if (isGitCommitWithoutMessage(processedCommand)) {
+        // git commit without -m parameter - prompt for commit message
+        setCommitMessageDialog({
+          show: true,
+          originalCommand: processedCommand,
+        });
+        setCommitMessage('');
+        setCommand('');
+      } else {
+        // All other commands - show raw output in dialog
+        const repoPath = await window.electron.getCurrentRepoPath();
+        const executionResult: CommandResult = await window.electron.executeGitCommand(repoPath, processedCommand);
+        setDialogTitle(processedCommand);
+        setDialogOutput(executionResult.output || executionResult.error || '');
+        setShowOutputDialog(true);
+        setResult(executionResult);
+        setCommand('');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleConfirmCommit = async () => {
-    if (!commitMessage.trim()) {
+    if (!commitMessage.trim() || loading) {
       return;
     }
-    const repoPath = await window.electron.getCurrentRepoPath();
-    // Build the final command: git commit -m "message"
-    // Add any extra arguments from original command
-    let finalCommand = commitMessageDialog.originalCommand;
-    if (finalCommand === 'git commit') {
-      finalCommand = `git commit -m "${commitMessage.replace(/"/g, '\\"')}"`;
-    } else {
-      // Insert -m before other flags
-      finalCommand = `${commitMessageDialog.originalCommand} -m "${commitMessage.replace(/"/g, '\\"')}"`;
+    setLoading(true);
+    try {
+      const repoPath = await window.electron.getCurrentRepoPath();
+      // Build the final command: git commit -m "message"
+      // Add any extra arguments from original command
+      let finalCommand = commitMessageDialog.originalCommand;
+      if (finalCommand === 'git commit') {
+        finalCommand = `git commit -m "${commitMessage.replace(/"/g, '\\"')}"`;
+      } else {
+        // Insert -m before other flags
+        finalCommand = `${commitMessageDialog.originalCommand} -m "${commitMessage.replace(/"/g, '\\"')}"`;
+      }
+      const executionResult: CommandResult = await window.electron.executeGitCommand(repoPath, finalCommand);
+      setDialogTitle(finalCommand);
+      setDialogOutput(executionResult.output || executionResult.error || '');
+      setShowOutputDialog(true);
+      setResult(executionResult);
+      setCommitMessageDialog({ show: false, originalCommand: '' });
+    } finally {
+      setLoading(false);
     }
-    const executionResult: CommandResult = await window.electron.executeGitCommand(repoPath, finalCommand);
-    setDialogTitle(finalCommand);
-    setDialogOutput(executionResult.output || executionResult.error || '');
-    setShowOutputDialog(true);
-    setResult(executionResult);
-    setCommitMessageDialog({ show: false, originalCommand: '' });
   };
 
   const handleCancelCommit = () => {
@@ -337,19 +347,21 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile }) => {
       <div className="flex gap-2">
         <input
           type="text"
-          className="flex-1 px-3 py-2 text-sm border rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 outline-none focus:ring-1 focus:ring-blue-500"
+          className="flex-1 px-3 py-2 text-sm border rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed dark:disabled:bg-gray-800"
           placeholder="输入 Git 命令，按回车执行..."
           value={command}
           onChange={e => setCommand(e.target.value)}
           onKeyDown={handleKeyDown}
+          disabled={loading}
         />
         <button
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded hover:bg-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded hover:bg-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
           onClick={executeCommand}
+          disabled={loading}
         >
-          发送
+          {loading ? '执行中...' : '发送'}
         </button>
-        {result && (
+        {result && !loading && (
           <span
             className={`flex items-center px-3 py-2 rounded ${
               result.success
@@ -362,7 +374,7 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile }) => {
         )}
         {loading && (
           <span className="flex items-center px-3 py-2 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-            加载中...
+            执行中...
           </span>
         )}
       </div>

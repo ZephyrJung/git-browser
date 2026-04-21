@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain, screen } from 'electron'
 import path from 'node:path'
 import { execSync } from 'child_process'
+import { spawn } from 'child_process'
 import { storageService } from './storage-service'
 import { gitService } from './git-service'
 import { fileService } from './file-service'
@@ -80,26 +81,68 @@ ipcMain.handle('get-git-status', async (_event, repoPath) => {
 })
 
 ipcMain.handle('execute-git-command', async (_event, repoPath, command): Promise<CommandResult> => {
-  try {
-    const output = execSync(command, {
+  return new Promise((resolve) => {
+    const isWindows = process.platform === 'win32';
+    // Use spawn to capture both stdout and stderr (git push/fetch output to stderr)
+    const child = spawn(isWindows ? 'cmd' : 'bash', [
+      isWindows ? '/c' : '-c',
+      command
+    ], {
       cwd: repoPath,
       encoding: 'utf-8',
-      stdio: [null, 'pipe', 'pipe'],
     });
-    return {
-      success: true,
-      output: output.trim(),
-    };
-  } catch (e: any) {
-    // Some git commands exit with non-zero but still have useful output (e.g. git diff)
-    // Still return the output we have
-    const output = e.stdout || e.stderr || e.message || String(e);
-    return {
-      success: false,
-      output: output.trim(),
-      error: String(e),
-    };
-  }
+
+    let stdout = '';
+    let stderr = '';
+    let timeoutId: NodeJS.Timeout | null = null;
+
+    // Set 5 minute timeout to prevent hanging on interactive commands
+    timeoutId = setTimeout(() => {
+      child.kill();
+      resolve({
+        success: false,
+        output: '命令执行超时（5分钟）。可能需要输入凭证，请先在命令行配置好 Git 凭证缓存。',
+        error: 'ETIMEDOUT',
+      });
+    }, 5 * 60 * 1000);
+
+    child.stdout.on('data', (data) => {
+      stdout += data.toString();
+    });
+
+    child.stderr.on('data', (data) => {
+      stderr += data.toString();
+    });
+
+    child.on('close', (code) => {
+      if (timeoutId) clearTimeout(timeoutId);
+
+      // Combine both stdout and stderr - git puts useful info in stderr
+      const combinedOutput = (stdout + '\n' + stderr).trim();
+
+      if (code === 0) {
+        resolve({
+          success: true,
+          output: combinedOutput,
+        });
+      } else {
+        resolve({
+          success: false,
+          output: combinedOutput || `进程退出码 ${code}`,
+          error: `Exit code ${code}`,
+        });
+      }
+    });
+
+    child.on('error', (err) => {
+      if (timeoutId) clearTimeout(timeoutId);
+      resolve({
+        success: false,
+        output: err.message,
+        error: String(err),
+      });
+    });
+  });
 })
 
 ipcMain.handle('get-file-diff', async (_event, repoPath, filePath) => {

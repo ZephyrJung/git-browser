@@ -3,7 +3,7 @@ var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { en
 var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
 import { app, BrowserWindow, ipcMain, screen } from "electron";
 import path$1 from "node:path";
-import { execSync } from "child_process";
+import { execSync, spawn } from "child_process";
 import fs from "fs";
 import path from "path";
 import os from "os";
@@ -624,10 +624,17 @@ var implementation$1 = function bind(that) {
 var implementation = implementation$1;
 var functionBind = Function.prototype.bind || implementation;
 var functionCall = Function.prototype.call;
-var functionApply = Function.prototype.apply;
+var functionApply;
+var hasRequiredFunctionApply;
+function requireFunctionApply() {
+  if (hasRequiredFunctionApply) return functionApply;
+  hasRequiredFunctionApply = 1;
+  functionApply = Function.prototype.apply;
+  return functionApply;
+}
 var reflectApply = typeof Reflect !== "undefined" && Reflect && Reflect.apply;
 var bind$2 = functionBind;
-var $apply$1 = functionApply;
+var $apply$1 = requireFunctionApply();
 var $call$2 = functionCall;
 var $reflectApply = reflectApply;
 var actualApply = $reflectApply || bind$2.call($call$2, $apply$1);
@@ -747,7 +754,7 @@ var hasSymbols = requireHasSymbols()();
 var getProto = requireGetProto();
 var $ObjectGPO = requireObject_getPrototypeOf();
 var $ReflectGPO = requireReflect_getPrototypeOf();
-var $apply = functionApply;
+var $apply = requireFunctionApply();
 var $call = functionCall;
 var needsEval = {};
 var TypedArray = typeof Uint8Array === "undefined" || !getProto ? undefined$1 : getProto(Uint8Array);
@@ -1388,7 +1395,7 @@ function requireApplyBind() {
   if (hasRequiredApplyBind) return applyBind;
   hasRequiredApplyBind = 1;
   var bind3 = functionBind;
-  var $apply2 = functionApply;
+  var $apply2 = requireFunctionApply();
   var actualApply$1 = actualApply;
   applyBind = function applyBind2() {
     return actualApply$1(bind3, $apply2, arguments);
@@ -18270,24 +18277,57 @@ ipcMain.handle("get-git-status", async (_event, repoPath) => {
   return gitService.getStatus(repoPath);
 });
 ipcMain.handle("execute-git-command", async (_event, repoPath, command) => {
-  try {
-    const output = execSync(command, {
+  return new Promise((resolve) => {
+    const isWindows = process.platform === "win32";
+    const child = spawn(isWindows ? "cmd" : "bash", [
+      isWindows ? "/c" : "-c",
+      command
+    ], {
       cwd: repoPath,
-      encoding: "utf-8",
-      stdio: [null, "pipe", "pipe"]
+      encoding: "utf-8"
     });
-    return {
-      success: true,
-      output: output.trim()
-    };
-  } catch (e) {
-    const output = e.stdout || e.stderr || e.message || String(e);
-    return {
-      success: false,
-      output: output.trim(),
-      error: String(e)
-    };
-  }
+    let stdout = "";
+    let stderr = "";
+    let timeoutId = null;
+    timeoutId = setTimeout(() => {
+      child.kill();
+      resolve({
+        success: false,
+        output: "命令执行超时（5分钟）。可能需要输入凭证，请先在命令行配置好 Git 凭证缓存。",
+        error: "ETIMEDOUT"
+      });
+    }, 5 * 60 * 1e3);
+    child.stdout.on("data", (data) => {
+      stdout += data.toString();
+    });
+    child.stderr.on("data", (data) => {
+      stderr += data.toString();
+    });
+    child.on("close", (code) => {
+      if (timeoutId) clearTimeout(timeoutId);
+      const combinedOutput = (stdout + "\n" + stderr).trim();
+      if (code === 0) {
+        resolve({
+          success: true,
+          output: combinedOutput
+        });
+      } else {
+        resolve({
+          success: false,
+          output: combinedOutput || `进程退出码 ${code}`,
+          error: `Exit code ${code}`
+        });
+      }
+    });
+    child.on("error", (err2) => {
+      if (timeoutId) clearTimeout(timeoutId);
+      resolve({
+        success: false,
+        output: err2.message,
+        error: String(err2)
+      });
+    });
+  });
 });
 ipcMain.handle("get-file-diff", async (_event, repoPath, filePath) => {
   return gitService.getFileDiff(repoPath, filePath);
