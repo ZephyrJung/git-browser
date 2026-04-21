@@ -17,6 +17,11 @@ interface BranchInfo {
   isRemote: boolean;
 }
 
+interface CommitMessageDialog {
+  show: boolean;
+  originalCommand: string;
+}
+
 interface CommandBarProps {
   selectedFile: FileNode | null;
 }
@@ -34,6 +39,11 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile }) => {
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [copyToast, setCopyToast] = useState<string | null>(null);
+  const [commitMessageDialog, setCommitMessageDialog] = useState<CommitMessageDialog>({
+    show: false,
+    originalCommand: '',
+  });
+  const [commitMessage, setCommitMessage] = useState('');
 
   // Close any open dialog on ESC key
   useEffect(() => {
@@ -42,11 +52,12 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile }) => {
         if (showCommitHistory) setShowCommitHistory(false);
         if (showOutputDialog) setShowOutputDialog(false);
         if (showSwitchBranch) setShowSwitchBranch(false);
+        if (commitMessageDialog.show) setCommitMessageDialog({ show: false, originalCommand: '' });
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showCommitHistory, showOutputDialog, showSwitchBranch]);
+  }, [showCommitHistory, showOutputDialog, showSwitchBranch, commitMessageDialog.show]);
 
   const isGitLogCommand = (cmd: string): boolean => {
     const trimmed = cmd.trim().toLowerCase();
@@ -60,12 +71,25 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile }) => {
     return trimmed === 'git branch';
   };
 
+  const isGitCommitWithoutMessage = (cmd: string): boolean => {
+    const trimmed = cmd.trim().toLowerCase();
+    // Check if this is a git commit command without -m/--message parameter
+    if (!trimmed.startsWith('git commit')) {
+      return false;
+    }
+    // If it's just "git commit" with no arguments
+    if (trimmed === 'git commit') {
+      return true;
+    }
+    // If it has arguments but no -m or --message
+    return !trimmed.includes(' -m') && !trimmed.includes(' --message');
+  };
+
   const shouldShowDialog = (cmd: string): boolean => {
     const trimmed = cmd.trim().toLowerCase();
-    // Common commands that produce multi-line output should open in dialog
-    const dialogCommands = ['git status', 'git diff'];
-    return dialogCommands.some(c => trimmed === c || trimmed.startsWith(c + ' ')) ||
-           isBranchCommand(trimmed);
+    // Already handled by specialized UI: git log, git branch (no args)
+    // All other commands should show output in dialog
+    return !isGitLogCommand(trimmed) && !isBranchCommand(trimmed);
   };
 
   const processCommand = (cmd: string): string => {
@@ -240,25 +264,57 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile }) => {
     if (isGitLogCommand(processedCommand)) {
       // Special handling for git log - open formatted commit dialog
       await loadCommitHistory();
-    } else if (isBranchCommand(lower) && shouldShowDialog(processedCommand)) {
+      setCommand('');
+    } else if (isBranchCommand(lower)) {
       // git branch - show selection dialog with all branches
       await loadAllBranches();
       setShowSwitchBranch(true);
-    } else if (shouldShowDialog(processedCommand)) {
-      // Show raw output in a dialog for common multi-line commands
+      setCommand('');
+    } else if (isGitCommitWithoutMessage(processedCommand)) {
+      // git commit without -m parameter - prompt for commit message
+      setCommitMessageDialog({
+        show: true,
+        originalCommand: processedCommand,
+      });
+      setCommitMessage('');
+      setCommand('');
+    } else {
+      // All other commands - show raw output in dialog
       const repoPath = await window.electron.getCurrentRepoPath();
       const executionResult: CommandResult = await window.electron.executeGitCommand(repoPath, processedCommand);
       setDialogTitle(processedCommand);
       setDialogOutput(executionResult.output || executionResult.error || '');
       setShowOutputDialog(true);
       setResult(executionResult);
-    } else {
-      // Normal command execution - just show status
-      const repoPath = await window.electron.getCurrentRepoPath();
-      const executionResult: CommandResult = await window.electron.executeGitCommand(repoPath, processedCommand);
-      setResult(executionResult);
+      setCommand('');
     }
-    setCommand('');
+  };
+
+  const handleConfirmCommit = async () => {
+    if (!commitMessage.trim()) {
+      return;
+    }
+    const repoPath = await window.electron.getCurrentRepoPath();
+    // Build the final command: git commit -m "message"
+    // Add any extra arguments from original command
+    let finalCommand = commitMessageDialog.originalCommand;
+    if (finalCommand === 'git commit') {
+      finalCommand = `git commit -m "${commitMessage.replace(/"/g, '\\"')}"`;
+    } else {
+      // Insert -m before other flags
+      finalCommand = `${commitMessageDialog.originalCommand} -m "${commitMessage.replace(/"/g, '\\"')}"`;
+    }
+    const executionResult: CommandResult = await window.electron.executeGitCommand(repoPath, finalCommand);
+    setDialogTitle(finalCommand);
+    setDialogOutput(executionResult.output || executionResult.error || '');
+    setShowOutputDialog(true);
+    setResult(executionResult);
+    setCommitMessageDialog({ show: false, originalCommand: '' });
+  };
+
+  const handleCancelCommit = () => {
+    setCommitMessageDialog({ show: false, originalCommand: '' });
+    setCommitMessage('');
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -510,6 +566,50 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile }) => {
                 {copyToast}
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Commit Message Input Dialog */}
+      {commitMessageDialog.show && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-900 rounded-lg p-6 w-[600px]">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">输入提交信息</h2>
+              <button
+                className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xl"
+                onClick={handleCancelCommit}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="mb-4">
+              <textarea
+                className="w-full px-3 py-2 text-sm border rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 outline-none focus:ring-1 focus:ring-blue-500"
+                placeholder="输入提交信息..."
+                rows={4}
+                value={commitMessage}
+                onChange={e => setCommitMessage(e.target.value)}
+                autoFocus
+              />
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <button
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                onClick={handleCancelCommit}
+              >
+                取消
+              </button>
+              <button
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                onClick={handleConfirmCommit}
+                disabled={!commitMessage.trim()}
+              >
+                提交
+              </button>
+            </div>
           </div>
         </div>
       )}

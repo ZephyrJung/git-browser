@@ -46,7 +46,7 @@ const FileTree: React.FC<FileTreeProps> = ({
     localStorage.setItem(FAVORITES_KEY, JSON.stringify(Array.from(favorites)));
   }, [favorites]);
 
-  // Reload files whenever tab changes or showHidden/repoPath changes
+  // Reload files whenever tab changes or showHidden/repoPath changes or gitStatus changes
   // to ensure we always get the latest file list
   useEffect(() => {
     const loadFiles = async () => {
@@ -56,7 +56,7 @@ const FileTree: React.FC<FileTreeProps> = ({
       setRootFiles(files);
     };
     loadFiles();
-  }, [showHidden, repoPath, activeTab]);
+  }, [showHidden, repoPath, activeTab, gitStatus]);
 
   const toggleExpand = (path: string) => {
     const newExpanded = new Set(expandedPaths);
