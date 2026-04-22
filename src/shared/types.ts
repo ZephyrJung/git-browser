@@ -35,10 +35,15 @@ export interface HttpCredential {
   username: string;
 }
 
+export interface GitFileStatus {
+  status: FileNode['status'];
+  staged: boolean;
+}
+
 export interface GitStatus {
   branch: string;
   hasUncommittedChanges: boolean;
-  files: { [path: string]: FileNode['status'] };
+  files: { [path: string]: GitFileStatus };
 }
 
 export interface CommandResult {

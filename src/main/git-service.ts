@@ -3,7 +3,7 @@
 import git from 'isomorphic-git';
 import fs from 'fs';
 import { execSync } from 'child_process';
-import type { GitStatus } from '@/shared/types';
+import type { GitStatus, FileNode } from '@/shared/types';
 
 import type { LineInfo } from '@/shared/types';
 
@@ -22,11 +22,13 @@ export class GitService {
 
       for (const line of lines) {
         // Format: "XY filepath" where X=index, Y=working tree
+        // X (first char) = index status. If X is not space/?, file is staged
         // We just care about the final state in working tree
         const trimmed = line.trim();
         if (!trimmed) continue;
 
         const code = trimmed.substring(0, 2);
+        const indexCode = code[0];
         let filePath = trimmed.substring(2).trim();
 
         // Remove quotes if present (for files with spaces)
@@ -38,24 +40,32 @@ export class GitService {
         filePath = filePath.replace(/\\/g, '/');
 
         // Determine status based on git status output
+        let status: FileNode['status'];
         if (code.includes('U')) {
-          files[filePath] = 'conflict';
+          status = 'conflict';
         } else if (code === '??') {
           // Untracked = new file
-          files[filePath] = 'new';
+          status = 'new';
         } else if (code.includes('A')) {
           // Added = new
-          files[filePath] = 'new';
+          status = 'new';
         } else if (code.includes('M')) {
           // Modified
-          files[filePath] = 'modified';
+          status = 'modified';
         } else if (code.includes('D')) {
           // Deleted
-          files[filePath] = 'deleted';
+          status = 'deleted';
         } else if (code.includes('R')) {
           // Renamed = treated as modified
-          files[filePath] = 'modified';
+          status = 'modified';
+        } else {
+          status = 'normal';
         }
+
+        // Check if file is staged (index has change, first character is not space)
+        const staged = indexCode !== ' ' && indexCode !== '?';
+
+        files[filePath] = { status, staged };
       }
 
       return {

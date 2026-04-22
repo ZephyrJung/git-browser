@@ -34,7 +34,7 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
   const [commitMessage, setCommitMessage] = useState('');
   const [gitUser, setGitUser] = useState({ name: '', email: '' });
-  const [gitStatusCache, setGitStatusCache] = useState<{ files: { [path: string]: string } }>({ files: {} });
+  const [gitStatusCache, setGitStatusCache] = useState<{ files: { [path: string]: { status: string; staged: boolean } } }>({ files: {} });
   const [showPullResult, setShowPullResult] = useState(false);
   const [pullResultMessage, setPullResultMessage] = useState('');
   const [pullIsSuccess, setPullIsSuccess] = useState(false);
@@ -313,12 +313,18 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
     setStatusMessage(null);
     try {
       // Get git status which gives us changed files
-      const status: { files: { [path: string]: string } } = await window.electron.getGitStatus(repoPath);
+      const status = await window.electron.getGitStatus(repoPath);
       setGitStatusCache(status);
       const files = Object.keys(status.files);
       setChangedFiles(files);
-      // Default select all
-      setSelectedFiles(new Set(files));
+      // Default select only files already staged (git add'ed)
+      const defaultSelected = new Set<string>();
+      files.forEach(file => {
+        if (status.files[file]?.staged) {
+          defaultSelected.add(file);
+        }
+      });
+      setSelectedFiles(defaultSelected);
       // Get git user info
       const userInfo = await window.electron.getGitUserInfo(repoPath);
       setGitUser(userInfo);
@@ -811,7 +817,8 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
 
                   <div className="space-y-2 max-h-[30vh] overflow-y-auto border border-gray-200 dark:border-gray-700 rounded p-2">
                     {changedFiles.map(filePath => {
-                      const status = gitStatusCache.files?.[filePath] || 'normal';
+                      const fileInfo = gitStatusCache.files?.[filePath];
+                      const status = fileInfo?.status || 'normal';
                       const isSelected = selectedFiles.has(filePath);
                       const fileName = filePath.split('/').pop() || filePath;
                       const colorClass = getStatusColorClass(status);
@@ -856,7 +863,13 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
                   <textarea
                     value={commitMessage}
                     onChange={(e) => setCommitMessage(e.target.value)}
-                    placeholder="输入提交信息..."
+                    onKeyDown={(e) => {
+                      // Ctrl/Cmd + Enter to submit
+                      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                        handleCommitPush();
+                      }
+                    }}
+                    placeholder="输入提交信息... (Ctrl/Cmd + Enter 提交)"
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 min-h-[80px]"
                   />
                 </div>
@@ -890,7 +903,13 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
                   <button
                     className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
                     onClick={handleCommitPush}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        handleCommitPush();
+                      }
+                    }}
                     disabled={loading}
+                    autoFocus
                   >
                     {loading ? '执行中...' : '确认提交并推送'}
                   </button>
@@ -933,6 +952,12 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
               <button
                 className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
                 onClick={handleClosePullResult}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleClosePullResult();
+                  }
+                }}
+                autoFocus
               >
                 关闭
               </button>

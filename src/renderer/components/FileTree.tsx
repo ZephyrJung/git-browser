@@ -86,7 +86,8 @@ const FileTree: React.FC<FileTreeProps> = ({
   };
 
   const getFileStatus = (path: string): FileNode['status'] => {
-    return gitStatus.files[path] || 'normal';
+    const fileInfo = gitStatus.files[path];
+    return fileInfo ? fileInfo.status : 'normal';
   };
 
   // Filter nodes based on active tab and search
