@@ -35,6 +35,9 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
   const [commitMessage, setCommitMessage] = useState('');
   const [gitUser, setGitUser] = useState({ name: '', email: '' });
   const [gitStatusCache, setGitStatusCache] = useState<{ files: { [path: string]: string } }>({ files: {} });
+  const [showPullResult, setShowPullResult] = useState(false);
+  const [pullResultMessage, setPullResultMessage] = useState('');
+  const [pullIsSuccess, setPullIsSuccess] = useState(false);
 
   // Close any open dialog on ESC key
   useEffect(() => {
@@ -44,11 +47,12 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
         if (showBranchList) setShowBranchList(false);
         if (showBranchManagement) setShowBranchManagement(false);
         if (showCommitPushDialog) setShowCommitPushDialog(false);
+        if (showPullResult) setShowPullResult(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showCommitHistory, showBranchList, showBranchManagement, showCommitPushDialog]);
+  }, [showCommitHistory, showBranchList, showBranchManagement, showCommitPushDialog, showPullResult]);
 
   const buttons = [
     { id: 'log', label: '提交历史' },
@@ -127,8 +131,52 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
       setShowBranchManagement(true);
     } else if (id === 'push') {
       await openCommitPushDialog();
+    } else if (id === 'pull') {
+      await handlePull();
     }
     // TODO: 其他按钮弹出对应操作对话框
+  };
+
+  const handlePull = async () => {
+    setLoading(true);
+    setPullIsSuccess(false);
+    try {
+      const output = await window.electron.executeGitCommand(repoPath, 'git pull');
+
+      if (output.success) {
+        // Check if already up to date (english and chinese messages)
+        if (output.output.includes('Already up to date') || output.output.includes('已是最新')) {
+          setPullResultMessage('本地已是最新代码');
+        } else {
+          // Get first non-empty line for simple message
+          const firstLine = output.output.split('\n').find((line: string) => line.trim());
+          setPullResultMessage(firstLine ? `拉取成功: ${firstLine}` : '拉取成功');
+        }
+        setPullIsSuccess(true);
+        // Refresh page after successful pull to update git status
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      } else {
+        // Simplify error message - extract first meaningful line
+        const lines = output.output.trim().split('\n').filter((line: string) => line.trim() && !line.startsWith(' '));
+        const simplifiedError = lines.length > 0 ? lines[0] : '拉取失败，请检查网络或权限';
+        setPullResultMessage(simplifiedError);
+        setPullIsSuccess(false);
+      }
+      setShowPullResult(true);
+    } catch (e) {
+      console.error('Pull failed:', e);
+      setPullResultMessage('拉取失败，请重试');
+      setPullIsSuccess(false);
+      setShowPullResult(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClosePullResult = () => {
+    setShowPullResult(false);
   };
 
   const handleClose = () => {
@@ -456,8 +504,9 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
         {buttons.map(btn => (
           <button
             key={btn.id}
-            className="px-4 py-2 text-sm font-medium border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="px-4 py-2 text-sm font-medium border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => handleClick(btn.id)}
+            disabled={loading}
           >
             {btn.label}
           </button>
@@ -848,6 +897,46 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
                 </div>
               </>
             )}
+
+            {copyToast && (
+              <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-4 py-2 rounded text-sm z-50">
+                {copyToast}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Pull Result Dialog */}
+      {showPullResult && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-900 rounded-lg p-6 w-[500px]">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">拉取最新</h2>
+              <button
+                className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xl"
+                onClick={handleClosePullResult}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className={`mb-6 p-4 rounded text-center ${
+              pullIsSuccess
+                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
+                : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200'
+            }`}>
+              <p className="text-lg">{pullResultMessage}</p>
+            </div>
+
+            <div className="flex justify-end">
+              <button
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                onClick={handleClosePullResult}
+              >
+                关闭
+              </button>
+            </div>
 
             {copyToast && (
               <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-4 py-2 rounded text-sm z-50">
