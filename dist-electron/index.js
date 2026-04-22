@@ -18160,6 +18160,28 @@ class GitService {
       }
     }
   }
+  async getGitUserInfo(repoPath) {
+    try {
+      let name = "";
+      let email = "";
+      try {
+        name = execSync("git config --get user.name", { cwd: repoPath, encoding: "utf-8" }).trim();
+        email = execSync("git config --get user.email", { cwd: repoPath, encoding: "utf-8" }).trim();
+      } catch (repoErr) {
+        try {
+          name = execSync("git config --global --get user.name", { encoding: "utf-8" }).trim();
+          email = execSync("git config --global --get user.email", { encoding: "utf-8" }).trim();
+        } catch (globalErr) {
+          console.error("Failed to get git user info from both repository and global config:", repoErr, globalErr);
+          return { name: "", email: "" };
+        }
+      }
+      return { name, email };
+    } catch (e) {
+      console.error("Failed to get git user info:", e);
+      return { name: "", email: "" };
+    }
+  }
 }
 const gitService = new GitService();
 class FileService {
@@ -18324,6 +18346,14 @@ ipcMain.handle("execute-git-command", async (_event, repoPath, command) => {
 });
 ipcMain.handle("get-file-diff", async (_event, repoPath, filePath) => {
   return gitService.getFileDiff(repoPath, filePath);
+});
+ipcMain.handle("get-git-user-info", async (_event, repoPath) => {
+  try {
+    return await gitService.getGitUserInfo(repoPath);
+  } catch (e) {
+    console.error("Failed to get git user info:", e);
+    return { name: "", email: "" };
+  }
 });
 ipcMain.handle("get-current-repo-path", () => {
   return currentRepoPath;

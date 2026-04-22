@@ -5,6 +5,7 @@ interface ElectronAPI {
   listFiles: (dirPath: string, showHidden: boolean) => Promise<any>;
   getGitStatus: (repoPath: string) => Promise<any>;
   getFileDiff: (repoPath: string, filePath: string) => Promise<any>;
+  getGitUserInfo: (repoPath: string) => Promise<{ name: string; email: string }>;
   executeGitCommand: (repoPath: string, command: string) => Promise<any>;
   getCurrentRepoPath: () => Promise<string>;
   setCurrentRepoPath: (path: string) => Promise<void>;

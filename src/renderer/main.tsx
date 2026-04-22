@@ -13,6 +13,7 @@ window.electron = {
   listFiles: (dirPath: string, showHidden: boolean) => ipcRenderer.invoke('list-files', dirPath, showHidden),
   getGitStatus: (repoPath: string) => ipcRenderer.invoke('get-git-status', repoPath),
   getFileDiff: (repoPath: string, filePath: string) => ipcRenderer.invoke('get-file-diff', repoPath, filePath),
+  getGitUserInfo: (repoPath: string) => ipcRenderer.invoke('get-git-user-info', repoPath),
   executeGitCommand: (repoPath: string, command: string) => ipcRenderer.invoke('execute-git-command', repoPath, command),
   getCurrentRepoPath: () => ipcRenderer.invoke('get-current-repo-path'),
   setCurrentRepoPath: (path: string) => ipcRenderer.invoke('set-current-repo-path', path),

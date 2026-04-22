@@ -181,6 +181,33 @@ export class GitService {
       }
     }
   }
+
+  async getGitUserInfo(repoPath: string): Promise<{ name: string; email: string }> {
+    try {
+      // First try repository-specific config
+      let name = '';
+      let email = '';
+
+      try {
+        name = execSync('git config --get user.name', { cwd: repoPath, encoding: 'utf-8' }).trim();
+        email = execSync('git config --get user.email', { cwd: repoPath, encoding: 'utf-8' }).trim();
+      } catch (repoErr) {
+        // Fall back to global config if repository config fails
+        try {
+          name = execSync('git config --global --get user.name', { encoding: 'utf-8' }).trim();
+          email = execSync('git config --global --get user.email', { encoding: 'utf-8' }).trim();
+        } catch (globalErr) {
+          console.error('Failed to get git user info from both repository and global config:', repoErr, globalErr);
+          return { name: '', email: '' };
+        }
+      }
+
+      return { name, email };
+    } catch (e) {
+      console.error('Failed to get git user info:', e);
+      return { name: '', email: '' };
+    }
+  }
 }
 
 export const gitService = new GitService();

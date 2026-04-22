@@ -149,6 +149,15 @@ ipcMain.handle('get-file-diff', async (_event, repoPath, filePath) => {
   return gitService.getFileDiff(repoPath, filePath);
 })
 
+ipcMain.handle('get-git-user-info', async (_event, repoPath) => {
+  try {
+    return await gitService.getGitUserInfo(repoPath);
+  } catch (e) {
+    console.error('Failed to get git user info:', e);
+    return { name: '', email: '' };
+  }
+})
+
 ipcMain.handle('get-current-repo-path', () => {
   return currentRepoPath;
 })
