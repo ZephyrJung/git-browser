@@ -38,6 +38,16 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
   const [showPullResult, setShowPullResult] = useState(false);
   const [pullResultMessage, setPullResultMessage] = useState('');
   const [pullIsSuccess, setPullIsSuccess] = useState(false);
+  const [showDiffDialog, setShowDiffDialog] = useState(false);
+  const [diffSelectedBranch, setDiffSelectedBranch] = useState<string>('');
+  const [diffResult, setDiffResult] = useState<{ path: string; changed: boolean }[]>([]);
+  const [showDiffViewer, setShowDiffViewer] = useState(false);
+  const [selectedDiffFile, setSelectedDiffFile] = useState<string>('');
+  const [leftContent, setLeftContent] = useState('');
+  const [rightContent, setRightContent] = useState<string>('');
+  const [currentBranchName, setCurrentBranchName] = useState<string>('');
+  const [compareBranchName, setCompareBranchName] = useState<string>('');
+  const [loadingDiff, setLoadingDiff] = useState(false);
 
   // Close any open dialog on ESC key
   useEffect(() => {
@@ -48,11 +58,12 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
         if (showBranchManagement) setShowBranchManagement(false);
         if (showCommitPushDialog) setShowCommitPushDialog(false);
         if (showPullResult) setShowPullResult(false);
+        if (showDiffDialog) setShowDiffDialog(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showCommitHistory, showBranchList, showBranchManagement, showCommitPushDialog, showPullResult]);
+  }, [showCommitHistory, showBranchList, showBranchManagement, showCommitPushDialog, showPullResult, showDiffDialog, showDiffViewer]);
 
   const buttons = [
     { id: 'log', label: '提交历史' },
@@ -133,6 +144,8 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
       await openCommitPushDialog();
     } else if (id === 'pull') {
       await handlePull();
+    } else if (id === 'diff') {
+      await openDiffDialog();
     }
     // TODO: 其他按钮弹出对应操作对话框
   };
@@ -177,6 +190,135 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
 
   const handleClosePullResult = () => {
     setShowPullResult(false);
+  };
+
+  const openDiffDialog = async () => {
+    await loadBranches();
+    setDiffSelectedBranch('');
+    setDiffResult([]);
+    setShowDiffDialog(true);
+  };
+
+  const handleCloseDiffDialog = () => {
+    setShowDiffDialog(false);
+  };
+
+  const handleCloseDiffViewer = () => {
+    setShowDiffViewer(false);
+    setSelectedDiffFile('');
+    setLeftContent('');
+    setRightContent('');
+  };
+
+  const handleDiffFileClick = async (filePath: string) => {
+    setSelectedDiffFile(filePath);
+    // Load content for both branches
+    const content1 = await getFileContentFromBranch(repoPath, currentBranchName, filePath);
+    const content2 = await getFileContentFromBranch(repoPath, compareBranchName, filePath);
+    setLeftContent(content1);
+    setRightContent(content2);
+  };
+
+  const toggleDiffBranchSelection = (branchName: string) => {
+    // If clicking the same branch, unselect it
+    if (diffSelectedBranch === branchName) {
+      setDiffSelectedBranch('');
+    } else {
+      // Select the clicked branch, compare with current branch
+      setDiffSelectedBranch(branchName);
+    }
+  };
+
+  const compareBranches = async () => {
+    if (!diffSelectedBranch) {
+      setStatusMessage('请选择一个分支进行比对');
+      return;
+    }
+
+    setLoadingDiff(true);
+    setStatusMessage(null);
+
+    try {
+      // Get current branch name
+      const currentBranchOutput = await window.electron.executeGitCommand(repoPath, 'git rev-parse --abbrev-ref HEAD');
+      if (!currentBranchOutput.success) {
+        setStatusMessage('获取当前分支名称失败');
+        setLoadingDiff(false);
+        return;
+      }
+      const currentBranch = currentBranchOutput.output.trim();
+      const compareBranch = diffSelectedBranch;
+
+      // Save branch names to state
+      setCurrentBranchName(currentBranch);
+      setCompareBranchName(compareBranch);
+
+      // Get all files tracked by both branches using git ls-tree
+      // Recursively list all files in the branch
+      const output1 = await window.electron.executeGitCommand(repoPath, `git ls-tree -r ${currentBranch} --name-only`);
+      const output2 = await window.electron.executeGitCommand(repoPath, `git ls-tree -r ${compareBranch} --name-only`);
+
+      if (!output1.success || !output2.success) {
+        setStatusMessage('获取文件列表失败');
+        setLoadingDiff(false);
+        return;
+      }
+
+      const files1 = output1.output.trim().split('\n').filter((f: string) => f.trim());
+      const files2 = output2.output.trim().split('\n').filter((f: string) => f.trim());
+
+      const allFiles = new Set([...files1, ...files2]);
+      const diffResult: { path: string; changed: boolean }[] = [];
+
+      // Compare content file by file
+      for (const filePath of allFiles) {
+        try {
+          // Get content from both branches
+          const content1 = await getFileContentFromBranch(repoPath, currentBranch, filePath);
+          const content2 = await getFileContentFromBranch(repoPath, compareBranch, filePath);
+
+          if (content1 !== content2) {
+            diffResult.push({ path: filePath, changed: true });
+          }
+        } catch (e) {
+          // If file doesn't exist in one branch, it's changed
+          diffResult.push({ path: filePath, changed: true });
+        }
+      }
+
+      setDiffResult(diffResult);
+
+      // Close selection dialog and open diff viewer
+      setShowDiffDialog(false);
+      // If no changes, just show message in selection dialog
+      if (diffResult.length === 0) {
+        setStatusMessage(`${currentBranch} ↔ ${compareBranch}\n两个分支内容完全一致`);
+        setLoadingDiff(false);
+      } else {
+        // Open diff viewer with first file selected
+        setSelectedDiffFile(diffResult[0].path);
+        // Load content for first file
+        const firstContent1 = await getFileContentFromBranch(repoPath, currentBranch, diffResult[0].path);
+        const firstContent2 = await getFileContentFromBranch(repoPath, compareBranch, diffResult[0].path);
+        setLeftContent(firstContent1);
+        setRightContent(firstContent2);
+        setShowDiffViewer(true);
+        setLoadingDiff(false);
+      }
+    } catch (e) {
+      console.error('Compare branches failed:', e);
+      setStatusMessage(`比对失败: ${String(e)}`);
+      setLoadingDiff(false);
+    }
+  };
+
+  // Get file content from a specific branch using git show
+  const getFileContentFromBranch = async (repoPath: string, branch: string, filePath: string): Promise<string> => {
+    const output = await window.electron.executeGitCommand(repoPath, `git show ${branch}:${filePath}`);
+    if (!output.success) {
+      throw new Error(`Failed to get ${filePath} from ${branch}`);
+    }
+    return output.output;
   };
 
   const handleClose = () => {
@@ -874,11 +1016,9 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
                   />
                 </div>
 
-                {(gitUser.name || gitUser.email) && (
+                {gitUser.email && (
                   <div className="mb-6 text-sm text-gray-600 dark:text-gray-400">
-                    {gitUser.name && <span>{gitUser.name}</span>}
-                    {gitUser.name && gitUser.email && <span className="mx-2">•</span>}
-                    {gitUser.email && <span>{gitUser.email}</span>}
+                    {gitUser.email}
                   </div>
                 )}
 
@@ -955,6 +1095,223 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     handleClosePullResult();
+                  }
+                }}
+                autoFocus
+              >
+                关闭
+              </button>
+            </div>
+
+            {copyToast && (
+              <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-4 py-2 rounded text-sm z-50">
+                {copyToast}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Branch Diff Dialog */}
+      {showDiffDialog && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-900 rounded-lg p-6 w-[800px] max-h-[80vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">分支比对</h2>
+              <button
+                className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xl"
+                onClick={handleCloseDiffDialog}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="mb-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                当前分支 ⟷ 你选择的分支
+              </p>
+              <div className="space-y-2 max-h-[40vh] overflow-y-auto border border-gray-200 dark:border-gray-700 rounded p-2">
+                {branches.map(branch => {
+                  const isSelected = diffSelectedBranch === branch.name;
+                  return (
+                    <div
+                      key={branch.fullName}
+                      className={`flex items-center gap-2 p-3 rounded cursor-pointer ${
+                        isSelected
+                          ? 'bg-blue-50 dark:bg-blue-900/30 border border-blue-500'
+                          : 'hover:bg-gray-50 dark:hover:bg-gray-800 border border-transparent'
+                      }`}
+                      onClick={() => toggleDiffBranchSelection(branch.name)}
+                    >
+                      <input
+                        type="radio"
+                        checked={isSelected}
+                        onChange={() => toggleDiffBranchSelection(branch.name)}
+                        className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                        name="diffBranchSelection"
+                      />
+                      <div className="flex items-center gap-2">
+                        <span className={`text-sm ${
+                          branch.isCurrent
+                            ? 'font-semibold text-blue-600 dark:text-blue-400'
+                            : 'text-gray-800 dark:text-gray-200'
+                        }`}>
+                          {branch.name}
+                        </span>
+                        {branch.isCurrent && (
+                          <span className="px-2 py-0.5 text-xs bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-200 rounded">
+                            当前
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {statusMessage && (
+              <div className={`mb-4 p-3 rounded text-sm whitespace-pre-line ${
+                statusMessage.includes('找到') || statusMessage.includes('完全一致')
+                  ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
+                  : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200'
+              }`}>
+                {statusMessage}
+              </div>
+            )}
+
+            {diffResult.length > 0 && (
+              <div className="mb-4">
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">差异文件 ({diffResult.length}):</h3>
+                <div className="space-y-1 max-h-[25vh] overflow-y-auto border border-gray-200 dark:border-gray-700 rounded p-2">
+                  {diffResult.map(item => (
+                    <div
+                      key={item.path}
+                      className="px-2 py-1 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded"
+                    >
+                      {item.path}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex justify-end gap-3">
+              <button
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                onClick={handleCloseDiffDialog}
+                disabled={loadingDiff}
+              >
+                关闭
+              </button>
+              <button
+                className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+                onClick={compareBranches}
+                disabled={loadingDiff || !diffSelectedBranch}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    compareBranches();
+                  }
+                }}
+                autoFocus
+              >
+                {loadingDiff ? '比对中...' : '开始比对'}
+              </button>
+            </div>
+
+            {copyToast && (
+              <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-4 py-2 rounded text-sm z-50">
+                {copyToast}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Diff Viewer Dialog - two panel comparison */}
+      {showDiffViewer && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-900 rounded-lg p-4 w-[90vw] h-[85vh] overflow-hidden">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">
+                {currentBranchName} ↔ {compareBranchName}
+                {selectedDiffFile && <span className="text-gray-500 dark:text-gray-400 text-sm ml-2">• {selectedDiffFile}</span>}
+              </h2>
+              <button
+                className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xl"
+                onClick={handleCloseDiffViewer}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="flex h-[calc(100%-4rem)] gap-4">
+              {/* Left panel: difference files list */}
+              <div className="w-64 flex-shrink-0 border border-gray-200 dark:border-gray-700 rounded overflow-y-auto">
+                <div className="p-2 border-b border-gray-200 dark:border-gray-700 mb-2">
+                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    差异文件 ({diffResult.length})
+                  </h3>
+                </div>
+                <div className="space-y-1 px-1">
+                  {diffResult.map(item => {
+                    const isSelected = selectedDiffFile === item.path;
+                    // Get status color based on if it's changed (which it always is here)
+                    // We just need a highlight
+                    return (
+                      <div
+                        key={item.path}
+                        className={`px-2 py-1 rounded cursor-pointer text-sm ${
+                          isSelected
+                            ? 'bg-blue-500 text-white'
+                            : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200'
+                        }`}
+                        onClick={() => handleDiffFileClick(item.path)}
+                      >
+                        {item.path}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Right panel: two column content comparison */}
+              <div className="flex-1 flex flex-col min-w-0">
+                <div className="flex flex-1 gap-px overflow-hidden">
+                  {/* Left column: current branch content */}
+                  <div className="flex-1 border border-gray-200 dark:border-gray-700 rounded overflow-y-auto">
+                    <div className="sticky top-0 bg-gray-50 dark:bg-gray-800 px-3 py-2 border-b border-gray-200 dark:border-gray-700">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {currentBranchName}
+                      </span>
+                    </div>
+                    <pre className="p-3 text-xs overflow-auto whitespace-pre text-gray-800 dark:text-gray-200 font-mono">
+{leftContent}
+                    </pre>
+                  </div>
+
+                  {/* Right column: compare branch content */}
+                  <div className="flex-1 border border-gray-200 dark:border-gray-700 rounded overflow-y-auto">
+                    <div className="sticky top-0 bg-gray-50 dark:bg-gray-800 px-3 py-2 border-b border-gray-200 dark:border-gray-700">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {compareBranchName}
+                      </span>
+                    </div>
+                    <pre className="p-3 text-xs overflow-auto whitespace-pre text-gray-800 dark:text-gray-200 font-mono">
+{rightContent}
+                    </pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end mt-4">
+              <button
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                onClick={handleCloseDiffViewer}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleCloseDiffViewer();
                   }
                 }}
                 autoFocus

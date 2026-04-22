@@ -624,10 +624,17 @@ var implementation$1 = function bind(that) {
 var implementation = implementation$1;
 var functionBind = Function.prototype.bind || implementation;
 var functionCall = Function.prototype.call;
-var functionApply = Function.prototype.apply;
+var functionApply;
+var hasRequiredFunctionApply;
+function requireFunctionApply() {
+  if (hasRequiredFunctionApply) return functionApply;
+  hasRequiredFunctionApply = 1;
+  functionApply = Function.prototype.apply;
+  return functionApply;
+}
 var reflectApply = typeof Reflect !== "undefined" && Reflect && Reflect.apply;
 var bind$2 = functionBind;
-var $apply$1 = functionApply;
+var $apply$1 = requireFunctionApply();
 var $call$2 = functionCall;
 var $reflectApply = reflectApply;
 var actualApply = $reflectApply || bind$2.call($call$2, $apply$1);
@@ -747,7 +754,7 @@ var hasSymbols = requireHasSymbols()();
 var getProto = requireGetProto();
 var $ObjectGPO = requireObject_getPrototypeOf();
 var $ReflectGPO = requireReflect_getPrototypeOf();
-var $apply = functionApply;
+var $apply = requireFunctionApply();
 var $call = functionCall;
 var needsEval = {};
 var TypedArray = typeof Uint8Array === "undefined" || !getProto ? undefined$1 : getProto(Uint8Array);
@@ -1388,7 +1395,7 @@ function requireApplyBind() {
   if (hasRequiredApplyBind) return applyBind;
   hasRequiredApplyBind = 1;
   var bind3 = functionBind;
-  var $apply2 = functionApply;
+  var $apply2 = requireFunctionApply();
   var actualApply$1 = actualApply;
   applyBind = function applyBind2() {
     return actualApply$1(bind3, $apply2, arguments);
@@ -18044,8 +18051,11 @@ class GitService {
       const lines = output.trim().split("\n").filter((line) => line.trim());
       const files = {};
       for (const line of lines) {
-        const trimmed = line.trim();
+        let trimmed = line.trim();
         if (!trimmed) continue;
+        if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
+          trimmed = trimmed.slice(1, -1);
+        }
         const code = trimmed.substring(0, 2);
         const indexCode = code[0];
         let filePath = trimmed.substring(2).trim();
@@ -18167,26 +18177,31 @@ class GitService {
     }
   }
   async getGitUserInfo(repoPath) {
+    let name = "";
+    let email = "";
     try {
-      let name = "";
-      let email = "";
-      try {
-        name = execSync("git config --get user.name", { cwd: repoPath, encoding: "utf-8" }).trim();
-        email = execSync("git config --get user.email", { cwd: repoPath, encoding: "utf-8" }).trim();
-      } catch (repoErr) {
+      name = execSync("git config --get user.name", { cwd: repoPath, encoding: "utf-8" }).trim();
+    } catch {
+    }
+    try {
+      email = execSync("git config --get user.email", { cwd: repoPath, encoding: "utf-8" }).trim();
+    } catch {
+    }
+    if (!name || !email) {
+      if (!name) {
         try {
           name = execSync("git config --global --get user.name", { encoding: "utf-8" }).trim();
-          email = execSync("git config --global --get user.email", { encoding: "utf-8" }).trim();
-        } catch (globalErr) {
-          console.error("Failed to get git user info from both repository and global config:", repoErr, globalErr);
-          return { name: "", email: "" };
+        } catch {
         }
       }
-      return { name, email };
-    } catch (e) {
-      console.error("Failed to get git user info:", e);
-      return { name: "", email: "" };
+      if (!email) {
+        try {
+          email = execSync("git config --global --get user.email", { encoding: "utf-8" }).trim();
+        } catch {
+        }
+      }
     }
+    return { name, email };
   }
 }
 const gitService = new GitService();

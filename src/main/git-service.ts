@@ -22,16 +22,22 @@ export class GitService {
 
       for (const line of lines) {
         // Format: "XY filepath" where X=index, Y=working tree
-        // X (first char) = index status. If X is not space/?, file is staged
+        // X (first character) = index status. If X is not space/?, file is staged
         // We just care about the final state in working tree
-        const trimmed = line.trim();
+        let trimmed = line.trim();
         if (!trimmed) continue;
 
+        // If the entire line is quoted (path contains spaces), remove the outer quotes first
+        if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
+          trimmed = trimmed.slice(1, -1);
+        }
+
+        // First two characters are always XY status code
         const code = trimmed.substring(0, 2);
         const indexCode = code[0];
         let filePath = trimmed.substring(2).trim();
 
-        // Remove quotes if present (for files with spaces)
+        // Remove inner quotes if present (for files with spaces)
         if (filePath.startsWith('"') && filePath.endsWith('"')) {
           filePath = filePath.slice(1, -1);
         }
@@ -63,6 +69,9 @@ export class GitService {
         }
 
         // Check if file is staged (index has change, first character is not space)
+        // For git status --porcelain format: XY filepath
+        // X = index status, Y = working tree status
+        // If X is not space and not ?, the file is staged
         const staged = indexCode !== ' ' && indexCode !== '?';
 
         files[filePath] = { status, staged };
@@ -193,30 +202,32 @@ export class GitService {
   }
 
   async getGitUserInfo(repoPath: string): Promise<{ name: string; email: string }> {
-    try {
-      // First try repository-specific config
-      let name = '';
-      let email = '';
+    let name = '';
+    let email = '';
 
-      try {
-        name = execSync('git config --get user.name', { cwd: repoPath, encoding: 'utf-8' }).trim();
-        email = execSync('git config --get user.email', { cwd: repoPath, encoding: 'utf-8' }).trim();
-      } catch (repoErr) {
-        // Fall back to global config if repository config fails
+    // Try repo config first, then global
+    try {
+      name = execSync('git config --get user.name', { cwd: repoPath, encoding: 'utf-8' }).trim();
+    } catch {}
+    try {
+      email = execSync('git config --get user.email', { cwd: repoPath, encoding: 'utf-8' }).trim();
+    } catch {}
+
+    if (!name || !email) {
+      // If repo config doesn't have it, try global config
+      if (!name) {
         try {
           name = execSync('git config --global --get user.name', { encoding: 'utf-8' }).trim();
-          email = execSync('git config --global --get user.email', { encoding: 'utf-8' }).trim();
-        } catch (globalErr) {
-          console.error('Failed to get git user info from both repository and global config:', repoErr, globalErr);
-          return { name: '', email: '' };
-        }
+        } catch {}
       }
-
-      return { name, email };
-    } catch (e) {
-      console.error('Failed to get git user info:', e);
-      return { name: '', email: '' };
+      if (!email) {
+        try {
+          email = execSync('git config --global --get user.email', { encoding: 'utf-8' }).trim();
+        } catch {}
+      }
     }
+
+    return { name, email };
   }
 }
 
