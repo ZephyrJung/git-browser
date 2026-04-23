@@ -40,6 +40,18 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile, repoPath }) => {
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [copyToast, setCopyToast] = useState<string | null>(null);
+  const [showDiffDialog, setShowDiffDialog] = useState(false);
+  const [diffSelectedBranch, setDiffSelectedBranch] = useState<string>('');
+  const [diffResult, setDiffResult] = useState<{ path: string; changed: boolean }[]>([]);
+  const [showDiffViewer, setShowDiffViewer] = useState(false);
+  const [selectedDiffFile, setSelectedDiffFile] = useState<string>('');
+  const [leftContent, setLeftContent] = useState('');
+  const [rightContent, setRightContent] = useState<string>('');
+  const [currentBranchName, setCurrentBranchName] = useState<string>('');
+  const [compareBranchName, setCompareBranchName] = useState<string>('');
+  const [loadingDiff, setLoadingDiff] = useState(false);
+  const [isDiffMaximized, setIsDiffMaximized] = useState(false);
+  const [diffContentCache, setDiffContentCache] = useState<Record<string, { left: string; right: string }>>({});
   const [commitMessageDialog, setCommitMessageDialog] = useState<CommitMessageDialog>({
     show: false,
     originalCommand: '',
@@ -49,18 +61,18 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile, repoPath }) => {
 
   // Auto-focus command input whenever no dialog is open and not loading
   useEffect(() => {
-    if (!loading && !showCommitHistory && !showOutputDialog && !showSwitchBranch && !commitMessageDialog.show) {
+    if (!loading && !showCommitHistory && !showOutputDialog && !showSwitchBranch && !commitMessageDialog.show && !showDiffDialog && !showDiffViewer) {
       setTimeout(() => {
         inputRef.current?.focus();
       }, 0);
     }
-  }, [loading, showCommitHistory, showOutputDialog, showSwitchBranch, commitMessageDialog.show]);
+  }, [loading, showCommitHistory, showOutputDialog, showSwitchBranch, commitMessageDialog.show, showDiffDialog, showDiffViewer]);
 
   // Global click handler - keep focus on command input when clicking outside dialogs
   useEffect(() => {
     const handleGlobalClick = (e: MouseEvent) => {
       // Don't steal focus if any dialog is open
-      if (showCommitHistory || showOutputDialog || showSwitchBranch || commitMessageDialog.show) {
+      if (showCommitHistory || showOutputDialog || showSwitchBranch || commitMessageDialog.show || showDiffDialog || showDiffViewer) {
         return;
       }
       // Don't steal focus if user clicked outside app or on another input/button
@@ -74,7 +86,7 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile, repoPath }) => {
 
     document.addEventListener('click', handleGlobalClick);
     return () => document.removeEventListener('click', handleGlobalClick);
-  }, [showCommitHistory, showOutputDialog, showSwitchBranch, commitMessageDialog.show, loading]);
+  }, [showCommitHistory, showOutputDialog, showSwitchBranch, commitMessageDialog.show, showDiffDialog, showDiffViewer, loading]);
 
   // Close any open dialog on ESC key
   useEffect(() => {
@@ -84,11 +96,13 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile, repoPath }) => {
         if (showOutputDialog) setShowOutputDialog(false);
         if (showSwitchBranch) setShowSwitchBranch(false);
         if (commitMessageDialog.show) setCommitMessageDialog({ show: false, originalCommand: '' });
+        if (showDiffViewer) handleCloseDiffViewer();
+        if (showDiffDialog) setShowDiffDialog(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showCommitHistory, showOutputDialog, showSwitchBranch, commitMessageDialog.show]);
+  }, [showCommitHistory, showOutputDialog, showSwitchBranch, commitMessageDialog.show, showDiffDialog, showDiffViewer]);
 
   const isGitLogCommand = (cmd: string): boolean => {
     const trimmed = cmd.trim().toLowerCase();
@@ -114,6 +128,11 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile, repoPath }) => {
     }
     // If it has arguments but no -m or --message
     return !trimmed.includes(' -m') && !trimmed.includes(' --message');
+  };
+
+  const isCompareCommand = (cmd: string): boolean => {
+    const trimmed = cmd.trim().toLowerCase();
+    return trimmed === 'compare';
   };
 
   const shouldShowDialog = (cmd: string): boolean => {
@@ -308,6 +327,13 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile, repoPath }) => {
           originalCommand: processedCommand,
         });
         setCommitMessage('');
+        setCommand('');
+      } else if (isCompareCommand(processedCommand)) {
+        // compare - open branch diff dialog
+        await loadAllBranches();
+        setDiffSelectedBranch('');
+        setDiffResult([]);
+        setShowDiffDialog(true);
         setCommand('');
       } else {
         // All other commands - show raw output in dialog

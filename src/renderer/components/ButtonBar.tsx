@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import * as Diff from 'diff';
+import { highlight } from '../utils/syntaxHighlight';
 
 import type { CommandResult } from '@/shared/types';
 
@@ -48,6 +50,9 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
   const [currentBranchName, setCurrentBranchName] = useState<string>('');
   const [compareBranchName, setCompareBranchName] = useState<string>('');
   const [loadingDiff, setLoadingDiff] = useState(false);
+  const [isDiffMaximized, setIsDiffMaximized] = useState(false);
+  // Cache for preloaded diff content: filePath -> { left, right }
+  const [diffContentCache, setDiffContentCache] = useState<Record<string, { left: string; right: string }>>({});
 
   // Close any open dialog on ESC key
   useEffect(() => {
@@ -59,6 +64,7 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
         if (showCommitPushDialog) setShowCommitPushDialog(false);
         if (showPullResult) setShowPullResult(false);
         if (showDiffDialog) setShowDiffDialog(false);
+        if (showDiffViewer) handleCloseDiffViewer();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -208,15 +214,87 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
     setSelectedDiffFile('');
     setLeftContent('');
     setRightContent('');
+    setIsDiffMaximized(false);
   };
 
-  const handleDiffFileClick = async (filePath: string) => {
-    setSelectedDiffFile(filePath);
-    // Load content for both branches
-    const content1 = await getFileContentFromBranch(repoPath, currentBranchName, filePath);
-    const content2 = await getFileContentFromBranch(repoPath, compareBranchName, filePath);
-    setLeftContent(content1);
-    setRightContent(content2);
+  // Diff line type for rendering
+  interface DiffLineData {
+    content: string;
+    type: 'unchanged' | 'added' | 'removed';
+    leftLineNum?: number;
+    rightLineNum?: number;
+  }
+
+  // Compute line-level diff between left and right content
+  const computeLineDiff = (left: string, right: string): { leftLines: DiffLineData[]; rightLines: DiffLineData[] } => {
+    const changes = Diff.diffLines(left, right);
+    const leftLines: DiffLineData[] = [];
+    const rightLines: DiffLineData[] = [];
+    let leftNum = 0;
+    let rightNum = 0;
+
+    for (const change of changes) {
+      const lines = change.value.replace(/\n$/, '').split('\n');
+      if (change.added) {
+        for (const line of lines) {
+          rightNum++;
+          rightLines.push({ content: line, type: 'added', rightLineNum: rightNum });
+          leftLines.push({ content: '', type: 'removed' });
+        }
+      } else if (change.removed) {
+        for (const line of lines) {
+          leftNum++;
+          leftLines.push({ content: line, type: 'removed', leftLineNum: leftNum });
+          rightLines.push({ content: '', type: 'added' });
+        }
+      } else {
+        for (const line of lines) {
+          leftNum++;
+          rightNum++;
+          leftLines.push({ content: line, type: 'unchanged', leftLineNum: leftNum, rightLineNum: rightNum });
+          rightLines.push({ content: line, type: 'unchanged', leftLineNum: leftNum, rightLineNum: rightNum });
+        }
+      }
+    }
+    return { leftLines, rightLines };
+  };
+
+  // Synchronized scrolling refs
+  const leftScrollRef = useRef<HTMLDivElement>(null);
+  const rightScrollRef = useRef<HTMLDivElement>(null);
+  const isSyncingScroll = useRef(false);
+
+  const handleSyncScroll = useCallback((source: 'left' | 'right') => {
+    if (isSyncingScroll.current) return;
+    isSyncingScroll.current = true;
+
+    const sourceEl = source === 'left' ? leftScrollRef.current : rightScrollRef.current;
+    const targetEl = source === 'left' ? rightScrollRef.current : leftScrollRef.current;
+
+    if (sourceEl && targetEl) {
+      const ratio = sourceEl.scrollTop / (sourceEl.scrollHeight - sourceEl.clientHeight || 1);
+      targetEl.scrollTop = ratio * (targetEl.scrollHeight - targetEl.clientHeight);
+    }
+
+    requestAnimationFrame(() => {
+      isSyncingScroll.current = false;
+    });
+  }, []);
+
+  // Memoize diff computation - only recompute when content changes
+  const computedDiff = useMemo(() => {
+    if (!leftContent && !rightContent) return { leftLines: [] as DiffLineData[], rightLines: [] as DiffLineData[] };
+    return computeLineDiff(leftContent, rightContent);
+  }, [leftContent, rightContent]);
+
+  // Switch diff file - content should already be preloaded in cache
+  const handleDiffFileClick = (filePath: string) => {
+    const cached = diffContentCache[filePath];
+    if (cached) {
+      setSelectedDiffFile(filePath);
+      setLeftContent(cached.left);
+      setRightContent(cached.right);
+    }
   };
 
   const toggleDiffBranchSelection = (branchName: string) => {
@@ -237,6 +315,8 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
 
     setLoadingDiff(true);
     setStatusMessage(null);
+    // Clear previous diff content cache
+    setDiffContentCache({});
 
     try {
       // Get current branch name
@@ -253,58 +333,59 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
       setCurrentBranchName(currentBranch);
       setCompareBranchName(compareBranch);
 
-      // Get all files tracked by both branches using git ls-tree
-      // Recursively list all files in the branch
-      const output1 = await window.electron.executeGitCommand(repoPath, `git ls-tree -r ${currentBranch} --name-only`);
-      const output2 = await window.electron.executeGitCommand(repoPath, `git ls-tree -r ${compareBranch} --name-only`);
+      // Get changed files between branches using git diff --name-only (fast, no content fetching)
+      const diffOutput = await window.electron.executeGitCommand(repoPath, `git diff --name-only ${currentBranch} ${compareBranch}`);
 
-      if (!output1.success || !output2.success) {
-        setStatusMessage('获取文件列表失败');
+      if (!diffOutput.success) {
+        setStatusMessage('获取差异文件列表失败');
         setLoadingDiff(false);
         return;
       }
 
-      const files1 = output1.output.trim().split('\n').filter((f: string) => f.trim());
-      const files2 = output2.output.trim().split('\n').filter((f: string) => f.trim());
-
-      const allFiles = new Set([...files1, ...files2]);
-      const diffResult: { path: string; changed: boolean }[] = [];
-
-      // Compare content file by file
-      for (const filePath of allFiles) {
-        try {
-          // Get content from both branches
-          const content1 = await getFileContentFromBranch(repoPath, currentBranch, filePath);
-          const content2 = await getFileContentFromBranch(repoPath, compareBranch, filePath);
-
-          if (content1 !== content2) {
-            diffResult.push({ path: filePath, changed: true });
-          }
-        } catch (e) {
-          // If file doesn't exist in one branch, it's changed
-          diffResult.push({ path: filePath, changed: true });
-        }
-      }
+      const diffFiles = diffOutput.output.trim().split('\n').filter((f: string) => f.trim());
+      const diffResult: { path: string; changed: boolean }[] = diffFiles.map((f: string) => ({
+        path: f,
+        changed: true,
+      }));
 
       setDiffResult(diffResult);
 
-      // Close selection dialog and open diff viewer
-      setShowDiffDialog(false);
       // If no changes, just show message in selection dialog
       if (diffResult.length === 0) {
         setStatusMessage(`${currentBranch} ↔ ${compareBranch}\n两个分支内容完全一致`);
         setLoadingDiff(false);
-      } else {
-        // Open diff viewer with first file selected
-        setSelectedDiffFile(diffResult[0].path);
-        // Load content for first file
-        const firstContent1 = await getFileContentFromBranch(repoPath, currentBranch, diffResult[0].path);
-        const firstContent2 = await getFileContentFromBranch(repoPath, compareBranch, diffResult[0].path);
-        setLeftContent(firstContent1);
-        setRightContent(firstContent2);
-        setShowDiffViewer(true);
-        setLoadingDiff(false);
+        setShowDiffDialog(false);
+        return;
       }
+
+      // Preload ALL files content in parallel before opening viewer
+      // Note: left = compareBranch, right = currentBranch (current branch on the right)
+      setStatusMessage('正在加载文件内容...');
+      const preloadPromises = diffResult.map(async (item) => {
+        const [left, right] = await Promise.all([
+          getFileContentFromBranch(repoPath, compareBranch, item.path),
+          getFileContentFromBranch(repoPath, currentBranch, item.path),
+        ]);
+        return { path: item.path, left, right };
+      });
+
+      const allContents = await Promise.all(preloadPromises);
+
+      // Build cache
+      const newCache: Record<string, { left: string; right: string }> = {};
+      allContents.forEach(({ path, left, right }) => {
+        newCache[path] = { left, right };
+      });
+      setDiffContentCache(newCache);
+
+      // Now open diff viewer with first file selected
+      setSelectedDiffFile(diffResult[0].path);
+      setLeftContent(newCache[diffResult[0].path]?.left || '');
+      setRightContent(newCache[diffResult[0].path]?.right || '');
+      setShowDiffDialog(false);
+      setShowDiffViewer(true);
+      setStatusMessage(null);
+      setLoadingDiff(false);
     } catch (e) {
       console.error('Compare branches failed:', e);
       setStatusMessage(`比对失败: ${String(e)}`);
@@ -316,7 +397,9 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
   const getFileContentFromBranch = async (repoPath: string, branch: string, filePath: string): Promise<string> => {
     const output = await window.electron.executeGitCommand(repoPath, `git show ${branch}:${filePath}`);
     if (!output.success) {
-      throw new Error(`Failed to get ${filePath} from ${branch}`);
+      // File doesn't exist in this branch or other error
+      // Return empty string to indicate "not present in this branch"
+      return '';
     }
     return output.output;
   };
@@ -1229,105 +1312,161 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
       )}
 
       {/* Diff Viewer Dialog - two panel comparison */}
-      {showDiffViewer && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-900 rounded-lg p-4 w-[90vw] h-[85vh] overflow-hidden">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">
-                {currentBranchName} ↔ {compareBranchName}
-                {selectedDiffFile && <span className="text-gray-500 dark:text-gray-400 text-sm ml-2">• {selectedDiffFile}</span>}
-              </h2>
-              <button
-                className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xl"
-                onClick={handleCloseDiffViewer}
-              >
-                ✕
-              </button>
-            </div>
+      {showDiffViewer && (() => {
+        const { leftLines, rightLines } = computedDiff;
 
-            <div className="flex h-[calc(100%-4rem)] gap-4">
-              {/* Left panel: difference files list */}
-              <div className="w-64 flex-shrink-0 border border-gray-200 dark:border-gray-700 rounded overflow-y-auto">
-                <div className="p-2 border-b border-gray-200 dark:border-gray-700 mb-2">
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    差异文件 ({diffResult.length})
-                  </h3>
+        const getLineBgClass = (type: DiffLineData['type']): string => {
+          switch (type) {
+            case 'added': return 'bg-green-50 dark:bg-green-900/30';
+            case 'removed': return 'bg-red-50 dark:bg-red-900/30';
+            default: return '';
+          }
+        };
+
+        const getLineNumBgClass = (type: DiffLineData['type']): string => {
+          switch (type) {
+            case 'added': return 'bg-green-100 dark:bg-green-900/50';
+            case 'removed': return 'bg-red-100 dark:bg-red-900/50';
+            default: return 'bg-gray-50 dark:bg-gray-800';
+          }
+        };
+
+        const dialogClass = isDiffMaximized
+          ? 'bg-white dark:bg-gray-900 w-screen h-screen overflow-hidden'
+          : 'bg-white dark:bg-gray-900 rounded-lg p-4 w-[90vw] h-[85vh] overflow-hidden';
+
+        return (
+          <div className={`fixed inset-0 ${isDiffMaximized ? '' : 'bg-black/50 flex items-center justify-center'} z-50`}>
+            <div className={dialogClass}>
+              <div className={`flex justify-between items-center ${isDiffMaximized ? 'px-4 pt-3' : ''} mb-3`}>
+                <h2 className="text-lg font-bold truncate">
+                  {compareBranchName} ↔ {currentBranchName}
+                  {selectedDiffFile && <span className="text-gray-500 dark:text-gray-400 text-sm ml-2 font-normal">• {selectedDiffFile}</span>}
+                </h2>
+                <div className="flex items-center gap-2">
+                  <button
+                    className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-lg px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                    onClick={() => setIsDiffMaximized(!isDiffMaximized)}
+                    title={isDiffMaximized ? '还原' : '最大化'}
+                  >
+                    {isDiffMaximized ? '🗗' : '🗖'}
+                  </button>
+                  <button
+                    className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xl px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                    onClick={handleCloseDiffViewer}
+                    title="关闭"
+                  >
+                    ✕
+                  </button>
                 </div>
-                <div className="space-y-1 px-1">
-                  {diffResult.map(item => {
-                    const isSelected = selectedDiffFile === item.path;
-                    // Get status color based on if it's changed (which it always is here)
-                    // We just need a highlight
-                    return (
-                      <div
-                        key={item.path}
-                        className={`px-2 py-1 rounded cursor-pointer text-sm ${
-                          isSelected
-                            ? 'bg-blue-500 text-white'
-                            : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200'
-                        }`}
-                        onClick={() => handleDiffFileClick(item.path)}
-                      >
-                        {item.path}
+              </div>
+
+              <div className="flex h-[calc(100%-3.5rem)] gap-3">
+                {/* Left panel: difference files list */}
+                <div className="w-56 flex-shrink-0 border border-gray-200 dark:border-gray-700 rounded overflow-y-auto">
+                  <div className="sticky top-0 bg-gray-50 dark:bg-gray-800 p-2 border-b border-gray-200 dark:border-gray-700">
+                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      差异文件 ({diffResult.length})
+                    </h3>
+                  </div>
+                  <div className="space-y-0.5 px-1 py-1">
+                    {diffResult.map(item => {
+                      const isSelected = selectedDiffFile === item.path;
+                      return (
+                        <div
+                          key={item.path}
+                          className={`px-2 py-1 rounded cursor-pointer text-xs ${
+                            isSelected
+                              ? 'bg-blue-500 text-white'
+                              : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200'
+                          }`}
+                          onClick={() => handleDiffFileClick(item.path)}
+                        >
+                          {item.path}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Right panel: two column content comparison */}
+                <div className="flex-1 flex flex-col min-w-0">
+                  <div className="flex flex-1 gap-0 overflow-hidden">
+                    {/* Left column: current branch content */}
+                    <div
+                      ref={leftScrollRef}
+                      className="flex-1 border border-gray-200 dark:border-gray-700 rounded-l overflow-y-auto"
+                      onScroll={() => handleSyncScroll('left')}
+                    >
+                      <div className="sticky top-0 bg-gray-50 dark:bg-gray-800 px-3 py-1.5 border-b border-gray-200 dark:border-gray-700 z-10">
+                        <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                          {compareBranchName}
+                        </span>
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Right panel: two column content comparison */}
-              <div className="flex-1 flex flex-col min-w-0">
-                <div className="flex flex-1 gap-px overflow-hidden">
-                  {/* Left column: current branch content */}
-                  <div className="flex-1 border border-gray-200 dark:border-gray-700 rounded overflow-y-auto">
-                    <div className="sticky top-0 bg-gray-50 dark:bg-gray-800 px-3 py-2 border-b border-gray-200 dark:border-gray-700">
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {currentBranchName}
-                      </span>
+                      {loadingDiff ? (
+                        <div className="flex items-center justify-center h-32 text-gray-500">
+                          <span className="animate-pulse">加载中...</span>
+                        </div>
+                      ) : (
+                      <pre className="text-xs font-mono leading-5">
+                        <code className="prism-code">
+                          {leftLines.map((line, index) => (
+                            <div key={index} className={`flex ${getLineBgClass(line.type)}`}>
+                              <span className={`inline-block w-10 text-right pr-2 select-none flex-shrink-0 text-gray-400 text-xs ${getLineNumBgClass(line.type)}`}>
+                                {line.leftLineNum ?? ''}
+                              </span>
+                              <span className="flex-1 pl-2 whitespace-pre" dangerouslySetInnerHTML={{
+                                __html: line.content === '' ? '\u00A0' : highlight(line.content, selectedDiffFile)
+                              }} />
+                            </div>
+                          ))}
+                        </code>
+                      </pre>
+                      )}
                     </div>
-                    <pre className="p-3 text-xs overflow-auto whitespace-pre text-gray-800 dark:text-gray-200 font-mono">
-{leftContent}
-                    </pre>
-                  </div>
 
-                  {/* Right column: compare branch content */}
-                  <div className="flex-1 border border-gray-200 dark:border-gray-700 rounded overflow-y-auto">
-                    <div className="sticky top-0 bg-gray-50 dark:bg-gray-800 px-3 py-2 border-b border-gray-200 dark:border-gray-700">
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {compareBranchName}
-                      </span>
+                    {/* Divider */}
+                    <div className="w-px bg-gray-300 dark:bg-gray-600 flex-shrink-0" />
+
+                    {/* Right column: current branch content */}
+                    <div
+                      ref={rightScrollRef}
+                      className="flex-1 border border-gray-200 dark:border-gray-700 rounded-r overflow-y-auto"
+                      onScroll={() => handleSyncScroll('right')}
+                    >
+                      <div className="sticky top-0 bg-gray-50 dark:bg-gray-800 px-3 py-1.5 border-b border-gray-200 dark:border-gray-700 z-10">
+                        <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                          {currentBranchName}
+                        </span>
+                      </div>
+                      {loadingDiff ? (
+                        <div className="flex items-center justify-center h-32 text-gray-500">
+                          <span className="animate-pulse">加载中...</span>
+                        </div>
+                      ) : (
+                      <pre className="text-xs font-mono leading-5">
+                        <code className="prism-code">
+                          {rightLines.map((line, index) => (
+                            <div key={index} className={`flex ${getLineBgClass(line.type)}`}>
+                              <span className={`inline-block w-10 text-right pr-2 select-none flex-shrink-0 text-gray-400 text-xs ${getLineNumBgClass(line.type)}`}>
+                                {line.rightLineNum ?? ''}
+                              </span>
+                              <span className="flex-1 pl-2 whitespace-pre" dangerouslySetInnerHTML={{
+                                __html: line.content === '' ? '\u00A0' : highlight(line.content, selectedDiffFile)
+                              }} />
+                            </div>
+                          ))}
+                        </code>
+                      </pre>
+                      )}
                     </div>
-                    <pre className="p-3 text-xs overflow-auto whitespace-pre text-gray-800 dark:text-gray-200 font-mono">
-{rightContent}
-                    </pre>
                   </div>
                 </div>
               </div>
             </div>
-
-            <div className="flex justify-end mt-4">
-              <button
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
-                onClick={handleCloseDiffViewer}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    handleCloseDiffViewer();
-                  }
-                }}
-                autoFocus
-              >
-                关闭
-              </button>
-            </div>
-
-            {copyToast && (
-              <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-4 py-2 rounded text-sm z-50">
-                {copyToast}
-              </div>
-            )}
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 };
