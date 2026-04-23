@@ -256,21 +256,21 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
       const currentBranch = currentBranchOutput.output.trim();
 
       const mergeCommand = `git checkout "${mergeSelectedBranch}" && git merge "${currentBranch}"`;
-      const output = await window.electron.executeGitCommand(repoPath, mergeCommand);
+      await window.electron.executeGitCommand(repoPath, mergeCommand);
 
       const statusOutput = await window.electron.executeGitCommand(repoPath, 'git status --porcelain');
       const conflictLines = statusOutput.output
         .split('\n')
-        .filter(line => line.trim());
+        .filter((line: string) => line.trim());
 
-      const actualConflicts = conflictLines.filter(line => {
+      const actualConflicts = conflictLines.filter((line: string) => {
         const parts = line.trim().split(' ');
         const status = parts[0];
         return status.includes('U') || status === 'DD' || status === 'AU' || status === 'DU' || status === 'UA' || status === 'UD';
       });
 
       if (actualConflicts.length > 0) {
-        const conflictFilePaths = actualConflicts.map(line => {
+        const conflictFilePaths = actualConflicts.map((line: string) => {
           const parts = line.trim().split(/\s+/);
           return parts[1] || parts[0];
         }).filter(Boolean);
@@ -283,7 +283,7 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
       }
 
       const mergeResultOutput = await window.electron.executeGitCommand(repoPath, 'git diff --name-only HEAD~1 HEAD');
-      const files = mergeResultOutput.output.trim().split('\n').filter(f => f.trim());
+      const files = mergeResultOutput.output.trim().split('\n').filter((f: string) => f.trim());
 
       setMergeResultFiles(files);
       setSelectedMergeResultFile(files[0] || '');
