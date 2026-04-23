@@ -239,6 +239,10 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
     }
   };
 
+  const executeMerge = () => {
+    console.warn('executeMerge not yet implemented - will be done in Task 4');
+  };
+
   const openDiffDialog = async () => {
     await loadBranches();
     setDiffSelectedBranch('');
@@ -1046,6 +1050,76 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
                 {copyToast}
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Merge Branch Selection Dialog */}
+      {showMergeSelectDialog && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-900 rounded-lg p-6 w-[600px] max-h-[70vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">选择合并目标分支</h2>
+              <button
+                className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xl"
+                onClick={() => setShowMergeSelectDialog(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              当前分支 <span className="font-semibold text-blue-600">{mergeSelectedBranch}</span> 将被合并到选择的分支
+            </p>
+
+            <div className="space-y-2 max-h-[40vh] overflow-y-auto border border-gray-200 dark:border-gray-700 rounded p-2">
+              {branches.filter(b => !b.isCurrent && !b.isRemote).map(branch => {
+                const isSelected = mergeSelectedBranch === branch.name;
+                return (
+                  <div
+                    key={branch.fullName}
+                    className={`flex items-center gap-3 p-3 rounded cursor-pointer border ${
+                      isSelected
+                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30'
+                        : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
+                    }`}
+                    onClick={() => handleMergeSelectBranch(branch.name)}
+                  >
+                    <input
+                      type="radio"
+                      checked={isSelected}
+                      onChange={() => handleMergeSelectBranch(branch.name)}
+                      className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-800 dark:text-gray-200">
+                      {branch.name}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {branches.filter(b => !b.isCurrent && !b.isRemote).length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                没有可合并的分支
+              </div>
+            )}
+
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                onClick={() => setShowMergeSelectDialog(false)}
+              >
+                取消
+              </button>
+              <button
+                className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+                onClick={executeMerge}
+                disabled={!mergeSelectedBranch || loading}
+              >
+                {loading ? '合并中...' : '执行合并'}
+              </button>
+            </div>
           </div>
         </div>
       )}
