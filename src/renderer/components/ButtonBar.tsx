@@ -54,6 +54,20 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
   // Cache for preloaded diff content: filePath -> { left, right }
   const [diffContentCache, setDiffContentCache] = useState<Record<string, { left: string; right: string }>>({});
 
+  // Merge related states
+  const [showMergeSelectDialog, setShowMergeSelectDialog] = useState(false);
+  const [showMergeResult, setShowMergeResult] = useState(false);
+  const [showConflictResolver, setShowConflictResolver] = useState(false);
+  const [mergeSelectedBranch, setMergeSelectedBranch] = useState<string>('');
+  const [mergeResultFiles, setMergeResultFiles] = useState<string[]>([]);
+  const [selectedMergeResultFile, setSelectedMergeResultFile] = useState<string>('');
+  const [mergeDiffContent, setMergeDiffContent] = useState<string>('');
+  const [conflictFiles, setConflictFiles] = useState<string[]>([]);
+  const [selectedConflictFile, setSelectedConflictFile] = useState<string>('');
+  const [conflictLeftContent, setConflictLeftContent] = useState<string>('');
+  const [conflictRightContent, setConflictRightContent] = useState<string>('');
+  const [isMergeMaximized, setIsMergeMaximized] = useState(false);
+
   // Close any open dialog on ESC key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -65,11 +79,14 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
         if (showPullResult) setShowPullResult(false);
         if (showDiffDialog) setShowDiffDialog(false);
         if (showDiffViewer) handleCloseDiffViewer();
+        if (showMergeSelectDialog) setShowMergeSelectDialog(false);
+        if (showMergeResult) setShowMergeResult(false);
+        if (showConflictResolver) setShowConflictResolver(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showCommitHistory, showBranchList, showBranchManagement, showCommitPushDialog, showPullResult, showDiffDialog, showDiffViewer]);
+  }, [showCommitHistory, showBranchList, showBranchManagement, showCommitPushDialog, showPullResult, showDiffDialog, showDiffViewer, showMergeSelectDialog, showMergeResult, showConflictResolver]);
 
   const buttons = [
     { id: 'log', label: '提交历史' },
