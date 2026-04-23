@@ -1182,6 +1182,94 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
         </div>
       )}
 
+      {/* Merge Result Dialog - shows merged files */}
+      {showMergeResult && mergeResultFiles.length > 0 && (
+        <div className={`fixed inset-0 ${isMergeMaximized ? '' : 'bg-black/50 flex items-center justify-center'} z-50`}>
+          <div className={`bg-white dark:bg-gray-900 ${isMergeMaximized ? 'w-screen h-screen' : 'rounded-lg p-4 w-[90vw] h-[85vh]'} overflow-hidden flex flex-col`}>
+            <div className={`flex justify-between items-center ${isMergeMaximized ? 'px-4 pt-3' : ''} mb-3`}>
+              <h2 className="text-lg font-bold">
+                成功合并到 <span className="text-blue-600">{mergeSelectedBranch}</span>
+              </h2>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-500">只读</span>
+                <button
+                  className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-lg px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                  onClick={() => setIsMergeMaximized(!isMergeMaximized)}
+                >
+                  {isMergeMaximized ? '🗗' : '🗖'}
+                </button>
+                <button
+                  className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xl px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                  onClick={() => {
+                    setShowMergeResult(false);
+                    setIsMergeMaximized(false);
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-1 gap-3 overflow-hidden">
+              {/* Left panel: merged files list */}
+              <div className="w-56 flex-shrink-0 border border-gray-200 dark:border-gray-700 rounded overflow-y-auto">
+                <div className="sticky top-0 bg-gray-50 dark:bg-gray-800 p-2 border-b border-gray-200 dark:border-gray-700">
+                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    合并文件 ({mergeResultFiles.length})
+                  </h3>
+                </div>
+                <div className="space-y-0.5 px-1 py-1">
+                  {mergeResultFiles.map(file => {
+                    const isSelected = selectedMergeResultFile === file;
+                    return (
+                      <div
+                        key={file}
+                        className={`px-2 py-1 rounded cursor-pointer text-xs ${
+                          isSelected
+                            ? 'bg-blue-500 text-white'
+                            : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200'
+                        }`}
+                        onClick={async () => {
+                          setSelectedMergeResultFile(file);
+                          const diffOutput = await window.electron.executeGitCommand(repoPath, `git diff HEAD~1 HEAD -- "${file}"`);
+                          setMergeDiffContent(diffOutput.output || '');
+                        }}
+                      >
+                        {file}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Right panel: diff content */}
+              <div className="flex-1 border border-gray-200 dark:border-gray-700 rounded overflow-y-auto">
+                <div className="sticky top-0 bg-gray-50 dark:bg-gray-800 px-3 py-1.5 border-b border-gray-200 dark:border-gray-700 z-10">
+                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                    {selectedMergeResultFile}
+                  </span>
+                </div>
+                <pre className="text-xs font-mono leading-5 p-2 overflow-x-auto">
+                  <code>{mergeDiffContent || '选择文件查看变更'}</code>
+                </pre>
+              </div>
+            </div>
+
+            <div className="flex justify-end mt-4">
+              <button
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                onClick={() => {
+                  setShowMergeResult(false);
+                  setIsMergeMaximized(false);
+                }}
+              >
+                关闭
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Commit and Push Dialog */}
       {showCommitPushDialog && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
