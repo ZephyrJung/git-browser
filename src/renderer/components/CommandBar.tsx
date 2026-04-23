@@ -809,10 +809,16 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile, repoPath }) => {
             <div className="mb-4">
               <textarea
                 className="w-full px-3 py-2 text-sm border rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 outline-none focus:ring-1 focus:ring-blue-500"
-                placeholder="输入提交信息..."
+                placeholder="输入提交信息... (Ctrl/Cmd + Enter 提交)"
                 rows={4}
                 value={commitMessage}
                 onChange={e => setCommitMessage(e.target.value)}
+                onKeyDown={(e) => {
+                  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    handleConfirmCommit();
+                  }
+                }}
                 autoFocus
               />
             </div>
