@@ -169,6 +169,8 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
       await handlePull();
     } else if (id === 'diff') {
       await openDiffDialog();
+    } else if (id === 'merge') {
+      await openMergeSelectDialog();
     }
     // TODO: 其他按钮弹出对应操作对话框
   };
@@ -213,6 +215,28 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
 
   const handleClosePullResult = () => {
     setShowPullResult(false);
+  };
+
+  const openMergeSelectDialog = async () => {
+    const currentBranchOutput = await window.electron.executeGitCommand(repoPath, 'git rev-parse --abbrev-ref HEAD');
+    if (!currentBranchOutput.success) {
+      setStatusMessage('获取当前分支失败');
+      return;
+    }
+    const currentBranch = currentBranchOutput.output.trim();
+
+    await loadBranches();
+
+    setMergeSelectedBranch(currentBranch);
+    setShowMergeSelectDialog(true);
+  };
+
+  const handleMergeSelectBranch = (branchName: string) => {
+    if (mergeSelectedBranch === branchName) {
+      setMergeSelectedBranch('');
+    } else {
+      setMergeSelectedBranch(branchName);
+    }
   };
 
   const openDiffDialog = async () => {
