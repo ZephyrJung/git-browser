@@ -239,8 +239,66 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
     }
   };
 
-  const executeMerge = () => {
-    console.warn('executeMerge not yet implemented - will be done in Task 4');
+  const executeMerge = async () => {
+    if (!mergeSelectedBranch) return;
+
+    setLoading(true);
+    setStatusMessage(null);
+    setShowMergeSelectDialog(false);
+
+    try {
+      const currentBranchOutput = await window.electron.executeGitCommand(repoPath, 'git rev-parse --abbrev-ref HEAD');
+      if (!currentBranchOutput.success) {
+        setStatusMessage('获取当前分支失败');
+        setLoading(false);
+        return;
+      }
+      const currentBranch = currentBranchOutput.output.trim();
+
+      const mergeCommand = `git checkout "${mergeSelectedBranch}" && git merge "${currentBranch}"`;
+      const output = await window.electron.executeGitCommand(repoPath, mergeCommand);
+
+      const statusOutput = await window.electron.executeGitCommand(repoPath, 'git status --porcelain');
+      const conflictLines = statusOutput.output
+        .split('\n')
+        .filter(line => line.trim());
+
+      const actualConflicts = conflictLines.filter(line => {
+        const parts = line.trim().split(' ');
+        const status = parts[0];
+        return status.includes('U') || status === 'DD' || status === 'AU' || status === 'DU' || status === 'UA' || status === 'UD';
+      });
+
+      if (actualConflicts.length > 0) {
+        const conflictFilePaths = actualConflicts.map(line => {
+          const parts = line.trim().split(/\s+/);
+          return parts[1] || parts[0];
+        }).filter(Boolean);
+
+        setConflictFiles(conflictFilePaths);
+        setSelectedConflictFile(conflictFilePaths[0] || '');
+        setShowConflictResolver(true);
+        setLoading(false);
+        return;
+      }
+
+      const mergeResultOutput = await window.electron.executeGitCommand(repoPath, 'git diff --name-only HEAD~1 HEAD');
+      const files = mergeResultOutput.output.trim().split('\n').filter(f => f.trim());
+
+      setMergeResultFiles(files);
+      setSelectedMergeResultFile(files[0] || '');
+      setShowMergeResult(true);
+      setLoading(false);
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+
+    } catch (e) {
+      console.error('Merge failed:', e);
+      setStatusMessage(`合并失败: ${String(e)}`);
+      setLoading(false);
+    }
   };
 
   const openDiffDialog = async () => {
