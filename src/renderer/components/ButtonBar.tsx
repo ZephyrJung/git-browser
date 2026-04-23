@@ -301,6 +301,99 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
     }
   };
 
+  const loadConflictFile = async (filePath: string) => {
+    setSelectedConflictFile(filePath);
+
+    try {
+      const [oursOutput, theirsOutput] = await Promise.all([
+        window.electron.executeGitCommand(repoPath, `git show :1:${filePath}`),
+        window.electron.executeGitCommand(repoPath, `git show :3:${filePath}`),
+      ]);
+
+      setConflictLeftContent(oursOutput.output || '(空)');
+      setConflictRightContent(theirsOutput.output || '(空)');
+    } catch (e) {
+      const fileOutput = await window.electron.executeGitCommand(repoPath, `cat "${filePath}"`);
+      const content = fileOutput.output || '';
+
+      const lines = content.split('\n');
+      const leftLines: string[] = [];
+      const rightLines: string[] = [];
+      let section = 'left';
+
+      for (const line of lines) {
+        if (line.startsWith('<<<<<<<')) {
+          section = 'left';
+        } else if (line.startsWith('=======')) {
+          section = 'right';
+        } else if (line.startsWith('>>>>>>>')) {
+          section = 'done';
+        } else {
+          if (section === 'left') leftLines.push(line);
+          else if (section === 'right') rightLines.push(line);
+        }
+      }
+
+      setConflictLeftContent(leftLines.join('\n'));
+      setConflictRightContent(rightLines.join('\n'));
+    }
+  };
+
+  const resolveConflict = async (version: 'ours' | 'theirs') => {
+    if (!selectedConflictFile) return;
+
+    try {
+      const checkoutCmd = version === 'ours'
+        ? `git checkout --ours "${selectedConflictFile}"`
+        : `git checkout --theirs "${selectedConflictFile}"`;
+
+      await window.electron.executeGitCommand(repoPath, checkoutCmd);
+      await window.electron.executeGitCommand(repoPath, `git add "${selectedConflictFile}"`);
+
+      const remainingConflicts = conflictFiles.filter(f => f !== selectedConflictFile);
+      setConflictFiles(remainingConflicts);
+
+      if (remainingConflicts.length > 0) {
+        setSelectedConflictFile(remainingConflicts[0]);
+        await loadConflictFile(remainingConflicts[0]);
+      } else {
+        setShowConflictResolver(false);
+        setStatusMessage('所有冲突已解决！');
+        setTimeout(() => window.location.reload(), 1000);
+      }
+    } catch (e) {
+      console.error('Failed to resolve conflict:', e);
+      setStatusMessage(`解决冲突失败: ${String(e)}`);
+    }
+  };
+
+  const resolveAllConflicts = async () => {
+    for (const file of conflictFiles) {
+      try {
+        await window.electron.executeGitCommand(repoPath, `git checkout --ours "${file}"`);
+        await window.electron.executeGitCommand(repoPath, `git add "${file}"`);
+      } catch (e) {
+        console.error(`Failed to resolve ${file}:`, e);
+      }
+    }
+
+    setConflictFiles([]);
+    setShowConflictResolver(false);
+    setStatusMessage('所有冲突已保留目标版本！');
+    setTimeout(() => window.location.reload(), 1000);
+  };
+
+  const openExternalEditor = async () => {
+    if (process.platform === 'darwin') {
+      await window.electron.executeGitCommand(repoPath, `open "${selectedConflictFile}"`);
+    } else if (process.platform === 'win32') {
+      await window.electron.executeGitCommand(repoPath, `start "" "${selectedConflictFile}"`);
+    } else {
+      await window.electron.executeGitCommand(repoPath, `xdg-open "${selectedConflictFile}"`);
+    }
+    setStatusMessage('已在外部编辑器中打开文件，保存后将自动暂存');
+  };
+
   const openDiffDialog = async () => {
     await loadBranches();
     setDiffSelectedBranch('');
@@ -1265,6 +1358,129 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
               >
                 关闭
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Conflict Resolver Dialog */}
+      {showConflictResolver && conflictFiles.length > 0 && (
+        <div className={`fixed inset-0 ${isMergeMaximized ? '' : 'bg-black/50 flex items-center justify-center'} z-50`}>
+          <div className={`bg-white dark:bg-gray-900 ${isMergeMaximized ? 'w-screen h-screen' : 'rounded-lg p-4 w-[90vw] h-[85vh]'} overflow-hidden flex flex-col`}>
+            <div className={`flex justify-between items-center ${isMergeMaximized ? 'px-4 pt-3' : ''} mb-3`}>
+              <h2 className="text-lg font-bold text-orange-600">
+                ⚠️ 存在 {conflictFiles.length} 个冲突文件
+              </h2>
+              <div className="flex items-center gap-2">
+                <button
+                  className="px-3 py-1 text-sm text-white bg-orange-500 rounded hover:bg-orange-600"
+                  onClick={resolveAllConflicts}
+                >
+                  全部保留目标
+                </button>
+                <button
+                  className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-lg px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                  onClick={() => setIsMergeMaximized(!isMergeMaximized)}
+                >
+                  {isMergeMaximized ? '🗗' : '🗖'}
+                </button>
+                <button
+                  className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xl px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                  onClick={() => {
+                    setShowConflictResolver(false);
+                    setIsMergeMaximized(false);
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-1 gap-3 overflow-hidden">
+              {/* Left panel: conflict files list */}
+              <div className="w-56 flex-shrink-0 border border-gray-200 dark:border-gray-700 rounded overflow-y-auto">
+                <div className="sticky top-0 bg-gray-50 dark:bg-gray-800 p-2 border-b border-gray-200 dark:border-gray-700">
+                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    冲突文件 ({conflictFiles.length})
+                  </h3>
+                </div>
+                <div className="space-y-0.5 px-1 py-1">
+                  {conflictFiles.map(file => {
+                    const isSelected = selectedConflictFile === file;
+                    return (
+                      <div
+                        key={file}
+                        className={`px-2 py-1 rounded cursor-pointer text-xs ${
+                          isSelected
+                            ? 'bg-orange-500 text-white'
+                            : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200'
+                        }`}
+                        onClick={() => loadConflictFile(file)}
+                      >
+                        {file}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Right panel: conflict comparison */}
+              <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+                <div className="flex flex-1 gap-0 overflow-hidden">
+                  {/* Left column: target branch (HEAD) */}
+                  <div
+                    className="flex-1 border border-gray-200 dark:border-gray-700 rounded-l overflow-y-auto"
+                  >
+                    <div className="sticky top-0 bg-gray-50 dark:bg-gray-800 px-3 py-1.5 border-b border-gray-200 dark:border-gray-700 z-10">
+                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                        &lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD (目标分支)
+                      </span>
+                    </div>
+                    <pre className="text-xs font-mono leading-5 p-2 overflow-x-auto">
+                      <code>{conflictLeftContent}</code>
+                    </pre>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="w-px bg-gray-300 dark:bg-gray-600 flex-shrink-0" />
+
+                  {/* Right column: current branch */}
+                  <div
+                    className="flex-1 border border-gray-200 dark:border-gray-700 rounded-r overflow-y-auto"
+                  >
+                    <div className="sticky top-0 bg-gray-50 dark:bg-gray-800 px-3 py-1.5 border-b border-gray-200 dark:border-gray-700 z-10">
+                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                        &gt;&gt;&gt;&gt;&gt;&gt;&gt; {mergeSelectedBranch} (当前分支)
+                      </span>
+                    </div>
+                    <pre className="text-xs font-mono leading-5 p-2 overflow-x-auto">
+                      <code>{conflictRightContent}</code>
+                    </pre>
+                  </div>
+                </div>
+
+                {/* Action buttons */}
+                <div className="flex justify-end gap-3 mt-4 p-2 border-t border-gray-200 dark:border-gray-700">
+                  <button
+                    className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                    onClick={() => resolveConflict('ours')}
+                  >
+                    保留目标
+                  </button>
+                  <button
+                    className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                    onClick={() => resolveConflict('theirs')}
+                  >
+                    保留当前
+                  </button>
+                  <button
+                    className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                    onClick={() => openExternalEditor()}
+                  >
+                    手动编辑
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
