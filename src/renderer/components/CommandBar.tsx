@@ -375,6 +375,156 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile, repoPath }) => {
     }
   };
 
+  const toggleDiffBranchSelection = (branchName: string) => {
+    if (diffSelectedBranch === branchName) {
+      setDiffSelectedBranch('');
+    } else {
+      setDiffSelectedBranch(branchName);
+    }
+  };
+
+  // Get file content from a specific branch
+  const getFileContentFromBranch = async (repoPath: string, branch: string, filePath: string): Promise<string> => {
+    const output = await window.electron.executeGitCommand(repoPath, `git show ${branch}:${filePath}`);
+    if (!output.success) {
+      return '';
+    }
+    return output.output;
+  };
+
+  const handleCloseDiffDialog = () => {
+    setShowDiffDialog(false);
+  };
+
+  const handleCloseDiffViewer = () => {
+    setShowDiffViewer(false);
+    setSelectedDiffFile('');
+    setLeftContent('');
+    setRightContent('');
+    setIsDiffMaximized(false);
+    setDiffContentCache({});
+  };
+
+  // Memoized diff computation
+  const computeLineDiff = (left: string, right: string) => {
+    // Simple line-by-line diff
+    const leftLines = left.split('\n');
+    const rightLines = right.split('\n');
+    const maxLen = Math.max(leftLines.length, rightLines.length);
+    const result: { leftLines: { content: string; type: string; leftLineNum?: number }[]; rightLines: { content: string; type: string; rightLineNum?: number }[] } = {
+      leftLines: [],
+      rightLines: []
+    };
+
+    for (let i = 0; i < maxLen; i++) {
+      const leftLine = leftLines[i] || '';
+      const rightLine = rightLines[i] || '';
+
+      if (leftLine === rightLine) {
+        result.leftLines.push({ content: leftLine, type: 'unchanged', leftLineNum: i + 1 });
+        result.rightLines.push({ content: rightLine, type: 'unchanged', rightLineNum: i + 1 });
+      } else if (leftLine === '' && rightLine !== "") {
+        result.leftLines.push({ content: '', type: 'removed' });
+        result.rightLines.push({ content: rightLine, type: 'added', rightLineNum: i + 1 });
+      } else if (leftLine !== "" && rightLine === "") {
+        result.leftLines.push({ content: leftLine, type: 'removed', leftLineNum: i + 1 });
+        result.rightLines.push({ content: '', type: 'added' });
+      } else {
+        result.leftLines.push({ content: leftLine, type: 'removed', leftLineNum: i + 1 });
+        result.rightLines.push({ content: rightLine, type: 'added', rightLineNum: i + 1 });
+      }
+    }
+    return result;
+  };
+
+  const compareBranches = async () => {
+    if (!diffSelectedBranch) {
+      setStatusMessage('请选择一个分支进行比对');
+      return;
+    }
+
+    setLoadingDiff(true);
+    setStatusMessage(null);
+    setDiffContentCache({});
+
+    try {
+      const currentBranchOutput = await window.electron.executeGitCommand(repoPath, 'git rev-parse --abbrev-ref HEAD');
+      if (!currentBranchOutput.success) {
+        setStatusMessage('获取当前分支名称失败');
+        setLoadingDiff(false);
+        return;
+      }
+      const currentBranch = currentBranchOutput.output.trim();
+      const compareBranch = diffSelectedBranch;
+
+      setCurrentBranchName(currentBranch);
+      setCompareBranchName(compareBranch);
+
+      const diffOutput = await window.electron.executeGitCommand(repoPath, `git diff --name-only ${currentBranch} ${compareBranch}`);
+
+      if (!diffOutput.success) {
+        setStatusMessage('获取差异文件列表失败');
+        setLoadingDiff(false);
+        return;
+      }
+
+      const diffFiles = diffOutput.output.trim().split('\n').filter((f: string) => f.trim());
+      const newDiffResult: { path: string; changed: boolean }[] = diffFiles.map((f: string) => ({
+        path: f,
+        changed: true,
+      }));
+
+      setDiffResult(newDiffResult);
+
+      if (newDiffResult.length === 0) {
+        setStatusMessage(`${currentBranch} ↔ ${compareBranch}\n两个分支内容完全一致`);
+        setLoadingDiff(false);
+        setShowDiffDialog(false);
+        return;
+      }
+
+      // Preload ALL files content
+      setStatusMessage('正在加载文件内容...');
+      const preloadPromises = newDiffResult.map(async (item) => {
+        const [left, right] = await Promise.all([
+          getFileContentFromBranch(repoPath, compareBranch, item.path),
+          getFileContentFromBranch(repoPath, currentBranch, item.path),
+        ]);
+        return { path: item.path, left, right };
+      });
+
+      const allContents = await Promise.all(preloadPromises);
+
+      const newCache: Record<string, { left: string; right: string }> = {};
+      allContents.forEach(({ path, left, right }) => {
+        newCache[path] = { left, right };
+      });
+      setDiffContentCache(newCache);
+
+      setSelectedDiffFile(newDiffResult[0].path);
+      setLeftContent(newCache[newDiffResult[0].path]?.left || '');
+      setRightContent(newCache[newDiffResult[0].path]?.right || '');
+      setShowDiffDialog(false);
+      setShowDiffViewer(true);
+      setStatusMessage(null);
+      setLoadingDiff(false);
+    } catch (e) {
+      console.error('Compare branches failed:', e);
+      setStatusMessage(`比对失败: ${String(e)}`);
+      setLoadingDiff(false);
+    }
+  };
+
+  // Switch diff file - content should already be preloaded
+  const handleDiffFileClick = (filePath: string) => {
+    const cached = diffContentCache[filePath];
+    if (cached) {
+      setSelectedDiffFile(filePath);
+      setLeftContent(cached.left);
+      setRightContent(cached.right);
+    }
+  };
+
   const handleCancelCommit = () => {
     setCommitMessageDialog({ show: false, originalCommand: '' });
     setCommitMessage('');
@@ -685,6 +835,253 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile, repoPath }) => {
           </div>
         </div>
       )}
+
+      {/* Branch Diff Dialog */}
+      {showDiffDialog && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-900 rounded-lg p-6 w-[800px] max-h-[80vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">分支比对</h2>
+              <button
+                className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xl"
+                onClick={handleCloseDiffDialog}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="mb-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                当前分支 ⟷ 你选择的分支
+              </p>
+              <div className="space-y-2 max-h-[40vh] overflow-y-auto border border-gray-200 dark:border-gray-700 rounded p-2">
+                {branches.map(branch => {
+                  const isSelected = diffSelectedBranch === branch.name;
+                  return (
+                    <div
+                      key={branch.fullName}
+                      className={`flex items-center gap-2 p-3 rounded cursor-pointer ${
+                        isSelected
+                          ? 'bg-blue-50 dark:bg-blue-900/30 border border-blue-500'
+                          : 'hover:bg-gray-50 dark:hover:bg-gray-800 border border-transparent'
+                      }`}
+                      onClick={() => toggleDiffBranchSelection(branch.name)}
+                    >
+                      <input
+                        type="radio"
+                        checked={isSelected}
+                        onChange={() => toggleDiffBranchSelection(branch.name)}
+                        className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                        name="diffBranchSelection"
+                      />
+                      <div className="flex items-center gap-2">
+                        <span className={`text-sm ${
+                          branch.isCurrent
+                            ? 'font-semibold text-blue-600 dark:text-blue-400'
+                            : 'text-gray-800 dark:text-gray-200'
+                        }`}>
+                          {branch.name}
+                        </span>
+                        {branch.isCurrent && (
+                          <span className="px-2 py-0.5 text-xs bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-200 rounded">
+                            当前
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {statusMessage && (
+              <div className={`mb-4 p-3 rounded text-sm whitespace-pre-line ${
+                statusMessage.includes('找到') || statusMessage.includes('完全一致')
+                  ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
+                  : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200'
+              }`}>
+                {statusMessage}
+              </div>
+            )}
+
+            {diffResult.length > 0 && (
+              <div className="mb-4">
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">差异文件 ({diffResult.length}):</h3>
+                <div className="space-y-1 max-h-[25vh] overflow-y-auto border border-gray-200 dark:border-gray-700 rounded p-2">
+                  {diffResult.map(item => (
+                    <div
+                      key={item.path}
+                      className="px-2 py-1 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded"
+                    >
+                      {item.path}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex justify-end gap-3">
+              <button
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                onClick={handleCloseDiffDialog}
+                disabled={loadingDiff}
+              >
+                关闭
+              </button>
+              <button
+                className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+                onClick={compareBranches}
+                disabled={loadingDiff || !diffSelectedBranch}
+              >
+                {loadingDiff ? '比对中...' : '开始比对'}
+              </button>
+            </div>
+
+            {copyToast && (
+              <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-4 py-2 rounded text-sm z-50">
+                {copyToast}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Diff Viewer Dialog */}
+      {showDiffViewer && (() => {
+        const diff = computeLineDiff(leftContent, rightContent);
+
+        const getLineBgClass = (type: string): string => {
+          switch (type) {
+            case 'added': return 'bg-green-50 dark:bg-green-900/30';
+            case 'removed': return 'bg-red-50 dark:bg-red-900/30';
+            default: return '';
+          }
+        };
+
+        const getLineNumBgClass = (type: string): string => {
+          switch (type) {
+            case 'added': return 'bg-green-100 dark:bg-green-900/50';
+            case 'removed': return 'bg-red-100 dark:bg-red-900/50';
+            default: return 'bg-gray-50 dark:bg-gray-800';
+          }
+        };
+
+        const dialogClass = isDiffMaximized
+          ? 'bg-white dark:bg-gray-900 w-screen h-screen overflow-hidden'
+          : 'bg-white dark:bg-gray-900 rounded-lg p-4 w-[90vw] h-[85vh] overflow-hidden';
+
+        return (
+          <div className={`fixed inset-0 ${isDiffMaximized ? '' : 'bg-black/50 flex items-center justify-center'} z-50`}>
+            <div className={dialogClass}>
+              <div className={`flex justify-between items-center ${isDiffMaximized ? 'px-4 pt-3' : ''} mb-3`}>
+                <h2 className="text-lg font-bold truncate">
+                  {compareBranchName} ↔ {currentBranchName}
+                  {selectedDiffFile && <span className="text-gray-500 dark:text-gray-400 text-sm ml-2 font-normal">• {selectedDiffFile}</span>}
+                </h2>
+                <div className="flex items-center gap-2">
+                  <button
+                    className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-lg px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                    onClick={() => setIsDiffMaximized(!isDiffMaximized)}
+                    title={isDiffMaximized ? '还原' : '最大化'}
+                  >
+                    {isDiffMaximized ? '🗗' : '🗖'}
+                  </button>
+                  <button
+                    className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xl px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                    onClick={handleCloseDiffViewer}
+                    title="关闭"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex h-[calc(100%-3.5rem)] gap-3">
+                {/* Left panel: difference files list */}
+                <div className="w-56 flex-shrink-0 border border-gray-200 dark:border-gray-700 rounded overflow-y-auto">
+                  <div className="sticky top-0 bg-gray-50 dark:bg-gray-800 p-2 border-b border-gray-200 dark:border-gray-700">
+                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      差异文件 ({diffResult.length})
+                    </h3>
+                  </div>
+                  <div className="space-y-0.5 px-1 py-1">
+                    {diffResult.map(item => {
+                      const isSelected = selectedDiffFile === item.path;
+                      return (
+                        <div
+                          key={item.path}
+                          className={`px-2 py-1 rounded cursor-pointer text-xs ${
+                            isSelected
+                              ? 'bg-blue-500 text-white'
+                              : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200'
+                          }`}
+                          onClick={() => handleDiffFileClick(item.path)}
+                        >
+                          {item.path}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Right panel: two column content comparison */}
+                <div className="flex-1 flex flex-col min-w-0">
+                  <div className="flex flex-1 gap-0 overflow-hidden">
+                    {/* Left column: compare branch content */}
+                    <div className="flex-1 border border-gray-200 dark:border-gray-700 rounded-l overflow-y-auto">
+                      <div className="sticky top-0 bg-gray-50 dark:bg-gray-800 px-3 py-1.5 border-b border-gray-200 dark:border-gray-700 z-10">
+                        <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                          {compareBranchName}
+                        </span>
+                      </div>
+                      <pre className="text-xs font-mono leading-5">
+                        <code className="prism-code">
+                          {diff.leftLines.map((line, index) => (
+                            <div key={index} className={`flex ${getLineBgClass(line.type)}`}>
+                              <span className={`inline-block w-10 text-right pr-2 select-none flex-shrink-0 text-gray-400 text-xs ${getLineNumBgClass(line.type)}`}>
+                                {line.leftLineNum ?? ''}
+                              </span>
+                              <span className="flex-1 pl-2 whitespace-pre">
+                                {line.content || '\u00A0'}
+                              </span>
+                            </div>
+                          ))}
+                        </code>
+                      </pre>
+                    </div>
+
+                    {/* Divider */}
+                    <div className="w-px bg-gray-300 dark:bg-gray-600 flex-shrink-0" />
+
+                    {/* Right column: current branch content */}
+                    <div className="flex-1 border border-gray-200 dark:border-gray-700 rounded-r overflow-y-auto">
+                      <div className="sticky top-0 bg-gray-50 dark:bg-gray-800 px-3 py-1.5 border-b border-gray-200 dark:border-gray-700 z-10">
+                        <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                          {currentBranchName}
+                        </span>
+                      </div>
+                      <pre className="text-xs font-mono leading-5">
+                        <code className="prism-code">
+                          {diff.rightLines.map((line, index) => (
+                            <div key={index} className={`flex ${getLineBgClass(line.type)}`}>
+                              <span className={`inline-block w-10 text-right pr-2 select-none flex-shrink-0 text-gray-400 text-xs ${getLineNumBgClass(line.type)}`}>
+                                {line.rightLineNum ?? ''}
+                              </span>
+                              <span className="flex-1 pl-2 whitespace-pre">
+                                {line.content || '\u00A0'}
+                              </span>
+                            </div>
+                          ))}
+                        </code>
+                      </pre>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };
