@@ -27,6 +27,93 @@ interface CommandBarProps {
   repoPath: string;
 }
 
+// Git 命令别名 - 参考 zsh git 插件
+const GIT_ALIASES: Record<string, string> = {
+  // 基础操作
+  'ga': 'git add',
+  'gaa': 'git add --all',
+  'gax': 'git add --patch',
+  'gau': 'git add --update',
+  'gap': 'git add --patch',
+
+  // commit 相关
+  'gc': 'git commit',
+  'gca': 'git commit --amend',
+  'gcm': 'git commit --message',
+  'gcam': 'git commit -a --message',
+  'gcf': 'git commit --fixup',
+  'gcs': 'git commit -S',
+
+  // push/pull/fetch
+  'gp': 'git push',
+  'gpf': 'git push --force-with-lease',
+  'gpF': 'git push --force',
+  'gpa': 'git push --all',
+  'gpt': 'git push --tags',
+  'gfl': 'git pull',
+  'gfa': 'git fetch --all',
+  'gf': 'git fetch',
+
+  // checkout/branch
+  'gco': 'git checkout',
+  'gcob': 'git checkout -b',
+  'gcom': 'git checkout main',
+  'gcod': 'git checkout develop',
+  'gb': 'git branch',
+  'gba': 'git branch -a',
+  'gbd': 'git branch -d',
+  'gbD': 'git branch -D',
+
+  // status/log/diff
+  'gst': 'git status',
+  'gss': 'git status -s',
+  'gl': 'git log',
+  'glo': 'git log --oneline',
+  'glg': 'git log --graph',
+  'glga': 'git log --graph --all --decorate',
+  'gld': 'git log --pretty=format:"%h %ad %s" --date=short',
+  'gd': 'git diff',
+  'gds': 'git diff --staged',
+  'gdn': 'git diff --name-only',
+  'gdc': 'git diff --cached',
+
+  // merge/rebase
+  'gm': 'git merge',
+  'gma': 'git merge --abort',
+  'gmc': 'git merge --continue',
+  'gr': 'git rebase',
+  'gra': 'git rebase --abort',
+  'grc': 'git rebase --continue',
+  'gri': 'git rebase --interactive',
+
+  // stash
+  'gstsh': 'git stash',
+  'gstshp': 'git stash pop',
+  'gstshl': 'git stash list',
+  'gstshd': 'git stash drop',
+
+  // reset
+  'grh': 'git reset',
+  'grhh': 'git reset --hard',
+  'grhs': 'git reset --soft',
+
+  // clean
+  'gcl': 'git clean',
+  'gcln': 'git clean -n',
+  'gclf': 'git clean -fd',
+
+  // other
+  'gbl': 'git blame',
+  'gsh': 'git show',
+  'gshs': 'git show --stat',
+  'gt': 'git tag',
+  'gta': 'git tag -a',
+  'grev': 'git revert',
+  'gcp': 'git cherry-pick',
+  'gclone': 'git clone',
+  'gini': 'git init',
+};
+
 const CommandBar: React.FC<CommandBarProps> = ({ selectedFile, repoPath }) => {
   const [command, setCommand] = useState('');
   const [result, setResult] = useState<CommandResult | null>(null);
@@ -57,6 +144,10 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile, repoPath }) => {
     originalCommand: '',
   });
   const [commitMessage, setCommitMessage] = useState('');
+  const [commandHistory, setCommandHistory] = useState<string[]>([]);
+  const [completionCandidates, setCompletionCandidates] = useState<string[]>([]);
+  const [selectedCompletionIndex, setSelectedCompletionIndex] = useState(-1);
+  const [showCompletions, setShowCompletions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Auto-focus command input whenever no dialog is open and not loading
@@ -104,6 +195,21 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile, repoPath }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showCommitHistory, showOutputDialog, showSwitchBranch, commitMessageDialog.show, showDiffDialog, showDiffViewer]);
 
+  // 从 localStorage 加载命令历史
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('git-browser-command-history');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setCommandHistory(parsed.slice(0, 100));
+        }
+      }
+    } catch (e) {
+      console.error('Failed to load command history:', e);
+    }
+  }, []);
+
   const isGitLogCommand = (cmd: string): boolean => {
     const trimmed = cmd.trim().toLowerCase();
     return trimmed === 'git log' || trimmed.startsWith('git log ');
@@ -135,17 +241,76 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile, repoPath }) => {
     return trimmed === 'compare';
   };
 
+  // 展开命令别名
+  const expandAlias = (cmd: string): string => {
+    const trimmed = cmd.trim();
+    if (!trimmed) return cmd;
+
+    // 检查是否匹配别名（支持带参数的情况）
+    // 例如 "gc" -> "git commit", "gc -m" -> "git commit -m"
+    const words = trimmed.split(/\s+/);
+    const firstWord = words[0].toLowerCase();
+
+    if (GIT_ALIASES[firstWord]) {
+      const expanded = GIT_ALIASES[firstWord];
+      if (words.length > 1) {
+        return `${expanded} ${words.slice(1).join(' ')}`;
+      }
+      return expanded;
+    }
+
+    return cmd;
+  };
+
+
+  const saveToHistory = (cmd: string) => {
+    if (!cmd.trim()) return;
+
+    setCommandHistory(prev => {
+      const filtered = prev.filter(c => c !== cmd);
+      const updated = [cmd, ...filtered].slice(0, 100);
+
+      try {
+        localStorage.setItem('git-browser-command-history', JSON.stringify(updated));
+      } catch (e) {
+        console.error('Failed to save command history:', e);
+      }
+
+      return updated;
+    });
+  };
+
+  const getCompletionCandidates = (input: string): string[] => {
+    if (!input.trim()) return [];
+
+    const lower = input.toLowerCase();
+    const candidates: string[] = [];
+
+    for (const [alias, fullCmd] of Object.entries(GIT_ALIASES)) {
+      if (alias.startsWith(lower) && fullCmd !== input) {
+        candidates.push(fullCmd);
+      }
+    }
+
+    const historyMatches = commandHistory.filter(cmd =>
+      cmd.toLowerCase().startsWith(lower) && !candidates.includes(cmd)
+    );
+
+    candidates.unshift(...historyMatches);
+
+    return candidates.slice(0, 8);
+  };
+
   const processCommand = (cmd: string): string => {
     let processed = cmd.trim();
-    const lower = processed.toLowerCase();
 
-    // If git diff with no arguments and we have a selected file, add the file path
-    if ((lower === 'git diff' || lower === 'diff') && selectedFile) {
-      if (lower === 'diff') {
-        processed = `git diff ${selectedFile.path}`;
-      } else {
-        processed = `git diff ${selectedFile.path}`;
-      }
+    // 先展开别名
+    processed = expandAlias(processed);
+    const expandedLower = processed.toLowerCase();
+
+    // 如果是 git diff 且没有参数且有选中文件，添加文件路径
+    if ((expandedLower === 'git diff' || expandedLower === 'diff') && selectedFile) {
+      processed = `git diff ${selectedFile.path}`;
     }
 
     return processed;
@@ -299,6 +464,7 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile, repoPath }) => {
 
   const executeCommand = async () => {
     if (!command.trim() || loading) return;
+    saveToHistory(command);
     const processedCommand = processCommand(command);
     const lower = processedCommand.toLowerCase();
 
@@ -527,7 +693,52 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile, repoPath }) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       executeCommand();
+    } else if (showCompletions) {
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        acceptCompletion();
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedCompletionIndex(prev =>
+          prev < completionCandidates.length - 1 ? prev + 1 : prev
+        );
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedCompletionIndex(prev => prev > 0 ? prev - 1 : -1);
+      } else if (e.key === 'Tab' && selectedCompletionIndex < 0) {
+        e.preventDefault();
+        if (completionCandidates.length > 0) {
+          setSelectedCompletionIndex(0);
+        }
+      } else if (e.key === 'Escape') {
+        setShowCompletions(false);
+        setSelectedCompletionIndex(-1);
+      }
     }
+  };
+
+  const handleCommandChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setCommand(value);
+
+    if (value.trim()) {
+      const candidates = getCompletionCandidates(value);
+      setCompletionCandidates(candidates);
+      setShowCompletions(candidates.length > 0);
+      setSelectedCompletionIndex(-1);
+    } else {
+      setCompletionCandidates([]);
+      setShowCompletions(false);
+      setSelectedCompletionIndex(-1);
+    }
+  };
+
+  const acceptCompletion = () => {
+    if (selectedCompletionIndex >= 0 && selectedCompletionIndex < completionCandidates.length) {
+      setCommand(completionCandidates[selectedCompletionIndex]);
+    }
+    setShowCompletions(false);
+    setSelectedCompletionIndex(-1);
   };
 
   const handleCloseCommitHistory = () => {
@@ -540,17 +751,41 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile, repoPath }) => {
 
   return (
     <div className="border-t border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2">
-      <div className="flex gap-2">
+      <div className="relative flex gap-2">
         <input
           ref={inputRef}
           type="text"
           className="flex-1 px-3 py-2 text-sm border rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed dark:disabled:bg-gray-800"
           placeholder="输入 Git 命令，按回车执行..."
           value={command}
-          onChange={e => setCommand(e.target.value)}
+          onChange={handleCommandChange}
           onKeyDown={handleKeyDown}
           disabled={loading}
         />
+        {showCompletions && completionCandidates.length > 0 && (
+          <div className="absolute bottom-full left-0 right-0 mb-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-64 overflow-y-auto z-50">
+            {completionCandidates.map((candidate, index) => (
+              <div
+                key={candidate}
+                className={`px-3 py-2 cursor-pointer text-sm ${
+                  index === selectedCompletionIndex
+                    ? 'bg-blue-500 text-white'
+                    : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300'
+                }`}
+                onClick={() => {
+                  setSelectedCompletionIndex(index);
+                  acceptCompletion();
+                }}
+                onMouseEnter={() => setSelectedCompletionIndex(index)}
+              >
+                <span className="text-gray-400 dark:text-gray-500 text-xs mr-2">{index + 1}</span>
+                <code className={index === selectedCompletionIndex ? '' : 'text-gray-500 dark:text-gray-400'}>
+                  {candidate}
+                </code>
+              </div>
+            ))}
+          </div>
+        )}
         <button
           className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded hover:bg-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
           onClick={executeCommand}
