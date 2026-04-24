@@ -70,7 +70,7 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile, repoPath }) => {
 
   // Global click handler - keep focus on command input when clicking outside dialogs
   useEffect(() => {
-    const handleGlobalClick = (e: MouseEvent) => {
+    const handleGlobalClick = () => {
       // Don't steal focus if any dialog is open
       if (showCommitHistory || showOutputDialog || showSwitchBranch || commitMessageDialog.show || showDiffDialog || showDiffViewer) {
         return;
@@ -133,13 +133,6 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile, repoPath }) => {
   const isCompareCommand = (cmd: string): boolean => {
     const trimmed = cmd.trim().toLowerCase();
     return trimmed === 'compare';
-  };
-
-  const shouldShowDialog = (cmd: string): boolean => {
-    const trimmed = cmd.trim().toLowerCase();
-    // Already handled by specialized UI: git log, git branch (no args)
-    // All other commands should show output in dialog
-    return !isGitLogCommand(trimmed) && !isBranchCommand(trimmed);
   };
 
   const processCommand = (cmd: string): string => {

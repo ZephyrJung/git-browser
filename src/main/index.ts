@@ -1,6 +1,5 @@
 import { app, BrowserWindow, ipcMain, screen, dialog } from 'electron'
 import path from 'node:path'
-import { execSync } from 'child_process'
 import { spawn } from 'child_process'
 import { storageService } from './storage-service'
 import { gitService } from './git-service'
@@ -89,7 +88,6 @@ ipcMain.handle('execute-git-command', async (_event, repoPath, command): Promise
       command
     ], {
       cwd: repoPath,
-      encoding: 'utf-8',
     });
 
     let stdout = '';

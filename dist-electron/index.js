@@ -18312,8 +18312,7 @@ ipcMain.handle("execute-git-command", async (_event, repoPath, command) => {
       isWindows ? "/c" : "-c",
       command
     ], {
-      cwd: repoPath,
-      encoding: "utf-8"
+      cwd: repoPath
     });
     let stdout = "";
     let stderr = "";

@@ -290,10 +290,6 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
       setShowMergeResult(true);
       setLoading(false);
 
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
-
     } catch (e) {
       console.error('Merge failed:', e);
       setStatusMessage(`合并失败: ${String(e)}`);
@@ -1276,7 +1272,7 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
       )}
 
       {/* Merge Result Dialog - shows merged files */}
-      {showMergeResult && mergeResultFiles.length > 0 && (
+      {showMergeResult && (
         <div className={`fixed inset-0 ${isMergeMaximized ? '' : 'bg-black/50 flex items-center justify-center'} z-50`}>
           <div className={`bg-white dark:bg-gray-900 ${isMergeMaximized ? 'w-screen h-screen' : 'rounded-lg p-4 w-[90vw] h-[85vh]'} overflow-hidden flex flex-col`}>
             <div className={`flex justify-between items-center ${isMergeMaximized ? 'px-4 pt-3' : ''} mb-3`}>
