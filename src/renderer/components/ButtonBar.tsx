@@ -67,6 +67,7 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
   const [conflictLeftContent, setConflictLeftContent] = useState<string>('');
   const [conflictRightContent, setConflictRightContent] = useState<string>('');
   const [isMergeMaximized, setIsMergeMaximized] = useState(false);
+  const [isConflictScrollLocked, setIsConflictScrollLocked] = useState(false);
 
   // Close any open dialog on ESC key
   useEffect(() => {
@@ -456,6 +457,11 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
   const rightScrollRef = useRef<HTMLDivElement>(null);
   const isSyncingScroll = useRef(false);
 
+  // Conflict resolver scrolling refs
+  const conflictLeftScrollRef = useRef<HTMLDivElement>(null);
+  const conflictRightScrollRef = useRef<HTMLDivElement>(null);
+  const isConflictSyncingScroll = useRef(false);
+
   const handleSyncScroll = useCallback((source: 'left' | 'right') => {
     if (isSyncingScroll.current) return;
     isSyncingScroll.current = true;
@@ -472,6 +478,24 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
       isSyncingScroll.current = false;
     });
   }, []);
+
+  const handleConflictScroll = useCallback((source: 'left' | 'right') => {
+    if (!isConflictScrollLocked) return;
+    if (isConflictSyncingScroll.current) return;
+    isConflictSyncingScroll.current = true;
+
+    const sourceEl = source === 'left' ? conflictLeftScrollRef.current : conflictRightScrollRef.current;
+    const targetEl = source === 'left' ? conflictRightScrollRef.current : conflictLeftScrollRef.current;
+
+    if (sourceEl && targetEl) {
+      const ratio = sourceEl.scrollTop / (sourceEl.scrollHeight - sourceEl.clientHeight || 1);
+      targetEl.scrollTop = ratio * (targetEl.scrollHeight - targetEl.clientHeight);
+    }
+
+    requestAnimationFrame(() => {
+      isConflictSyncingScroll.current = false;
+    });
+  }, [isConflictScrollLocked]);
 
   // Memoize diff computation - only recompute when content changes
   const computedDiff = useMemo(() => {
@@ -1375,6 +1399,13 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
                   全部保留目标
                 </button>
                 <button
+                  className={`px-3 py-1 text-sm rounded ${isConflictScrollLocked ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'} hover:opacity-80`}
+                  onClick={() => setIsConflictScrollLocked(!isConflictScrollLocked)}
+                  title="行锁：同步左右滚动"
+                >
+                  {isConflictScrollLocked ? '🔗' : '⛓'} 行锁
+                </button>
+                <button
                   className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-lg px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                   onClick={() => setIsMergeMaximized(!isMergeMaximized)}
                 >
@@ -1425,7 +1456,9 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
                 <div className="flex flex-1 gap-0 overflow-hidden">
                   {/* Left column: target branch (HEAD) */}
                   <div
+                    ref={conflictLeftScrollRef}
                     className="flex-1 border border-gray-200 dark:border-gray-700 rounded-l overflow-y-auto"
+                    onScroll={() => handleConflictScroll('left')}
                   >
                     <div className="sticky top-0 bg-gray-50 dark:bg-gray-800 px-3 py-1.5 border-b border-gray-200 dark:border-gray-700 z-10">
                       <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
@@ -1442,7 +1475,9 @@ const ButtonBar: React.FC<ButtonBarProps> = ({ repoPath }) => {
 
                   {/* Right column: current branch */}
                   <div
+                    ref={conflictRightScrollRef}
                     className="flex-1 border border-gray-200 dark:border-gray-700 rounded-r overflow-y-auto"
+                    onScroll={() => handleConflictScroll('right')}
                   >
                     <div className="sticky top-0 bg-gray-50 dark:bg-gray-800 px-3 py-1.5 border-b border-gray-200 dark:border-gray-700 z-10">
                       <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
