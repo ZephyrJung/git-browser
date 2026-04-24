@@ -285,10 +285,12 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile, repoPath }) => {
 
     const lower = input.toLowerCase();
     const candidates: string[] = [];
+    const seen = new Set<string>();
 
     for (const [alias, fullCmd] of Object.entries(GIT_ALIASES)) {
-      if (alias.startsWith(lower) && fullCmd !== input) {
+      if (alias.startsWith(lower) && fullCmd !== input && !seen.has(fullCmd)) {
         candidates.push(fullCmd);
+        seen.add(fullCmd);
       }
     }
 
@@ -770,13 +772,12 @@ const CommandBar: React.FC<CommandBarProps> = ({ selectedFile, repoPath }) => {
                 className={`px-3 py-2 cursor-pointer text-sm ${
                   index === selectedCompletionIndex
                     ? 'bg-blue-500 text-white'
-                    : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300'
+                    : 'text-gray-600 dark:text-gray-300'
                 }`}
                 onClick={() => {
                   setSelectedCompletionIndex(index);
                   acceptCompletion();
                 }}
-                onMouseEnter={() => setSelectedCompletionIndex(index)}
               >
                 <span className="text-gray-400 dark:text-gray-500 text-xs mr-2">{index + 1}</span>
                 <code className={index === selectedCompletionIndex ? '' : 'text-gray-500 dark:text-gray-400'}>
